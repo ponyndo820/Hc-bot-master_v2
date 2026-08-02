@@ -3,89 +3,58 @@
      * By Heart candy 
   */
 import fs from 'fs';
+import os from 'os';
+import dns from 'dns';
 import './settings.js';
 import pino from 'pino';
 import path from 'path';
 import chalk from 'chalk';
+import axios from 'axios';
 import cron from 'node-cron';
 import handler from './Hc.js';
 import readline from 'readline';
-import makeWASocket, { 
-    DisconnectReason, 
-    useMultiFileAuthState, 
-    fetchLatestBaileysVersion, 
-    makeCacheableSignalKeyStore
-} from '@whiskeysockets/baileys';
+import makeWASocket, { DisconnectReason, useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore } from '@whiskeysockets/baileys';
 
-const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+import { dataBase, cmdDel, checkStatus } from './src/database.js;
+
+const require = createRequire(import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+let phoneNumber;
+let pairingStarted = false;
+const time_end = 60000 - (time_now.getSeconds() * 1000 + time_now.getMilliseconds());
+const tempDir = path.join(__dirname, 'database/temp');
+const question = (text) => new Promise((resolve) => rl.question(text, resolve))
 const question = (text) => new Promise((resolve) => rl.question(text, resolve));
-
-const dbFile = './database/database.json';
-const backupDir = './database/backup';
-
-if (!fs.existsSync(dbFile)) {
-    if (!fs.existsSync('./database')) {
-        fs.mkdirSync('./database', { recursive: true });
-    }
-    fs.writeFileSync(dbFile, JSON.stringify({ users: {}, stats: {} }, null, 2));
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+const pairingCode = process.argv.includes('--qr') ? false : process.argv.includes('--pairing-code') || global.pairing_code;
+const print = (label, value) => console.log(`${chalk.green.bold('||')} ${chalk.cyan.bold(label.padEnd(16)){chalk.yellow.bold(':')} ${value}`);
+const userInfoSyt = () => {
+ try {
+  return os.userInfo().username
+ } catch (e) 
+  return process.env.USER || process.env.USERNAME || 'unknown';
+ }
 }
 
-global.db = JSON.parse(fs.readFileSync(dbFile));
-global.saveDB = () => {
-    try {
-        fs.writeFileSync(dbFile, JSON.stringify(global.db, null, 2));
-    } catch (err) {
-        console.error('[DATABASE ERROR] Gagal menyimpan data ke database.json:', err);
-    }
-};
-if (!global.intervalSaveDB) {
-    global.intervalSaveDB = setInterval(() => {
-        if (typeof global.saveDB === 'function') {
-            global.saveDB();
-            console.log(chalk.green('[DATABASE]: Berhasil auto-save otomatis ke lokal.'));
-        }
-    }, 20000); 
+try {
+ dns.setServers(['8.8.8.8', '1.1.1.1']);
+ console.log(chalk.yellowBright('[SYSTEM] Custom DNS Google & Cloudflare.'));
+} catch (e) {
+ console.log(chalk.yellowBright('[SYSTEM] failed to custom DNS:'), e.message);
 }
 
-const autoBackup = () => {
-    if (!fs.existsSync(backupDir)) {
-        fs.mkdirSync(backupDir, { recursive: true });
-    }
-    const fileName = `database-${Date.now()}.json`;
-    const dest = path.join(backupDir, fileName);
+const storeDB = dataBase(global.tempatStore);
+const database = dataBase(global.tempatDB);
+const msgRetryCounterCache = new NodeCache();
 
-    try {
-        if (fs.existsSync(dbFile)) {
-            fs.copyFileSync(dbFile, dest);
-            console.log(`[BACKUP] Berhasil mencadangkan database: ${fileName}`);
-        }
-    } catch (err) {
-        console.error('[BACKUP ERROR] Gagal mencadangkan database:', err);
-    }
-};
-setInterval(autoBackup, 6 * 60 * 60 * 1000);
-cron.schedule('0 0 * * *', () => {
-    try {
-        const users = global.db.users;
-        let count = 0;
-        
-        if (users) {
-            for (let jid in users) {
-                if (users[jid] && !users[jid].isPremium) {
-                    users[jid].limit = 20; 
-                    count++;
-                }
-            }
-            global.saveDB();
-            console.log(`[RESET SYSTEM] Berhasil mereset limit harian untuk ${count} user.`);
-        }
-    } catch (err) {
-        console.error('[RESET ERROR] Gagal menjalankan reset limit otomatis:', err);
-    }
-}, {
-    scheduled: true,
-    timezone: "Asia/Jakarta"
-});
+
+
+
+
+
+
 
 function displaySystemInfo() {
     console.log(chalk.red.bold(`
