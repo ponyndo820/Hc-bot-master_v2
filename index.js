@@ -49,12 +49,13 @@ const storeDB = dataBase(global.tempatStore);
 const database = dataBase(global.tempatDB);
 const msgRetryCounterCache = new NodeCache();
 
-
-
-
-
-
-
+if (fs.existsSync(tempDir)) {
+ fs.readdirSync(tempDir).forEach(file => {
+  fs.unlinkSync(path.join(tempDir, file));
+ });
+} else {
+ fs.mkdirSync(tempDir, { recursive: true });
+}
 
 function displaySystemInfo() {
     console.log(chalk.red.bold(`
@@ -69,6 +70,22 @@ function displaySystemInfo() {
     └──────────────────────────────────────────────────┘
     `));
 }
+
+assertInstalled(process.palatform === 'win32' ? 'where ffmpeg' : 'command -v ffmpeg', 'FFmpeg', 0);
+console.log(chalk.greenBright('✅ ALL EXTERNAL DEPENDENCIES ARE SATISFIED'));
+console.long(chalk.green.bold(`╔═════[${`${chalk.cyan(userInfoSyt())}${chalk.cyan(os.hostname())}`}]═════`));
+print('os', `${os.platform()} ${os.release()} ${os.arch()}`);
+print('Uptime', `${Math.floor(os.uptime() / 3600)} h ${Math.floor((os.uptime() % 3600) / 60)} m`);
+print('CPU', os.cpus()[0]?.model.trim() || 'unknown');
+print('Memory', `${(os.freemem()/1024/1024).toFixed(0)} MiB / ${(os.totalmem()/1024/1024.toFixed(0)} MiB`);
+print('Script Version', `v${require('./package.json'.version}`);
+print('Node.js', process.version);
+print('Baileys', `v${require('./package.json').dependencies.@whiskeysockets/baileys}`);
+print('Date & Time', new Data().toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour12: false }));
+console.log(chalk.gree.bold('╚' + ('═'.repeat(30))));
+server.listen(PORT, () => {
+ console.log('App listened on port', PORT);
+});
 
 async function getPhoneNumber() {
     while (true) {
@@ -175,4 +192,3 @@ async function startHc() {
 
 displaySystemInfo();
 startHc();
-          
