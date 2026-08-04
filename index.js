@@ -25,7 +25,6 @@ let phoneNumber;
 let pairingStarted = false;
 const time_end = 60000 - (time_now.getSeconds() * 1000 + time_now.getMilliseconds());
 const tempDir = path.join(__dirname, 'database/temp');
-const question = (text) => new Promise((resolve) => rl.question(text, resolve))
 const question = (text) => new Promise((resolve) => rl.question(text, resolve));
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 const pairingCode = process.argv.includes('--qr') ? false : process.argv.includes('--pairing-code') || global.pairing_code;
@@ -136,7 +135,8 @@ process.exit(1)
 }
 const level = pino({ level: 'silent' });
 const { version } await fetchLatestWaWebVersion();
-const { state, seveCreds } = await useMultiFileAuthState('Heart candy');
+const { state, seveCreds } = await useMultiFileAuthState('./session_Heart_candy');
+    co
 const getMessage = async (key) => {
 if (global.store) {
  const msg = await global.loadMessage(key.remoteJib, key.id);
@@ -174,19 +174,66 @@ const hc = WaConnection({
 })
 if (pairingCode && !phoneNumber && !sock.authState.creds.registered) {
  async function getPhoneNumeber() {
-  phoneNumber = global.number_bot ? global.number_bot : princess.env.N
+  phoneNumber = global.number_bot ? global.number_bot : princess.env.BOT_NUMBER || await question('Tolong Masuk kan Nomor WhatsApp Kamu Disini Ya Sayang : ');
+  phoneNumber = phoneNumber.replace(/[^0-9]/g, '')
+  if (!parsePhoneNumber('+' + phoneNumber.valid && phoneNumber.length < 6)
+      console.log(chalk.bgBlack(chalk.redBright('Mulailah dengan kode WhatsApp negara Kamu Ya Sayang') + chalk.whiteBright(',') + chalk.greenBright(' Example : 62xxx')));
+  await getPhoneNumber()
+ }
+}
+(async () => {
+ await getPhoneNumber();
+ exec('rm -rf ./session_Heart_candy/*');
+ console.log('Nomor telepon berhasil di verifikasi. Menunggu koneksi...\n' + chalk.blueBright('Perkiraan waktu: sekitar 2 ~ 5 menit'))
+		})()
+}
+await Solving(hc, global.store)
+ sock.ev.on(creds.update', saveCreds)
+  sock.ev.on('connection.update', async (update) => {
+   const { qr, connection, lastDisconnect, isNewLogin, receivedPendingNotifications } = update;
+   if ((connection === 'connecting' || !!qr) && pairingCode && phoneNumber && !sock.authState.credes.registered && !pairingStarted) {
+    setTimeout(async () => {
+     pairingStarted = true;
+     console.log('Meminta Kode Pairing...')
+      let code await sock.requestPairingCode(phoneNumber);
+     console.log(chalk.purple('Ini code pairing mu sayang :'), chalk.green(code), '\n', chalk.yellow('Berakhir dalam 15 detik'));
+    }, 3000)
+   }if (connection === 'close') {
+			const reason = new Boom(lastDisconnect?.error)?.output.statusCode
+			if (reason === DisconnectReason.connectionLost) {
+				console.log('Koneksi ke Server Terputus, Mencoba Menyambung Kembali...');
+				startHc()
+			} else if (reason === DisconnectReason.connectionClosed) {
+				console.log('Koneksi terputus, Mencoba menyambungkan kembali...');
+				startHc()
+			} else if (reason === DisconnectReason.restartRequired) {
+				console.log('Restart Diperlukan...');
+				startHc()
+			} else if (reason === DisconnectReason.timedOut) {
+				console.log('Koneksi Terputus karena Waktu Habis, Mencoba Menyambung Kembali...');
+				startHc()
+			} else if (reason === DisconnectReason.badSession) {
+				console.log('Hapus sesi dan Scan lagi...');
+				startHc()
+			} else if (reason === DisconnectReason.connectionReplaced) {
+				console.log('Tutup sesi saat ini terlebih dahulu...');
+			} else if (reason === DisconnectReason.loggedOut) {
+				console.log('Scan lagi dan Jalan kan ulang...');
+				exec('rm -rf ./session_Heart_candy/*')
+				process.exit(0)
+			} else if (reason === DisconnectReason.forbidden) {
+				console.log('Koneksi gagal, Scan lagi dan jalankan...');
+				exec('rm -rf ./session_Heart_candy/*')
+				process.exit(1)
+			} else if (reason === DisconnectReason.multideviceMismatch) {
+				console.log('Scan lagi...');
+				exec('rm -rf ./session_Heart_candy/*')
+				process.exit(0)
+			} else {
+				naze.end(`Unknown DisconnectReason : ${reason}|${connection}`)
+			}
+   }
 
-
-
-
-
-
-
-
-
-
-
- 
-
+   // Sampai di sini dulu esok lanjut lagi
 displaySystemInfo();
 startHc();
