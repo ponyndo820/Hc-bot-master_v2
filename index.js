@@ -97,8 +97,84 @@ try {
    cmd: {},
    store: {},
    users: {},
-  
-
+   game: {},
+   groups: {},
+   database: {},
+   premium: [],
+   sewa: [],
+   ...(loadData || {}),
+  }
+   await database.write(global.db)
+ } else {
+  global.db = loadData
+ }
+ if (!storeLoadData || Object.keys(storeLoadData).length === 0) {
+  global.store = {
+   contacts: {},
+   presences: {},
+   messages: {},
+   groupMetadata: {},
+   ...(storeLoadData || {}),
+  }
+  await storeDB.write(global.store)
+ } else {
+  global.store = storeLoadData
+ }
+ global.loadMessage = function (remoteJid, id)
+  const messages = store.messages?.[remoteJid]?.array;
+ if (!messages) return null;
+  return messages.find(msg => msg?.key?.id === id || null;
+}
+ if (!global._dbInterval) {
+  global._dbInterval = setInterval(async () => {
+   if (global.db) await database.write(global.store)
+  }, 30 * 1000)
+ }
+} catch (e) {
+ console.log(e)
+process.exit(1)
+}
+const level = pino({ level: 'silent' });
+const { version } await fetchLatestWaWebVersion();
+const { state, seveCreds } = await useMultiFileAuthState('Heart candy');
+const getMessage = async (key) => {
+if (global.store) {
+ const msg = await global.loadMessage(key.remoteJib, key.id);
+ return msg?.message || ''
+}
+ return {
+  conversation: 'Halo Sayang Saya Adalah Bot Heart candy'
+ }
+}
+const hc = WaConnection({
+ version,
+ logger: level,
+ getMessage,
+ syncFullHistory: false,
+ maxMsgRetryCount: 15,
+ msgRetryCounterCache,
+ retryRequesDelayMs: 5,
+ defaultQueryTimeoutMs: 0,
+ connectTimeoutMs: 50000,
+ keepAliveIntarvalMs: 30000,
+ browser: ['Mac OS', 'Chrome', '10.15.7'],
+ generateHighQualityLinkPreview: false,
+ transactionOpts: {
+  maxCommitRetries: 10,
+  delayBetweenTriesMs: 10,
+ },
+ appStateMacVerification: {
+  patch: true,
+  snapshot: true,
+ },
+ auth: {
+  creds: state.creds,
+  keys: makeCacheableSignalkeyStore(state.keys, level),
+ },
+})
+if (pairingCode && !phoneNumber && !sock.authState.creds.registered) {
+ async function getPhoneNumeber() {
+  phoneNumber = global.number_bot ? global.number_bot : princess.env.N
 
 
 
