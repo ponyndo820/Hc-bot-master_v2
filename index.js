@@ -231,15 +231,15 @@ sock.ev.on('connection.update', async (update) => {
 				exec('rm -rf ./session_Heart_candy/*')
 				process.exit(0)
 			} else {
-				naze.end(`Unknown DisconnectReason : ${reason}|${connection}`)
+				sock.end(`Unknown DisconnectReason : ${reason}|${connection}`)
 			}
 		}
 		if (connection == 'open') {
-			console.log('Connected to : ' + JSON.stringify(naze.user, null, 2));
-			let botNumber = await naze.decodeJid(naze.user.id);
+			console.log('Connected to : ' + JSON.stringify(sock.user, null, 2));
+			let botNumber = await sock.decodeJid(sock.user.id);
 			if (global.db?.set[botNumber] && !global.db?.set[botNumber]?.join) {
 				if (my.ch.length > 0 && my.ch.includes('@newsletter')) {
-					if (my.ch) await naze.newsletterMsg(my.ch, { type: 'follow' }).catch(e => {})
+					if (my.ch) await sock.newsletterMsg(my.ch, { type: 'follow' }).catch(e => {})
 					db.set[botNumber].join = true
 				}
 			}
@@ -254,26 +254,26 @@ sock.ev.on('connection.update', async (update) => {
 		if (isNewLogin) console.log(chalk.green('[INFO] New device login detected...'))
 		if (receivedPendingNotifications == 'true') {
 			console.log(chalk.green('[INFO] Please wait About 1 Minute...'))
-			naze.ev.flush()
+			sock.ev.flush()
 		}
 	});
 sock.ev.on('call', async (call) => {
-		let botNumber = await naze.decodeJid(naze.user.id);
+		let botNumber = await sock.decodeJid(sock.user.id);
 		if (global.db?.set[botNumber]?.anticall) {
 			for (let id of call) {
 				if (id.status === 'offer') {
-					let msg = await naze.sendMessage(id.from, { text: `Saat Ini, Kami Tidak Dapat Menerima Panggilan ${id.isVideo ? 'Video' : 'Suara'}.\nJika @${id.from.split('@')[0]} Memerlukan Bantuan, Silakan Hubungi Owner :)`, mentions: [id.from]});
-					await naze.sendContact(id.from, global.owner, msg);
-					await naze.rejectCall(id.id, id.from)
+					let msg = await sock.sendMessage(id.from, { text: `Saat Ini, Kami Tidak Dapat Menerima Panggilan ${id.isVideo ? 'Video' : 'Suara'}.\nJika @${id.from.split('@')[0]} Memerlukan Bantuan, Silakan Hubungi Owner :)`, mentions: [id.from]});
+					await sock.sendContact(id.from, global.owner, msg);
+					await sock.rejectCall(id.id, id.from)
 				}
 			}
 		}
 	});
 	sock.ev.on('messages.upsert', async (message) => {
-		await MessagesUpsert(naze, message, global.store);
+		await MessagesUpsert(sock, message, global.store);
 	});
 	sock.ev.on('group-participants.update', async (update) => {
-		await GroupParticipantsUpdate(naze, update, global.store);
+		await GroupParticipantsUpdate(sock, update, global.store);
 	});
 	sock.ev.on('groups.update', (update) => {
 		for (const n of update) {
@@ -291,7 +291,7 @@ sock.ev.on('call', async (call) => {
 		cmdDel(global.db.hit);
 		console.log(chalk.cyan('[INFO] Reseted Limit Users'));
 		let user = Object.keys(global.db.users)
-		let botNumber = await naze.decodeJid(naze.user.id);
+		let botNumber = await sock.decodeJid(sock.user.id);
 		for (let jid of user) {
 			const limitUser = global.db.users[jid].vip ? global.limit.vip : checkStatus(jid, global.db.premium) ? global.limit.premium : global.limit.free
 			if (global.db.users[jid].limit < limitUser) global.db.users[jid].limit = limitUser
@@ -304,7 +304,7 @@ sock.ev.on('call', async (call) => {
 			}
 			for (let o of ownerNumber) {
 				try {
-					await naze.sendMessage(o, { document: fs.readFileSync(datanya), mimetype: 'application/json', fileName: new Date().toISOString().replace(/[:.]/g, '-') + '_database.json' })
+					await sock.sendMessage(o, { document: fs.readFileSync(datanya), mimetype: 'application/json', fileName: new Date().toISOString().replace(/[:.]/g, '-') + '_database.json' })
 					console.log(chalk.cyanBright(`[AUTO BACKUP] Backup success send to ${o}`));
 				} catch (e) {
 					console.error(chalk.cyanBright(`[AUTO BACKUP] Failed to Sending Backup ${o}:`, error));
@@ -330,7 +330,7 @@ sock.ev.on('call', async (call) => {
 					global.waktusholat[sholat] = hariIni
 					for (const [idnya, settings] of Object.entries(global.db.groups)) {
 						if (settings.waktusholat) {
-							await naze.sendMessage(idnya, { text: `Waktu *${sholat}* telah tiba, ambilah air wudhu dan segeralah shalat🙂.\n\n*${waktu.slice(0, 5)}*\n_untuk wilayah ${global.timezone} dan sekitarnya._` }, { ephemeralExpiration: store?.messages[idnya]?.array?.slice(-1)[0]?.metadata?.ephemeralDuration || 0 }).catch(e => {})
+							await sock.sendMessage(idnya, { text: `Waktu *${sholat}* telah tiba, ambilah air wudhu dan segeralah shalat🙂.\n\n*${waktu.slice(0, 5)}*\n_untuk wilayah ${global.timezone} dan sekitarnya._` }, { ephemeralExpiration: store?.messages[idnya]?.array?.slice(-1)[0]?.metadata?.ephemeralDuration || 0 }).catch(e => {})
 						}
 					}
 				}
@@ -340,11 +340,11 @@ sock.ev.on('call', async (call) => {
 	
 	if (!global._dbPresence) {
 		global._dbPresence = setInterval(async () => {
-			if (naze?.user?.id) await naze.sendPresenceUpdate('available', naze.decodeJid(naze.user.id)).catch(e => {})
+			if (sock?.user?.id) await sock.sendPresenceUpdate('available', sock.decodeJid(sock.user.id)).catch(e => {})
 		}, 10 * 60 * 1000);
 	}
 
-	return naze
+	return Hc
 
    // Sampai di sini dulu esok lanjut lagi
 displaySystemInfo();
