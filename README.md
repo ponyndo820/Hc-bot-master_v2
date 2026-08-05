@@ -4,8 +4,8 @@ Terimakasih telah mengunjungi repositori ini.
 
 INFORMASI UPDATE
 
-file: index.js
+file: index.js & package.json
 
-judul: Refactor connection update logic and improve logs
+judul: update
 
-deskripsi: Refactor connection update handling and improve pairing code logging.
+deskripsi: Sedikit Perubahan pada index.js dan penambahan beberapa modul di package.json.
