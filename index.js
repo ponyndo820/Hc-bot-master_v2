@@ -15,7 +15,7 @@ import handler from './Hc.js';
 import readline from 'readline';
 import makeWASocket, { DisconnectReason, useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore } from '@whiskeysockets/baileys';
 
-import { dataBase, cmdDel, checkStatus } from './src/database.js;
+import { dataBase, cmdDel, checkStatus } from './src/database.js';
 
 const require = createRequire(import.meta.url);
 const __filename = fileURLToPath(import.meta.url);
@@ -28,11 +28,11 @@ const tempDir = path.join(__dirname, 'database/temp');
 const question = (text) => new Promise((resolve) => rl.question(text, resolve));
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 const pairingCode = process.argv.includes('--qr') ? false : process.argv.includes('--pairing-code') || global.pairing_code;
-const print = (label, value) => console.log(`${chalk.green.bold('||')} ${chalk.cyan.bold(label.padEnd(16)){chalk.yellow.bold(':')} ${value}`);
+const print = (label, value) => console.log(`${chalk.green.bold('||')} ${chalk.cyan.bold(label.padEnd(16))}${chalk.yellow.bold(':')} ${value}`);
 const userInfoSyt = () => {
  try {
   return os.userInfo().username
- } catch (e) 
+ } catch (e) {
   return process.env.USER || process.env.USERNAME || 'unknown';
  }
 }
@@ -76,10 +76,10 @@ console.long(chalk.green.bold(`╔═════[${`${chalk.cyan(userInfoSyt())
 print('os', `${os.platform()} ${os.release()} ${os.arch()}`);
 print('Uptime', `${Math.floor(os.uptime() / 3600)} h ${Math.floor((os.uptime() % 3600) / 60)} m`);
 print('CPU', os.cpus()[0]?.model.trim() || 'unknown');
-print('Memory', `${(os.freemem()/1024/1024).toFixed(0)} MiB / ${(os.totalmem()/1024/1024.toFixed(0)} MiB`);
-print('Script Version', `v${require('./package.json'.version}`);
+print('Memory', `${(os.freemem()/1024/1024).toFixed(0)} MiB / ${(os.totalmem()/1024/1024).toFixed(0)} MiB`);
+print('Script version', `v${require('./package.json'). version}`);
 print('Node.js', process.version);
-print('Baileys', `v${require('./package.json').dependencies.@whiskeysockets/baileys}`);
+print('Baileys', `v${require('./package.json').dependencies.baileys}`);
 print('Date & Time', new Data().toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour12: false }));
 console.log(chalk.gree.bold('╚' + ('═'.repeat(30))));
 server.listen(PORT, () => {
@@ -119,10 +119,10 @@ try {
  } else {
   global.store = storeLoadData
  }
- global.loadMessage = function (remoteJid, id)
+ global.loadMessage = function (remoteJid, id) {
   const messages = store.messages?.[remoteJid]?.array;
  if (!messages) return null;
-  return messages.find(msg => msg?.key?.id === id || null;
+  return messages.find(msg => msg?.key?.id === id) || null;
 }
  if (!global._dbInterval) {
   global._dbInterval = setInterval(async () => {
@@ -134,7 +134,7 @@ try {
 process.exit(1)
 }
 const level = pino({ level: 'silent' });
-const { version } await fetchLatestWaWebVersion();
+const { version } = await fetchLatestWaWebVersion();
 const { state, seveCreds } = await useMultiFileAuthState('./session_Heart_candy');
     co
 const getMessage = async (key) => {
@@ -176,7 +176,7 @@ if (pairingCode && !phoneNumber && !sock.authState.creds.registered) {
  async function getPhoneNumeber() {
   phoneNumber = global.number_bot ? global.number_bot : princess.env.BOT_NUMBER || await question('Tolong Masuk kan Nomor WhatsApp Kamu Disini Ya Sayang : ');
   phoneNumber = phoneNumber.replace(/[^0-9]/g, '')
-  if (!parsePhoneNumber('+' + phoneNumber.valid && phoneNumber.length < 6)
+  if (!parsePhoneNumber('+' + phoneNumber).valid && phoneNumber.length < 6)
       console.log(chalk.bgBlack(chalk.redBright('Mulailah dengan kode WhatsApp negara Kamu Ya Sayang') + chalk.whiteBright(',') + chalk.greenBright(' Example : 62xxx')));
   await getPhoneNumber()
  }
@@ -199,10 +199,10 @@ sock.ev.on('connection.update', async (update) => {
 			console.log(chalk.blue('Ini Kode Pairing Mu Sayang :'), chalk.purple(code), '\n', chalk.yellow('Akan Kadaluarsa Dalam Waktu 15 detik'));
 		}, 3000)
 	}
-   }if (connection === 'close') {
+	if (connection === 'close') {
 			const reason = new Boom(lastDisconnect?.error)?.output.statusCode
 			if (reason === DisconnectReason.connectionLost) {
-				console.log('Koneksi ke Server Terputus, Mencoba Menyambung Kembali...');
+				console.log('Koneksi ke Server Terputus, Mencoba MenyambungKan Kembali..');
 				startHc()
 			} else if (reason === DisconnectReason.connectionClosed) {
 				console.log('Koneksi terputus, Mencoba menyambungkan kembali...');
@@ -211,19 +211,19 @@ sock.ev.on('connection.update', async (update) => {
 				console.log('Restart Diperlukan...');
 				startHc()
 			} else if (reason === DisconnectReason.timedOut) {
-				console.log('Koneksi Terputus karena Waktu Habis, Mencoba Menyambung Kembali...');
+				console.log('Koneksi Terputus karena Waktu Habis, Mencoba Menyambungkan Kembali...');
 				startHc()
 			} else if (reason === DisconnectReason.badSession) {
-				console.log('Hapus sesi dan Scan lagi...');
+				console.log('Hapus sesi dan scan lagi...');
 				startHc()
 			} else if (reason === DisconnectReason.connectionReplaced) {
 				console.log('Tutup sesi saat ini terlebih dahulu...');
 			} else if (reason === DisconnectReason.loggedOut) {
-				console.log('Scan lagi dan Jalan kan ulang...');
+				console.log('Scan lagi dan jalankan...');
 				exec('rm -rf ./session_Heart_candy/*')
 				process.exit(0)
 			} else if (reason === DisconnectReason.forbidden) {
-				console.log('Koneksi gagal, Scan lagi dan jalankan...');
+				console.log('Koneksi gagal, scan lagi dan jalankan...');
 				exec('rm -rf ./session_Heart_candy/*')
 				process.exit(1)
 			} else if (reason === DisconnectReason.multideviceMismatch) {
@@ -233,42 +233,118 @@ sock.ev.on('connection.update', async (update) => {
 			} else {
 				naze.end(`Unknown DisconnectReason : ${reason}|${connection}`)
 			}
-}
-if (connection == 'open') {
-	console.log('Connected to : ' + JSON.stringify(hc.user, null, 2));
-	let botNumber = await sock.decodeJid(hc.user.id);
-	if (global.db?.set[botNumber] && !global.db?.set[botNumber]?.join) {
-		if (my.ch.length > 0 && my.ch.includes('@newsletter')) {
-			if (my.ch) await sock.newsletterMsg(my.ch, { type: 'follow' }).catch(e => {})
-			db.set[botNumber].join = true
 		}
-	}
-}
-if (qr) {
-	if (!pairingCode) qrcode.generate(qr, { small: true })
-	app.use('/qr', async (req, res) => {
-		res.setHeader('content-type', 'image/png')
-		res.end(await toBuffer(qr))
+		if (connection == 'open') {
+			console.log('Connected to : ' + JSON.stringify(naze.user, null, 2));
+			let botNumber = await naze.decodeJid(naze.user.id);
+			if (global.db?.set[botNumber] && !global.db?.set[botNumber]?.join) {
+				if (my.ch.length > 0 && my.ch.includes('@newsletter')) {
+					if (my.ch) await naze.newsletterMsg(my.ch, { type: 'follow' }).catch(e => {})
+					db.set[botNumber].join = true
+				}
+			}
+		}
+		if (qr) {
+			if (!pairingCode) qrcode.generate(qr, { small: true })
+			app.use('/qr', async (req, res) => {
+				res.setHeader('content-type', 'image/png')
+				res.end(await toBuffer(qr))
+			});
+		}
+		if (isNewLogin) console.log(chalk.green('[INFO] New device login detected...'))
+		if (receivedPendingNotifications == 'true') {
+			console.log(chalk.green('[INFO] Please wait About 1 Minute...'))
+			naze.ev.flush()
+		}
 	});
-}
-if (isNewLogin) console.log(chalk.green('[INFO] Login perangkat baru terdeteksi...'))
-if (receivedPendingNotification == 'true') {
-	console.log(chalk.green('[INFO] Mohon tunggu sekitar 1 menit...'))
-	sock.ev.flush()
-}
-}
+sock.ev.on('call', async (call) => {
+		let botNumber = await naze.decodeJid(naze.user.id);
+		if (global.db?.set[botNumber]?.anticall) {
+			for (let id of call) {
+				if (id.status === 'offer') {
+					let msg = await naze.sendMessage(id.from, { text: `Saat Ini, Kami Tidak Dapat Menerima Panggilan ${id.isVideo ? 'Video' : 'Suara'}.\nJika @${id.from.split('@')[0]} Memerlukan Bantuan, Silakan Hubungi Owner :)`, mentions: [id.from]});
+					await naze.sendContact(id.from, global.owner, msg);
+					await naze.rejectCall(id.id, id.from)
+				}
+			}
+		}
+	});
+	sock.ev.on('messages.upsert', async (message) => {
+		await MessagesUpsert(naze, message, global.store);
+	});
+	sock.ev.on('group-participants.update', async (update) => {
+		await GroupParticipantsUpdate(naze, update, global.store);
+	});
+	sock.ev.on('groups.update', (update) => {
+		for (const n of update) {
+			if (global.store.groupMetadata[n.id]) {
+				Object.assign(global.store.groupMetadata[n.id], n);
+			} else global.store.groupMetadata[n.id] = n;
+		}
+	});
+	sock.ev.on('presence.update', (update) => {
+		const { id, presences } = update;
+		store.presences[id] = global.store.presences?.[id] || {};
+		Object.assign(global.store.presences[id], presences);
+	});
+	cron.schedule('00 00 * * *', async () => {
+		cmdDel(global.db.hit);
+		console.log(chalk.cyan('[INFO] Reseted Limit Users'));
+		let user = Object.keys(global.db.users)
+		let botNumber = await naze.decodeJid(naze.user.id);
+		for (let jid of user) {
+			const limitUser = global.db.users[jid].vip ? global.limit.vip : checkStatus(jid, global.db.premium) ? global.limit.premium : global.limit.free
+			if (global.db.users[jid].limit < limitUser) global.db.users[jid].limit = limitUser
+		}
+		if (global.db?.set[botNumber].autobackup) {
+			let datanya = './database/' + global.tempatDB;
+			if (global.tempatDB.startsWith('mongodb')) {
+				datanya = './database/backup_database.json';
+				fs.writeFileSync(datanya, JSON.stringify(global.db, null, 2), 'utf-8');
+			}
+			for (let o of ownerNumber) {
+				try {
+					await naze.sendMessage(o, { document: fs.readFileSync(datanya), mimetype: 'application/json', fileName: new Date().toISOString().replace(/[:.]/g, '-') + '_database.json' })
+					console.log(chalk.cyanBright(`[AUTO BACKUP] Backup success send to ${o}`));
+				} catch (e) {
+					console.error(chalk.cyanBright(`[AUTO BACKUP] Failed to Sending Backup ${o}:`, error));
+				}
+			}
+		}
+	}, {
+		scheduled: true,
+		timezone: global.timezone
+	});
+	if (!global.intervalSholat) global.intervalSholat = null;
+	if (!global.waktusholat) global.waktusholat = {};
+	if (global.intervalSholat) clearInterval(global.intervalSholat); 
+	setTimeout(() => {
+		global.intervalSholat = setInterval(async() => {
+			const sekarang = moment.tz(global.timezone);
+			const jamSholat = sekarang.format('HH:mm');
+			const hariIni = sekarang.format('YYYY-MM-DD');
+			const detik = sekarang.format('ss');
+			if (detik !== '00') return;
+			for (const [sholat, waktu] of Object.entries(global.jadwalSholat)) {
+				if (jamSholat === waktu && global.waktusholat[sholat] !== hariIni) {
+					global.waktusholat[sholat] = hariIni
+					for (const [idnya, settings] of Object.entries(global.db.groups)) {
+						if (settings.waktusholat) {
+							await naze.sendMessage(idnya, { text: `Waktu *${sholat}* telah tiba, ambilah air wudhu dan segeralah shalat🙂.\n\n*${waktu.slice(0, 5)}*\n_untuk wilayah ${global.timezone} dan sekitarnya._` }, { ephemeralExpiration: store?.messages[idnya]?.array?.slice(-1)[0]?.metadata?.ephemeralDuration || 0 }).catch(e => {})
+						}
+					}
+				}
+			}
+		}, 60000)
+	}, time_end);
+	
+	if (!global._dbPresence) {
+		global._dbPresence = setInterval(async () => {
+			if (naze?.user?.id) await naze.sendPresenceUpdate('available', naze.decodeJid(naze.user.id)).catch(e => {})
+		}, 10 * 60 * 1000);
+	}
 
-
-
-
-
-
-
-
-
-
-
-
+	return naze
 
    // Sampai di sini dulu esok lanjut lagi
 displaySystemInfo();
