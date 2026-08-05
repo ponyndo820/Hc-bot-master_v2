@@ -13,16 +13,20 @@ import axios from 'axios';
 import cron from 'node-cron';
 import handler from './Hc.js';
 import readline from 'readline';
+import NodeCache from 'node-cache'
+import { fileURLToPath } from 'url'
+import { createRequire } from 'module'
 import makeWASocket, { DisconnectReason, useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore } from '@whiskeysockets/baileys';
 
 import { dataBase, cmdDel, checkStatus } from './src/database.js';
 
 const require = createRequire(import.meta.url);
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = path.dirname(__filename);	
 
 let phoneNumber;
 let pairingStarted = false;
+const time_now = new Date()
 const time_end = 60000 - (time_now.getSeconds() * 1000 + time_now.getMilliseconds());
 const tempDir = path.join(__dirname, 'database/temp');
 const question = (text) => new Promise((resolve) => rl.question(text, resolve));
@@ -70,9 +74,9 @@ function displaySystemInfo() {
     `));
 }
 
-assertInstalled(process.palatform === 'win32' ? 'where ffmpeg' : 'command -v ffmpeg', 'FFmpeg', 0);
+assertInstalled(process.platform === 'win32' ? 'where ffmpeg' : 'command -v ffmpeg', 'FFmpeg', 0);
 console.log(chalk.greenBright('✅ ALL EXTERNAL DEPENDENCIES ARE SATISFIED'));
-console.long(chalk.green.bold(`╔═════[${`${chalk.cyan(userInfoSyt())}${chalk.cyan(os.hostname())}`}]═════`));
+console.log(chalk.green.bold(`╔═════[${`${chalk.cyan(userInfoSyt())}${chalk.cyan(os.hostname())}`}]═════`));
 print('os', `${os.platform()} ${os.release()} ${os.arch()}`);
 print('Uptime', `${Math.floor(os.uptime() / 3600)} h ${Math.floor((os.uptime() % 3600) / 60)} m`);
 print('CPU', os.cpus()[0]?.model.trim() || 'unknown');
@@ -80,8 +84,8 @@ print('Memory', `${(os.freemem()/1024/1024).toFixed(0)} MiB / ${(os.totalmem()/1
 print('Script version', `v${require('./package.json'). version}`);
 print('Node.js', process.version);
 print('Baileys', `v${require('./package.json').dependencies.baileys}`);
-print('Date & Time', new Data().toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour12: false }));
-console.log(chalk.gree.bold('╚' + ('═'.repeat(30))));
+print('Date & Time', new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour12: false }));
+console.log(chalk.green.bold('╚' + ('═'.repeat(30))));
 server.listen(PORT, () => {
  console.log('App listened on port', PORT);
 });
