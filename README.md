@@ -6,6 +6,6 @@ INFORMASI UPDATE
 
 file: index.js & package.json
 
-judul: update
+Perubahan: update
 
 deskripsi: Sedikit Perubahan pada index.js dan penambahan beberapa modul di package.json.
