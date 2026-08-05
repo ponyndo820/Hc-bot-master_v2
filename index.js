@@ -188,16 +188,17 @@ if (pairingCode && !phoneNumber && !sock.authState.creds.registered) {
 		})()
 }
 await Solving(hc, global.store)
- sock.ev.on(creds.update', saveCreds)
-  sock.ev.on('connection.update', async (update) => {
-   const { qr, connection, lastDisconnect, isNewLogin, receivedPendingNotifications } = update;
-   if ((connection === 'connecting' || !!qr) && pairingCode && phoneNumber && !sock.authState.credes.registered && !pairingStarted) {
-    setTimeout(async () => {
-     pairingStarted = true;
-     console.log('Meminta Kode Pairing...')
-      let code await sock.requestPairingCode(phoneNumber);
-     console.log(chalk.purple('Ini code pairing mu sayang :'), chalk.green(code), '\n', chalk.yellow('Berakhir dalam 15 detik'));
-    }, 3000)
+sock.ev.on('creds.update', saveCreds)
+sock.ev.on('connection.update', async (update) => {
+	const { qr, connection, lastDisconnect, isNewLogin, receivedpPendingNotifications } = update;
+	if ((connection === 'connecting' || !!qr) && pairingCode && phoneNumber && !sock.authState.creds.registered && !pairingStarted) {
+		setTimeout(async () => {
+			pairingStarted = true;
+			console.log('Meminta Kode Pairing...')
+			let code = await sock.requestPairingCode(phoneNumber);
+			console.log(chalk.blue('Ini Kode Pairing Mu Sayang :'), chalk.purple(code), '\n', chalk.yellow('Akan Kadaluarsa Dalam Waktu 15 detik'));
+		}, 3000)
+	}
    }if (connection === 'close') {
 			const reason = new Boom(lastDisconnect?.error)?.output.statusCode
 			if (reason === DisconnectReason.connectionLost) {
@@ -232,7 +233,42 @@ await Solving(hc, global.store)
 			} else {
 				naze.end(`Unknown DisconnectReason : ${reason}|${connection}`)
 			}
-   }
+}
+if (connection == 'open') {
+	console.log('Connected to : ' + JSON.stringify(hc.user, null, 2));
+	let botNumber = await sock.decodeJid(hc.user.id);
+	if (global.db?.set[botNumber] && !global.db?.set[botNumber]?.join) {
+		if (my.ch.length > 0 && my.ch.includes('@newsletter')) {
+			if (my.ch) await sock.newsletterMsg(my.ch, { type: 'follow' }).catch(e => {})
+			db.set[botNumber].join = true
+		}
+	}
+}
+if (qr) {
+	if (!pairingCode) qrcode.generate(qr, { small: true })
+	app.use('/qr', async (req, res) => {
+		res.setHeader('content-type', 'image/png')
+		res.end(await toBuffer(qr))
+	});
+}
+if (isNewLogin) console.log(chalk.green('[INFO] Login perangkat baru terdeteksi...'))
+if (receivedPendingNotification == 'true') {
+	console.log(chalk.green('[INFO] Mohon tunggu sekitar 1 menit...'))
+	sock.ev.flush()
+}
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
    // Sampai di sini dulu esok lanjut lagi
 displaySystemInfo();
