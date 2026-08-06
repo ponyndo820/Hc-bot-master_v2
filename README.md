@@ -4,11 +4,11 @@ Terimakasih telah mengunjungi repositori ini.
 
 INFORMASI UPDATE
 
-file: index.js, package.json, settings.js
+file: database.js
 
-perubahan: Code Error dan import beberapa modul tambah
+perubahan: Membuat database.js
 
-deskripsi: Perbaikan code index.js yang error dan meupdate settings.js. Menambah kan beberapa modul dependencies seperti @hapi/boom, qrcode-terminal, moment-timezone.
+deskripsi: database.js di gunakan untuk                                    dataBase,                                                                cmdAdd,                                                                  cmdDel,                                                                  cmdAddHit,                                                               addExpired,                                                              getPosition,                                                             getStatus,                                                       	      getExpired,                                                              checkStatus,                                                             getAllExpired,                                                           checkExpired
 
 run [
 
