@@ -193,7 +193,6 @@ if (pairingCode && !phoneNumber && !sock.authState.creds.registered) {
  exec('rm -rf ./session_Heart_candy/*');
  console.log('Nomor telepon berhasil di verifikasi. Menunggu koneksi...\n' + chalk.blueBright('Perkiraan waktu: sekitar 2 ~ 5 menit'))
 		})()
-}
 await Solving(sock, global.store)
 sock.ev.on('creds.update', saveCreds)
 sock.ev.on('connection.update', async (update) => {
@@ -351,7 +350,8 @@ sock.ev.on('call', async (call) => {
 		}, 10 * 60 * 1000);
 	}
 
-	return Hc
+	return sock;
+	}
 
    // Sampai di sini dulu esok lanjut lagi
 displaySystemInfo();
