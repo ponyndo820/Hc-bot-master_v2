@@ -10,7 +10,10 @@ global.author = 'Heart candy'
 global.botname = 'Hc-bot'
 global.packname = '@ponyndo'
 global.timezone = 'Asia/Jakarta'
+global.locale = 'en'
+global.listprefix = ['+',',','.','!']
 global.tempatDB = 'database.json'
+global.tempatStore = 'baileys_store.json'
 global.mode = 'public'
 
 global.fake = {

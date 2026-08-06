@@ -11,12 +11,16 @@ import path from 'path';
 import chalk from 'chalk';
 import axios from 'axios';
 import cron from 'node-cron';
-import handler from './Hc.js';
+import handler from './sock.js';
 import readline from 'readline';
+import { Boom } from '@hapi/boom';
 import NodeCache from 'node-cache'
 import { fileURLToPath } from 'url'
+import qrcode from 'qrcode-terminal';
+import moment from 'moment-timezone';
+import { exec } from 'child_process';
 import { createRequire } from 'module'
-import makeWASocket, { DisconnectReason, useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore } from '@whiskeysockets/baileys';
+import makeWASocket, { DisconnectReason, useMultiFileAuthState, Browser, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, jidNormalizedUser } from '@whiskeysockets/baileys';
 
 import { dataBase, cmdDel, checkStatus } from './src/database.js';
 
@@ -81,7 +85,7 @@ print('os', `${os.platform()} ${os.release()} ${os.arch()}`);
 print('Uptime', `${Math.floor(os.uptime() / 3600)} h ${Math.floor((os.uptime() % 3600) / 60)} m`);
 print('CPU', os.cpus()[0]?.model.trim() || 'unknown');
 print('Memory', `${(os.freemem()/1024/1024).toFixed(0)} MiB / ${(os.totalmem()/1024/1024).toFixed(0)} MiB`);
-print('Script version', `v${require('./package.json'). version}`);
+print('Script version', `v${require('./package.json').version}`);
 print('Node.js', process.version);
 print('Baileys', `v${require('./package.json').dependencies.baileys}`);
 print('Date & Time', new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour12: false }));
@@ -138,29 +142,28 @@ try {
 process.exit(1)
 }
 const level = pino({ level: 'silent' });
-const { version } = await fetchLatestWaWebVersion();
-const { state, seveCreds } = await useMultiFileAuthState('./session_Heart_candy');
-    co
+const { version } = await fetchLatestBaileysVersion();
+const { state, saveCreds } = await useMultiFileAuthState('./session_Heart_candy');
 const getMessage = async (key) => {
 if (global.store) {
- const msg = await global.loadMessage(key.remoteJib, key.id);
+ const msg = await global.loadMessage(key.remoteJid, key.id);
  return msg?.message || ''
 }
  return {
   conversation: 'Halo Sayang Saya Adalah Bot Heart candy'
  }
 }
-const hc = WaConnection({
+const sock = makeWASocket({
  version,
  logger: level,
  getMessage,
  syncFullHistory: false,
  maxMsgRetryCount: 15,
  msgRetryCounterCache,
- retryRequesDelayMs: 5,
+ retryRequestDelayMs: 5,
  defaultQueryTimeoutMs: 0,
  connectTimeoutMs: 50000,
- keepAliveIntarvalMs: 30000,
+ keepAliveIntervalMs: 30000,
  browser: ['Mac OS', 'Chrome', '10.15.7'],
  generateHighQualityLinkPreview: false,
  transactionOpts: {
@@ -173,12 +176,12 @@ const hc = WaConnection({
  },
  auth: {
   creds: state.creds,
-  keys: makeCacheableSignalkeyStore(state.keys, level),
+  keys: makeCacheableSignalKeyStore(state.keys, level),
  },
 })
 if (pairingCode && !phoneNumber && !sock.authState.creds.registered) {
- async function getPhoneNumeber() {
-  phoneNumber = global.number_bot ? global.number_bot : princess.env.BOT_NUMBER || await question('Tolong Masuk kan Nomor WhatsApp Kamu Disini Ya Sayang : ');
+ async function getPhoneNumber() {
+  phoneNumber = global.number_bot ? global.number_bot : process.env.BOT_NUMBER || await question('Tolong Masuk kan Nomor WhatsApp Kamu Disini Ya Sayang : ');
   phoneNumber = phoneNumber.replace(/[^0-9]/g, '')
   if (!parsePhoneNumber('+' + phoneNumber).valid && phoneNumber.length < 6)
       console.log(chalk.bgBlack(chalk.redBright('Mulailah dengan kode WhatsApp negara Kamu Ya Sayang') + chalk.whiteBright(',') + chalk.greenBright(' Example : 62xxx')));
@@ -191,7 +194,7 @@ if (pairingCode && !phoneNumber && !sock.authState.creds.registered) {
  console.log('Nomor telepon berhasil di verifikasi. Menunggu koneksi...\n' + chalk.blueBright('Perkiraan waktu: sekitar 2 ~ 5 menit'))
 		})()
 }
-await Solving(hc, global.store)
+await Solving(sock, global.store)
 sock.ev.on('creds.update', saveCreds)
 sock.ev.on('connection.update', async (update) => {
 	const { qr, connection, lastDisconnect, isNewLogin, receivedpPendingNotifications } = update;
