@@ -11,7 +11,6 @@ import path from 'path';
 import chalk from 'chalk';
 import axios from 'axios';
 import cron from 'node-cron';
-import handler from './sock.js';
 import readline from 'readline';
 import { Boom } from '@hapi/boom';
 import NodeCache from 'node-cache'
