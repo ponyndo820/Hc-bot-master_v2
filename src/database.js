@@ -2,7 +2,7 @@
      * database.js
      * By Heart candy 
   */
-import fs from 'fs;
+import fs from 'fs';
 import toMs from 'ms';
 import path from 'path';
 import '../settings.js';
@@ -44,7 +44,7 @@ class MongoDB {
             await mongoose.connect(this.url, { ...htis.options });
           }
           if (!this._model) {
-            const schema = new mongoos2.Schema({
+            const schema = new mongoose.Schema({
               data: { type: Object, required: true, default: {} }
             })
             this._model = mongoose.models.data || mongoose.model('data', schema);
@@ -59,8 +59,49 @@ class MongoDB {
           retries--;
         }
       }
+      this.isConnecting = false;
+      throw new Error('❌ Koneksi MongoDB gagal setelah beberapa kali percobaan.');
     }
-  )
+    read = async () => {
+      if (mongoose.connection.readyState !== 1 && !this.isConnecting) {
+        await this.connect();
+      }
+      let doc = await this._model.findOne({});
+      if (!doc) {
+        doc = new this._model({ data: {} });
+        await doc.save();
+      }
+      try {
+        return JSON.parse(doc.data);
+      } catch {
+        return doc.data || {};
+      }
+    }
+    write = async (data) => {
+      if (!data) return;
+      if (mongoose.connection.readyState !== 1 && !this.isConnecting) {
+        await this.connect();
+      }
+      const safeData = JSON.stringify(data, (key, value) => {
+        if (typeof value === 'object' && value !== null && value._id) {
+          return undefined;
+        }
+        if (typeof value === 'bigint') {
+          return value.toString();
+        }
+        return value;
+      });
+      await this._model.findOneAndUpdate({}, { data: safeData }, { upsert: true, new: true, setDefaultsOnInsert: true });
+    }
+}
+
+class JsonDB {
+  constructor(file = global.tempatDB) {
+    this.data = {}
+    this.file = path.join(process.cwd(), 'database', file);
+    this.isWriting = false;
+    this.writePending = false;
+  }
 }
 
 // Sampai di sini dulu Esok lanjut lagi
