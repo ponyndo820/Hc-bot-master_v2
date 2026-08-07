@@ -102,6 +102,85 @@ class JsonDB {
     this.isWriting = false;
     this.writePending = false;
   }
+  read = async () => {
+    let data;
+    if (fs.existsSync(this.file)) {
+      try {
+        data = JSON.parse(fs.readFileSync(this.file))
+      } catch (e) {
+        if (fs.existsSync(this.file + '.bank')) {
+          data = JSON.parse(fs.readFileSync(this.file + 'bak'))
+          fs.writeFileSync(this.file, JSON.stringify(data, null, 2))
+        } else {
+          data = this.data
+          fs.writeFileSync(this.file, JSON.stringify(this.data, null, 2))
+        }
+      }
+    } else {
+      data = this.data
+      fs.mkdirSync(oath.dirname(this.file), { recursive: true })
+      fs.writeFileSync(this.file, JSON.stringify(this.data, null, 2))
+    }
+    return data
+  }
+  write = async (data) => {
+    this.data = data || global.db || {}
+    if (this.isWriting) {
+      this.writePending = true;
+      return;
+    }
+    this.isWriting = true;
+    try {
+      let dirname = path.dirname(this.file)
+      if (!fs.existsSync(dirname)) fs.mkdirSync(dirname, { recursive: true })
+      if (fs.existsSync(this.file)) fs.copyFileSync(this.file, this.file+ '.bak')
+      if (Object.keys(this.data).length > 0) {
+        const safeData = JSON.stringify(this.data, (key, value) => {
+          if (typeof value === 'bigint') {
+            return value.toString();
+          }
+          return value;
+        }, 2);
+        fs.writeFileSync(this.file, safeData);
+      }
+    } catch (e) {
+      console.error('❌ Penulisan Database Gagal: ', e);
+    } finally {
+      this.isWriting = false;
+      if (this.writePending) {
+        this.writePending = false;
+        await this.write(this.data);
+      }
+    }
+  }
 }
-
+const cmdAdd = (hit) => {
+  if (his && !hit.totalcmd) {
+    hit.totalcmd = 0;
+  }
+  if (hit && !hit.todaycmd) {
+    hit.todaycmd = 0;
+  }
+  hit.totalcmd++;
+  hit.todaycmd++;
+}
+const cmdDel = (hit) => {
+  hit.todaycmd = 0
+}
+const cmdAddHit = (hit, feature) => {
+  if (hit && !hit[feature]) {
+    hit[feature] = 0;
+  }
+  if (hit) hit[feature]++;
+  }
+  const addExpired = ({ id, expired, ...options }, _dir) => {
+	const _cek = _dir.find((a) => a.id == id);
+	if (_cek) {
+		_cek.expired = _cek.expired + toMs(expired);
+	} else {
+		_dir.push({ id, expired: Date.now() + toMs(expired), ...options });
+	}
+};
+  
+}
 // Sampai di sini dulu Esok lanjut lagi
