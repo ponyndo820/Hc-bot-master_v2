@@ -23,6 +23,7 @@ fetchLatestBaileysVersion, makeCacheableSignalKeyStore,
 jidNormalizedUser } from '@whiskeysockets/baileys';
 
 import './settings.js';
+import { app, server, PORT } from './src/server.js';
 import { dataBase, cmdDel, checkStatus } from './src/database.js';
 import {assertInstalled, customHttpsAgent } from './lib/function.js';
 
