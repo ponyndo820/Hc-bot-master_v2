@@ -5,7 +5,6 @@
 import fs from 'fs';
 import os from 'os';
 import dns from 'dns';
-import './settings.js';
 import pino from 'pino';
 import path from 'path';
 import chalk from 'chalk';
@@ -23,7 +22,9 @@ import makeWASocket, { DisconnectReason, useMultiFileAuthState,
 fetchLatestBaileysVersion, makeCacheableSignalKeyStore,
 jidNormalizedUser } from '@whiskeysockets/baileys';
 
+import './settings.js';
 import { dataBase, cmdDel, checkStatus } from './src/database.js';
+import {assertInstalled, customHttpsAgent } from './lib/function.js';
 
 const require = createRequire(import.meta.url);
 const __filename = fileURLToPath(import.meta.url);
