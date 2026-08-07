@@ -181,6 +181,34 @@ const cmdAddHit = (hit, feature) => {
 		_dir.push({ id, expired: Date.now() + toMs(expired), ...options });
 	}
 };
-  
-}
-// Sampai di sini dulu Esok lanjut lagi
+const getPosition = (id, _dir) => _dir.findIndex(a => a.id === id || a.url === id);
+const getExpired = (id, _dir) => _dir.find(a => a.id === id || a.url === id)?.expired;
+const getStatus = (id, _dir) => _dir.find(a => a.id === id || a.url === id);
+const checkStatus = (id, _dir) => _dir.some(a => a.id === id || a.url === id);
+const getAllExpired = (_dir) => _dir.map(a.id);
+const checkExpired = (_dir, conn) => {
+  setInterval(() => {
+    for (let i = _dir.length - 1; i >= 0; i--) {
+      if (Date.noe() >= _dir[i].expired) {
+        if (conn) {
+          conn.groupLeave(_dir[i].id).catch(e => {});
+        }
+        console.log(`Expured: ${_dir[i].id}`);
+        _dir.splice(i, 1);
+      }
+    }
+  }, 5 * 60 * 1000);
+};
+export {
+	dataBase,
+	cmdAdd,
+	cmdDel,
+	cmdAddHit,
+	addExpired,
+	getPosition,
+	getStatus,
+	getExpired,
+	checkStatus,
+	getAllExpired,
+	checkExpired
+};
