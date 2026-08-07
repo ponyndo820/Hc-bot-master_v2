@@ -182,20 +182,19 @@ const sock = makeWASocket({
   keys: makeCacheableSignalKeyStore(state.keys, level),
  },
 })
-if (pairingCode && !phoneNumber && !sock.authState.creds.registered) {
  async function getPhoneNumber() {
   phoneNumber = global.number_bot ? global.number_bot : process.env.BOT_NUMBER || await question('Tolong Masuk kan Nomor WhatsApp Kamu Disini Ya Sayang : ');
   phoneNumber = phoneNumber.replace(/[^0-9]/g, '')
-  if (!parsePhoneNumber('+' + phoneNumber).valid && phoneNumber.length < 6)
+  if (phoneNumber.length < 6) {
       console.log(chalk.bgBlack(chalk.redBright('Mulailah dengan kode WhatsApp negara Kamu Ya Sayang') + chalk.whiteBright(',') + chalk.greenBright(' Example : 62xxx')));
-  await getPhoneNumber()
+  }
+      return await getPhoneNumber;
  }
-}
-(async () => {
- await getPhoneNumber();
+ if (pairingCode && !phoneNumber && !sock.authState.creds.registered) {
+ 	await getPhoneNumber();
  exec('rm -rf ./session_Heart_candy/*');
- console.log('Nomor telepon berhasil di verifikasi. Menunggu koneksi...\n' + chalk.blueBright('Perkiraan waktu: sekitar 2 ~ 5 menit'))
-		})()
+ console.log('Nomor telepon berhasil di verifikasi. Menunggu koneksi...\n' + chalk.blueBright('Perkiraan waktu: sekitar 2 ~ 5 menit'));
+}
 await Solving(sock, global.store)
 sock.ev.on('creds.update', saveCreds)
 sock.ev.on('connection.update', async (update) => {
