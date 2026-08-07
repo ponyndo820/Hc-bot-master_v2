@@ -19,7 +19,9 @@ import qrcode from 'qrcode-terminal';
 import moment from 'moment-timezone';
 import { exec } from 'child_process';
 import { createRequire } from 'module'
-import makeWASocket, { DisconnectReason, useMultiFileAuthState, Browser, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, jidNormalizedUser } from '@whiskeysockets/baileys';
+import makeWASocket, { DisconnectReason, useMultiFileAuthState,
+fetchLatestBaileysVersion, makeCacheableSignalKeyStore,
+jidNormalizedUser } from '@whiskeysockets/baileys';
 
 import { dataBase, cmdDel, checkStatus } from './src/database.js';
 
