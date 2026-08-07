@@ -41,7 +41,7 @@ class MongoDB {
         try {
           console.log(`🔄 Mencoba terhubung ke MongoDB... (Attempt ${6 - retries}/5)`);
           if (mongoose.connection.readyState === 0) {
-            await mongoose.connect(this.url, { ...htis.options });
+            await mongoose.connect(this.url, { ...this.options });
           }
           if (!this._model) {
             const schema = new mongoose.Schema({
@@ -118,7 +118,7 @@ class JsonDB {
       }
     } else {
       data = this.data
-      fs.mkdirSync(oath.dirname(this.file), { recursive: true })
+      fs.mkdirSync(path.dirname(this.file), { recursive: true })
       fs.writeFileSync(this.file, JSON.stringify(this.data, null, 2))
     }
     return data
@@ -154,8 +154,14 @@ class JsonDB {
     }
   }
 }
+const dataBase = (source) => {
+  if (/^mongodb(\+srv)?:\/\//i.test(source)) {
+    return new MongoDB(source);
+  }
+  return new JsonDB(source);
+}
 const cmdAdd = (hit) => {
-  if (his && !hit.totalcmd) {
+  if (hit && !hit.totalcmd) {
     hit.totalcmd = 0;
   }
   if (hit && !hit.todaycmd) {
@@ -185,11 +191,11 @@ const getPosition = (id, _dir) => _dir.findIndex(a => a.id === id || a.url === i
 const getExpired = (id, _dir) => _dir.find(a => a.id === id || a.url === id)?.expired;
 const getStatus = (id, _dir) => _dir.find(a => a.id === id || a.url === id);
 const checkStatus = (id, _dir) => _dir.some(a => a.id === id || a.url === id);
-const getAllExpired = (_dir) => _dir.map(a.id);
+const getAllExpired = (_dir) => _dir.map(a => a.id);
 const checkExpired = (_dir, conn) => {
   setInterval(() => {
     for (let i = _dir.length - 1; i >= 0; i--) {
-      if (Date.noe() >= _dir[i].expired) {
+      if (Date.now() >= _dir[i].expired) {
         if (conn) {
           conn.groupLeave(_dir[i].id).catch(e => {});
         }
