@@ -28,7 +28,7 @@ const reloadHandler = async () => {
   } catch (err) {
     console.error(chalk.redBright(`[ERROR] ${err}`));
   }
-}:
+};
 reloadHandler();
 
 // Sampai di sini dulu esok lanjut lagi 
