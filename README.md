@@ -10,22 +10,7 @@ perubahan: Membuat database.js
 
 deskripsi: database.js di gunakan untuk
 
-    dataBase,
-	cmdAdd,
-	cmdDel,
-	cmdAddHit,
-	addExpired,
-	getPosition,
-	getStatus,
-	getExpired,
-	checkStatus,
-	getAllExpired,
-	checkExpired,
-	
-run [
+Run ⬇️
 
-  yarn install or npm install
-  
-  yarn start or npm start
-  
-]
+	yarn install or npm install
+	yarn start or npm start
