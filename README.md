@@ -6,9 +6,9 @@ INFORMASI UPDATE
 
 file: database.js
 
-perubahan: Membuat database.js
+perubahan: -
 
-deskripsi: database.js di gunakan untuk
+deskripsi: -
 
 Run ⬇️
 
