@@ -23,3 +23,5 @@ Install pkg⬇️
 	pkg install ffmpeg
 	pkg install imagemagick
 	pkg install yarn
+	
+- [Follow akun ig ku](https://www.instagram.com/ponyndo1_original?igsh=NDZ0dmYwNDltZHFu)
