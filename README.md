@@ -24,4 +24,6 @@ Install pkg⬇️
 	pkg install imagemagick
 	pkg install yarn
 	
-- [Follow akun ig ku](https://www.instagram.com/ponyndo1_original?igsh=NDZ0dmYwNDltZHFu)
+- [Follow](https://www.instagram.com/ponyndo1_original?igsh=NDZ0dmYwNDltZHFu)
+- [Subscribe](https://youtube.com/@ponyndo?si=rMY2tSN5BbeNZWQ4)
+- [Follow our WhatsApp Channel](https://whatsapp.com/channel/0029Vb6en2iAu3aXA7AcFI0Y)
