@@ -12,7 +12,7 @@
   "author": "Heart candy",
   "license": "MIT",
   "type": "module",
-  "main": "index.js",
+  "main": "main.js",
   "directories": {
     "lib": "lib",
     "src": "src"
