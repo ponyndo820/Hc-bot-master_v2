@@ -15,11 +15,11 @@ Run ⬇️
 	yarn install or npm install
 	yarn start or npm start
 
-Install pkg ⬇️
+Install pkg⬇️
 
-pkg update && pkg upgrade
-pkg install git
-pkg install nodejs
-pkg install ffmpeg
-pkg install imagemagick
-pkg install yarn
+	pkg update && pkg upgrade
+	pkg install git
+	pkg install nodejs
+	pkg install ffmpeg
+	pkg install imagemagick
+	pkg install yarn
