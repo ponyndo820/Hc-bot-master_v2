@@ -14,6 +14,8 @@ global.locale = 'en'
 global.listprefix = ['+',',','.','!']
 global.tempatDB = 'database.json'
 global.tempatStore = 'baileys_store.json'
+global.pairing_code = true
+global.number_bot = ''
 global.mode = 'public'
 
 global.fake = {
