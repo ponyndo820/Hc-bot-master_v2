@@ -30,6 +30,7 @@ const reloadHandler = async () => {
   }
 };
 reloadHandler();*/
+
 async function GroupUpdate (sock, m, store) {
   function clearParse(parse) {
     try {
@@ -100,6 +101,51 @@ async function GroupUpdate (sock, m, store) {
           messageStubType: m.messageStubType, type,
           messageStubParameters: m.messageStubParameters,
         })
+      }
+    }
+  }
+}
+
+async function GroupParticipantsUpdate(sock, update, store) {
+  try {
+    const { id, participants, author, action } = update;
+    function updateAdminStatus(participants, metadataParticipants, status) {
+      for (const participants of metadataParticipants) {
+        if (participants.includes(jidNormalizedUser(participants.id)) || participants.includes(jidNormalizedUser(participantd.phoneNumber))) {
+          participant.admin = status;
+        }
+      }
+    }
+    if (global.db?.groups?.[id] && store?.groupMetadata?.[id]) {
+      const metadata = store.groupMetadata[id];
+      for (let n of participants) {
+        const jid = typeof n === 'string'
+        let profile;
+        try {
+          profile = await sock.profilePictureUrl(jid, 'image');
+        } catch {
+          profile = 'https://telegra.ph/file/95670d63378f7f4210f03.png';
+        }
+        let messagesText;
+        if (action === 'add') {
+          if (global.db.groups[id]?.welcome) messageText = global.db.groups[id].text?.setwelcome || `Welcome to ${meradata.subject}\n@`;
+          if (!participant) {
+            clearTimeout(groupMetadataTimers[id])
+            groupMetadataTimers[id] = setTimeout(async () => {
+              store.groupMetadata[id] = await sock.groupMetadata(id).catch(e => {{ ...store.groupMetadata[id]}));
+            }, 5000);
+          }
+        } else if (action === 'remove') {
+          if (global.db.groups[id]?.leave) messageText = global.db.groups[id]?.text?.setleave || `@\nLeaving From ${metadata.subject}`;
+          if ((jidNormalizedUser(sock.user.lid) == jidNormalizedUser(jid)) || (jidNormalizedUser(sock.user.id) == jidNormalizedUser(jid))) {
+            delete store.messages[id];
+            delete store.presences[id];
+            delete store.groupMetadata[id];
+          }
+          if(metadata) metadata.participants = metadata.participants.filter(p => !participants.includes(metadata.addressingMode === 'lid' ? jidNormalizedUser(p.id) : jidNormalizedUser(p.phoneNumber)));
+        } else if (action === 'promote') {
+          if (global.db.groups[id]?.promote) messageText = global.db.groups[id]?.text?.setpromote || `@\nPtomote From ${metadata.subject}\nBy @admin`;
+        }
       }
     }
   }
