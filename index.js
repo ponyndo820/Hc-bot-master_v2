@@ -26,7 +26,7 @@ import './settings.js';
 import { app, server, PORT } from './src/server.js';
 import { dataBase, cmdDel, checkStatus } from './src/database.js';
 import { assertInstalled, customHttpsAgent } from './lib/function.js';
-import { Solving } from './src/message.js';
+import { GroupUpdate, Solving } from './src/message.js';
 
 const require = createRequire(import.meta.url);
 const __filename = fileURLToPath(import.meta.url);
@@ -196,7 +196,7 @@ const sock = makeWASocket({
  exec('rm -rf ./session_Heart_candy/*');
  console.log('Nomor telepon berhasil di verifikasi. Menunggu koneksi...\n' + chalk.blueBright('Perkiraan waktu: sekitar 2 ~ 5 menit'));
 }
-await Solving(sock, global.store)
+//await Solving(sock, global.store)
 sock.ev.on('creds.update', saveCreds)
 sock.ev.on('connection.update', async (update) => {
 	const { qr, connection, lastDisconnect, isNewLogin, receivedpPendingNotifications } = update;
