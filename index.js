@@ -199,7 +199,7 @@ const sock = makeWASocket({
 //await Solving(sock, global.store)
 sock.ev.on('creds.update', saveCreds)
 sock.ev.on('connection.update', async (update) => {
-	const { qr, connection, lastDisconnect, isNewLogin, receivedpPendingNotifications } = update;
+	const { qr, connection, lastDisconnect, isNewLogin, receivedPendingNotifications } = update;
 	if ((connection === 'connecting' || !!qr) && pairingCode && phoneNumber && !sock.authState.creds.registered && !pairingStarted) {
 		setTimeout(async () => {
 			pairingStarted = true;
