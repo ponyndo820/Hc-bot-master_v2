@@ -205,7 +205,7 @@ sock.ev.on('connection.update', async (update) => {
 			pairingStarted = true;
 			console.log('Meminta Kode Pairing...')
 			let code = await sock.requestPairingCode(phoneNumber);
-			console.log(chalk.blue('Ini Kode Pairing Mu Sayang :'), chalk.purple(code), '\n', chalk.yellow('Akan Kadaluarsa Dalam Waktu 15 detik'));
+			console.log(chalk.blue('Ini Kode Pairing Mu Sayang :'), chalk.magenta(code), '\n', chalk.yellow('Akan Kadaluarsa Dalam Waktu 15 detik'));
 		}, 3000)
 	}
 	if (connection === 'close') {
