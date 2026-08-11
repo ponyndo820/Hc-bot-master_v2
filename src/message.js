@@ -39,46 +39,54 @@ async function GroupUpdate (sock, m, store) {
       return parse;
     }
   }
-  if (!m.messageStubType || !m.isGroup) return 
+  if (!m.messageStubType || !m.isGroup) return;
   if (global.db?.groups?.[m.chat] && store?.groupMetadata?.[m.chat]) {
-    const admin = `@${m.sender.split('@')[0]}`
+    const admin = `@${m.sender.split('@')[0]}`;
     const metadata = store.groupMetadata[m.chat];
     const normalizedTarget = clearParse(m.messageStubParameters[0]);
-    const type = m.messageStupType;
+    const type = m.messageStubType; // FIXED: Typo messageStupType
     const messages = {
       1: 'mereset link grup!',
-/*21*/      2: `megubah Subject Grup menjadi :\n*${normalizedTarget}*`,
-/*22*/      3: 'telah megubah icon grup.',
-/*23*/      4: 'mereset link grup!',
-/*24*/      5: `mengubah deskripsi grup.\n\n${normalizedTarget}`,
-/*25*/      6: `telah mengatur agar *${normalizedTarget == 'on' ? 'hanya admin' : 'semua peserta'}* yang dapat mengedit info grup.`,
-/*26*/      7: `telah *${normalizedTarget == 'on' ? 'menutup' : 'membuka'}* grup!\nSekarang ${normalizedTarget == 'on' ? 'hanya admin yang' : 'semua peserta'} dapat mengirim pesan.`,
-/*29*/      8: `telah menjadikan @${normalizedTarget?.id?.split('@')?.[0]} sebagai admin.`,
-/*30*/      9: `telah menghentikan @${normalizedTarget?.id?.split('@')?.[0]} dari admin.`,
- /*72*/     10: `mengubah durasi pesan sementara menjadi *@${normalizedTarget}*`,
-/*123*/      11: 'menonaktifkan pesan sementara.',
-/*132*/      12: 'mereset link grup!',
-/*172*/     13: `@${normalizedTarget.on?.split('@')?.[0]} meminta bergabung`,
+      2: `mengubah Subject Grup menjadi :\n*${normalizedTarget}*`,
+      3: 'telah mengubah icon grup.',
+      4: 'mereset link grup!',
+      5: `mengubah deskripsi grup.\n\n${normalizedTarget}`,
+      6: `telah mengatur agar *${normalizedTarget == 'on' ? 'hanya admin' : 'semua peserta'}* yang dapat mengedit info grup.`,
+      7: `telah *${normalizedTarget == 'on' ? 'menutup' : 'membuka'}* grup!\nSekarang ${normalizedTarget == 'on' ? 'hanya admin yang' : 'semua peserta'} dapat mengirim pesan.`,
+      8: `telah menjadikan @${normalizedTarget?.id?.split('@')?.[0]} sebagai admin.`,
+      9: `telah menghentikan @${normalizedTarget?.id?.split('@')?.[0]} dari admin.`,
+      10: `mengubah durasi pesan sementara menjadi *@${normalizedTarget}*`,
+      11: 'menonaktifkan pesan sementara.',
+      12: 'mereset link grup!',
+      13: `@${normalizedTarget.on?.split('@')?.[0]} meminta bergabung`,
     }
+    
     if (sock.public && global.db?.groups?.[m.chat]?.setinfo && messages[type]) {
-      await sock.sendMessage(m.chat, {text: `${admin} ${messages[type]}`, mentions: [m.sender, ...((normalizedTarget?.id || normalizedTarget)?.includes('@') ? [`${normalizedTarget.id || normalizedTarget}`] : [])].filter(Boolean)}, { eohemeralExpiration: m.expiration || m?.metadata?.ephemeralDuration || store?.messages[m.chat]?.array?.sice(-1)[0]?.metadata?.ephemeralDuration || 0 })
+      await sock.sendMessage(m.chat, {
+          text: `${admin} ${messages[type]}`, 
+          mentions: [m.sender, ...((normalizedTarget?.id || normalizedTarget)?.includes('@') ? [`${normalizedTarget.id || normalizedTarget}`] : [])].filter(Boolean)
+      }, { 
+          ephemeralExpiration: m.expiration || m?.metadata?.ephemeralDuration || store?.messages[m.chat]?.array?.slice(-1)[0]?.metadata?.ephemeralDuration || 0
+      });
     }
+    
     if (type === 20) {
       clearTimeout(groupMetadataTimers[m.chat])
       groupMetadataTimers[m.chat] = setTimeout(async () => {
         store.groupMetadata[m.chat] = await sock.groupMetadata(m.chat).catch(e => ({ ...store.groupMetadata[m.chat] }));
       }, 5000);
     } else if (type === 8 || type === 9) {
-      const target = jidNormalizedUser(normalizedTarget.id || normalizedTarget)
-      const newAdmunValue = type === 8 ? 'admin' : null
+      const target = jidNormalizedUser(normalizedTarget.id || normalizedTarget);
+      const newAdminValue = type === 8 ? 'admin' : null;
+      
       if (metadata?.participants?.length) {
         metadata.participants = metadata.participants.map(p => {
-          const key = metadata.addressingMode === 'lid'?jidNormalizedUser(p.id) : jidNormalizedUser(p.phoneNumber)
-          if (key === tatget) {
-            return { ...p, admin: newAdminValue }
+          const key = metadata.addressingMode === 'lid' ? jidNormalizedUser(p.id) : jidNormalizedUser(p.phoneNumber);
+          if (key === target) {
+            return { ...p, admin: newAdminValue };
           }
-          return p
-        })
+          return p;
+        });
       }
     } else if (type === 27) {
       if (!metadata.participants.some(a => (a.id === (normalizedTarget.id || normalizedTarget) || a.phoneNumber === (normalizedTarget.id || normalizedTarget)))) {
@@ -87,20 +95,20 @@ async function GroupUpdate (sock, m, store) {
           store.groupMetadata[m.chat] = await sock.groupMetadata(m.chat).catch(e => ({ ...store.groupMetadata[m.chat] }));
         }, 5000);
       } else if (type === 28 || type === 32) {
-        if (m.fromMe && ((jidNormalizedUser(sock.user.id) == (normalizedTarget.id || normalizedTarget)) || (jiNomalizedUser(sock.user.lid) == (normalizedTarget.id || normalizedTarget)))) {
+        if (m.fromMe && ((jidNormalizedUser(sock.user.id) == (normalizedTarget.id || normalizedTarget)) || (jidNormalizedUser(sock.user.lid) == (normalizedTarget.id || normalizedTarget)))) {
           delete store.messages[m.chat];
           delete store.presences[m.chat];
           delete store.groupMetadata[m.chat];
         }
         if(!!metadata) metadata.participants = metadata.participants.filter(p => {
-          const key = metadata.addressingMode === 'lid' ? jidNormalizedUser(p.id) : jidNormalizedUser(p.phoneNumber)
-          return key !== (normalizedTarget.id || normalizedTarget)
+          const key = metadata.addressingMode === 'lid' ? jidNormalizedUser(p.id) : jidNormalizedUser(p.phoneNumber);
+          return key !== (normalizedTarget.id || normalizedTarget);
         });
       } else {
-        consolelog({
+        console.log({
           messageStubType: m.messageStubType, type,
           messageStubParameters: m.messageStubParameters,
-        })
+        });
       }
     }
   }
@@ -109,30 +117,36 @@ async function GroupUpdate (sock, m, store) {
 async function GroupParticipantsUpdate(sock, update, store) {
   try {
     const { id, participants, author, action } = update;
-    function updateAdminStatus(participants, metadataParticipants, status) {
-      for (const participants of metadataParticipants) {
-        if (participants.includes(jidNormalizedUser(participants.id)) || participants.includes(jidNormalizedUser(participantd.phoneNumber))) {
+    
+    function updateAdminStatus(updateParticipants, metadataParticipants, status) {
+      for (const participant of metadataParticipants) {
+        if (updateParticipants.includes(jidNormalizedUser(participant.id)) || updateParticipants.includes(jidNormalizedUser(participant.phoneNumber))) {
           participant.admin = status;
         }
       }
     }
+
     if (global.db?.groups?.[id] && store?.groupMetadata?.[id]) {
       const metadata = store.groupMetadata[id];
+      
       for (let n of participants) {
-        const jid = typeof n === 'string'
+        const jid = typeof n === 'string' ? n : n.id;
         let profile;
         try {
           profile = await sock.profilePictureUrl(jid, 'image');
         } catch {
           profile = 'https://telegra.ph/file/95670d63378f7f4210f03.png';
         }
-        let messagesText;
+        
+        let messageText;
+        const participant = metadata?.participants?.find(p => p.id === jid);
+        
         if (action === 'add') {
-          if (global.db.groups[id]?.welcome) messageText = global.db.groups[id].text?.setwelcome || `Welcome to ${meradata.subject}\n@`;
+          if (global.db.groups[id]?.welcome) messageText = global.db.groups[id].text?.setwelcome || `Welcome to ${metadata.subject}\n@`;
           if (!participant) {
             clearTimeout(groupMetadataTimers[id])
             groupMetadataTimers[id] = setTimeout(async () => {
-              store.groupMetadata[id] = await sock.groupMetadata(id).catch(e => {{ ...store.groupMetadata[id]}));
+              store.groupMetadata[id] = await sock.groupMetadata(id).catch(e => ({ ...store.groupMetadata[id] }));
             }, 5000);
           }
         } else if (action === 'remove') {
@@ -142,17 +156,38 @@ async function GroupParticipantsUpdate(sock, update, store) {
             delete store.presences[id];
             delete store.groupMetadata[id];
           }
-          if(metadata) metadata.participants = metadata.participants.filter(p => !participants.includes(metadata.addressingMode === 'lid' ? jidNormalizedUser(p.id) : jidNormalizedUser(p.phoneNumber)));
+          if(metadata) metadata.participants = metadata.participants.filter(p => !participants.includes(metadata.addressingMode == 'lid' ? jidNormalizedUser(p.id) : jidNormalizedUser(p.phoneNumber)));
         } else if (action === 'promote') {
-          if (global.db.groups[id]?.promote) messageText = global.db.groups[id]?.text?.setpromote || `@\nPtomote From ${metadata.subject}\nBy @admin`;
+          if (global.db.groups[id]?.promote) messageText = global.db.groups[id]?.text?.setpromote || `#\nPromote From ${metadata.subject}\nBy @admin`;
+          updateAdminStatus(participants, metadata.participants, 'admin');
+        }
+
+        if (messageText && sock.public) {
+          await sock.sendMessage(id, {
+            text: messageText.replace('@subject', metadata.subject).replace('@admin', author ? `@${author.split('@')[0]}` : '@admin').replace(/(?<=\s|^)@(?!\w)/g, `@${jid.split('@')[0]}`),
+            contextInfo: {
+              mentionedJid: [jid, author].filter(Boolean),
+              externalAdReply: {
+                title: action == 'add' ? 'Welcome' : action == 'remove' ? 'Leaving' : action.charAt(0).toUpperCase() + action.slice(1),
+                mediaType: 1,
+                previewType: 0,
+                thumbnailUrl: profile,
+                renderLargerThumbnail: true,
+                sourceUrl: global.my?.gh || '' 
+              }
+            }
+          }, { ephemeralExpiration: metadata?.ephemeralDuration || store?.messages[id]?.array?.slice(-1)[0]?.metadata?.ephemeralDuration || 0 });
         }
       }
     }
+  } catch (e) {
+    throw e;
   }
 }
-
+  
 export {
   GroupUpdate,
+  GroupParticipantsUpdate,
 }
 // Follow akun ig ponyndo1_original dulu gak sih
 // Sampai di sini dulu esok lanjut lagi 
