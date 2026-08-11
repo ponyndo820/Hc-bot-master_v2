@@ -40,21 +40,6 @@ const tempDir = path.join(__dirname, 'database/temp');
 const question = (text) => new Promise((resolve) => rl.question(text, resolve));
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 const pairingCode = process.argv.includes('--qr') ? false : process.argv.includes('--pairing-code') || global.pairing_code;
-const print = (label, value) => console.log(`${chalk.green.bold('||')} ${chalk.cyan.bold(label.padEnd(16))}${chalk.yellow.bold(':')} ${value}`);
-const userInfoSyt = () => {
- try {
-  return os.userInfo().username
- } catch (e) {
-  return process.env.USER || process.env.USERNAME || 'unknown';
- }
-}
-
-try {
- dns.setServers(['8.8.8.8', '1.1.1.1']);
- console.log(chalk.yellowBright('[SYSTEM] Custom DNS Google & Cloudflare.'));
-} catch (e) {
- console.log(chalk.yellowBright('[SYSTEM] failed to custom DNS:'), e.message);
-}
 
 const storeDB = dataBase(global.tempatStore);
 const database = dataBase(global.tempatDB);
@@ -80,6 +65,21 @@ function displaySystemInfo() {
     │                  By Heart candy                  │
     └──────────────────────────────────────────────────┘
     `));
+}
+const print = (label, value) => console.log(`${chalk.green.bold('||')} ${chalk.cyan.bold(label.padEnd(16))}${chalk.yellow.bold(':')} ${value}`);
+const userInfoSyt = () => {
+ try {
+  return os.userInfo().username
+ } catch (e) {
+  return process.env.USER || process.env.USERNAME || 'unknown';
+ }
+}
+
+try {
+ dns.setServers(['8.8.8.8', '1.1.1.1']);
+ console.log(chalk.yellowBright('[SYSTEM] Custom DNS Google & Cloudflare.'));
+} catch (e) {
+ console.log(chalk.yellowBright('[SYSTEM] failed to custom DNS:'), e.message);
 }
 displaySystemInfo();
 assertInstalled(process.platform === 'win32' ? 'where ffmpeg' : 'command -v ffmpeg', 'FFmpeg', 0);
