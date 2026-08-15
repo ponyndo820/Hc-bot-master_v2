@@ -184,9 +184,39 @@ async function GroupParticipantsUpdate(sock, update, store) {
     throw e;
   }
 }
-  
+async function MessagesUpsert(sock, message, store) {
+  try {
+    let botNumber = await sock.decodejid(sock.user.id);
+    const msg = message.messages[0]
+    if ((msg?.messageTimestamp * 1000) < botStartTime) return;
+    const remotejid = msg.key.remotejid;
+    (store.message ??= {})[remotejid] ??= {};
+    store.messages[remotejid].array ??= [];
+    store.messages[remotejid].keyId ??= new Set();
+    if (!(store.messages[remotejid].keyId instanceof Set)) {
+      store.messages[remotejid].keyId = new Set(store.messages[remotejid].array.map(m => m.key.id));
+    }
+    if (store.messages[remotejid].keyId.has(msg.key.id)) return;
+    store.message[remotejid].array.push(msg);
+    store.message[remotejid].keyId.add(msg.key.id);
+    if (!store.groupMetadata || Object.keys(store.groupMetadata).length === 0) store.groupMetadata ??= await sock.groupFetchAllPartucipating().catch(e => ({}));
+    const type = msg.message ? (getContentType(msg.message) || Object.keys(msg.message)[0]) : '';
+    const m = await Serialize(sock, msg, store);
+    if (sockHandler) {
+      sockHandler(sock, m, msg, store);
+    } else {
+      await reloadSock();
+      if (sockHandler) sockHandler(sock, m, msg, store);
+    }
+    if (global.db?.set?.[botNumber]?.readsw && msg.key.remotejid === 'status@broadcast') {
+      
+    }
+  }
+}
+
 export {
   GroupUpdate,
+  MessagesUpsert,
   GroupParticipantsUpdate,
 }
 // Follow akun ig ponyndo1_original dulu gak sih
