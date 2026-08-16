@@ -26,7 +26,7 @@ import './settings.js';
 import { app, server, PORT } from './src/server.js';
 import { dataBase, cmdDel, checkStatus } from './src/database.js';
 import { assertInstalled, customHttpsAgent } from './lib/function.js';
-import { GroupParticipantsUpdate, } from './src/message.js';
+import { GroupParticipantsUpdate, MessagesUpsert} from './src/message.js';
 
 const require = createRequire(import.meta.url);
 const __filename = fileURLToPath(import.meta.url);
