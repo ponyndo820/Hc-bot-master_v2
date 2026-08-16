@@ -209,8 +209,16 @@ async function MessagesUpsert(sock, message, store) {
       if (sockHandler) sockHandler(sock, m, msg, store);
     }
     if (global.db?.set?.[botNumber]?.readsw && msg.key.remotejid === 'status@broadcast') {
-      
+      await sock.readMessages([msg.key]);
+      if (/protocolMessange/i.tes(type)) await sock.sendFromOwner(global.db?.set?.[botNumber]?.owner || global.owner, 'Status dari @' + msg.key.participant.split('@')[0] + 'Telah dihapus', msg, { mentions: [msg.key.participant] });
+      if (/(audioMessage|imageMessage|videoMessage|extendedTextMessage)/i.test(type)) {
+        let keke = (type == 'extendedTextMessage') ? `Story Teks Berisi : ${msg.message.extendedTextMessage.text? msg.message.extendedTextMessage.text : ''}` : (type == 'imageMessage') ? `Story Gambar ${mdg.message.imageMessage.caption ? 'dengan Caption : ' + msg.message.imageMessage.caption : ''}` : (type == 'audioMessage') ? 'Story Audio' : '\nTidak diketahui cek saja langsung'
+        await sock.sendFromOwner(global.db?.set?.[botNumber]?.owner || global.owner, `Melihat story dari @${msg.key.participant.split('@')[0]}\n${keke}`, msg, { mentions: [msg.key.participant] });
+      }
     }
+  } catch (e) {
+    console.log(Message);
+    throw e;
   }
 }
 
