@@ -186,7 +186,7 @@ async function GroupParticipantsUpdate(sock, update, store) {
 }
 async function MessagesUpsert(sock, message, store) {
   try {
-    let botNumber = await sock.decodejid(sock.user.id);
+    let botNumber = await jidNormalizedUser(sock.user.id);
     const msg = message.messages[0]
     if ((msg?.messageTimestamp * 1000) < botStartTime) return;
     const remotejid = msg.key.remotejid;

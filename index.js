@@ -245,7 +245,7 @@ sock.ev.on('connection.update', async (update) => {
 		}
 		if (connection == 'open') {
 			console.log('Connected to : ' + JSON.stringify(sock.user, null, 2));
-			let botNumber = await sock.decodeJid(sock.user.id);
+			let botNumber = await jidNormalizedUser(sock.user.id);
 			if (global.db?.set[botNumber] && !global.db?.set[botNumber]?.join) {
 				if (my.ch.length > 0 && my.ch.includes('@newsletter')) {
 					if (my.ch) await sock.newsletterMsg(my.ch, { type: 'follow' }).catch(e => {})
@@ -267,7 +267,7 @@ sock.ev.on('connection.update', async (update) => {
 		}
 	});
 sock.ev.on('call', async (call) => {
-		let botNumber = await sock.decodeJid(sock.user.id);
+		let botNumber = await jidNormalizedUser(sock.user.id);
 		if (global.db?.set[botNumber]?.anticall) {
 			for (let id of call) {
 				if (id.status === 'offer') {
@@ -300,7 +300,7 @@ sock.ev.on('call', async (call) => {
 		cmdDel(global.db.hit);
 		console.log(chalk.cyan('[INFO] Reseted Limit Users'));
 		let user = Object.keys(global.db.users)
-		let botNumber = await sock.decodeJid(sock.user.id);
+		let botNumber = await jidNormalizedUser(sock.user.id);
 		for (let jid of user) {
 			const limitUser = global.db.users[jid].vip ? global.limit.vip : checkStatus(jid, global.db.premium) ? global.limit.premium : global.limit.free
 			if (global.db.users[jid].limit < limitUser) global.db.users[jid].limit = limitUser
@@ -349,7 +349,7 @@ sock.ev.on('call', async (call) => {
 	
 	if (!global._dbPresence) {
 		global._dbPresence = setInterval(async () => {
-			if (sock?.user?.id) await sock.sendPresenceUpdate('available', sock.decodeJid(sock.user.id)).catch(e => {})
+			if (sock?.user?.id) await sock.sendPresenceUpdate('available', jidNormalizedUser(sock.user.id)).catch(e => {})
 		}, 10 * 60 * 1000);
 	}
 
