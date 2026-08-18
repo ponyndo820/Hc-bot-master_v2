@@ -16,7 +16,7 @@ import { printMessageLog } from './lib/function.js';
 import { loadDatabase, saveDatabase } from './src/database.js';
 
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-const question = (text) => new Promise((resolve) => rl.question(text, resoleve));
+const question = (text) => new Promise((resolve) => rl.question(text, resolve));
 
 function displaySystemInfo() {
     console.log(chalk.red.bold(`
