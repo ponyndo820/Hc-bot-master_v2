@@ -1,0 +1,406 @@
+{
+  "creator": "Heart candy",
+  "deskripsi": "Nih quotes dari gw, Bacalah kata-kata mutiara ku",
+  "quotes": [
+    {
+      "id": 1,
+      "quotes": "Hidup itu indah Kalau kamu bisa menikmati nya"
+    },
+    {
+      "id": 2,
+      "quotes": "Santai aja bro setiap maslahah pasti ada solusi nya"
+    },
+    {
+      "id": 3,
+      "quotes": "Hidup itu seperti coffe ☕ rasanya pahit tapi kalau di nikmati secara perlahan pasti akan habis"
+    },
+    {
+      "id": 4,
+      "quotes": "Berusaha lah untuk mendapatkan apa yang kau inginkan, kalau duduk diam saja tidak ada gunanya"
+    },
+    {
+      "id": 5,
+      "quotes": "Kamu gak akan bisa maju kalau kamu terus menyia-nyiakan waktu"
+    },
+    {
+      "id": 6,
+      "quotes": "Habis kan dulu coffe mu baju lanjut kerja"
+    },
+    {
+      "id": 7,
+      "quotes": "Tidur dulu bro soal uang bisa dicari esok"
+    },
+    {
+      "id": 8,
+      "quotes": "Cari lah teman yang benar-benar bisa menolong mu saat dirimu sedang berada di titik terendah hidup mu"
+    },
+    {
+      "id": 9,
+      "quotes": "Masalah uang memang bisa membuat keluarga renggang"
+    },
+    {
+      "id": 10,
+      "quotes": "Sini bro Kita bersantai sambil minum kopi dan saling berbagi cerita"
+    },
+    {
+      "id": 11,
+      "quotes": "Hall yang paling menenangkan ada lah duduk di teras rumah di temani oleh segelas kopi hangat dan gorengan pisang"
+    },
+    {
+      "id": 12,
+      "quotes": "Jangan terlalu memikirkan perkataan orang lain yang tidak suka dengan kesuksesanmu"
+    },
+    {
+      "id": 13,
+      "quotes": "Fokus pada prosesmu sendiri, tidak usah membandingkan hidupmu dengan orang lain di media sosial"
+    },
+    {
+      "id": 14,
+      "quotes": "Kegagalan itu cuma cara semesta menyuruhmu untuk mencoba lagi dengan cara yang lebih baik"
+    },
+    {
+      "id": 15,
+      "quotes": "Rokok sebatang dan secangkir kopi hitam cukup buat menemani malam yang sunyi ini"
+    },
+    {
+      "id": 16,
+      "quotes": "Loyalitas itu mahal, jangan harapkan dari orang murahan"
+    },
+    {
+      "id": 17,
+      "quotes": "Hati yang tenang adalah harta yang paling berharga di dunia ini"
+    },
+    {
+      "id": 18,
+      "quotes": "Jangan pernah berjanji jika kamu tahu kamu tidak bisa menepatinya"
+    },
+    {
+      "id": 19,
+      "quotes": "Waktu terus berjalan, jangan habiskan untuk hal-hal yang tidak ada gunanya"
+    },
+    {
+      "id": 20,
+      "quotes": "Kopi dingin ini mengingatkan ku pada kenangan lama yang sudah berlalu"
+    },
+    {
+      "id": 21,
+      "quotes": "Kerja keras itu penting, tapi jangan lupa istirahat supaya badan tidak tumbang"
+    },
+    {
+      "id": 22,
+      "quotes": "Senyuman palsu terkadang jadi topeng terbaik untuk menutupi rasa lelah"
+    },
+    {
+      "id": 23,
+      "quotes": "Jadilah diri sendiri tanpa harus pura-pura menjadi orang lain demi disukai"
+    },
+    {
+      "id": 24,
+      "quotes": "Rezeki sudah ada yang mengatur, tugas kita cuma ikhtiar dan berdoa"
+    },
+    {
+      "id": 25,
+      "quotes": "Jangan menunda pekerjaan hari ini kalau bisa dikerjakan sekarang juga"
+    },
+    {
+      "id": 26,
+      "quotes": "Sahabat sejati itu selalu ada di saat suka maupun duka, bukan pas lagi butuhnya doang"
+    },
+    {
+      "id": 27,
+      "quotes": "Nikmati prosesnya walau melelahkan, karena hasil tidak akan pernah mengkhianati usaha"
+    },
+    {
+      "id": 28,
+      "quotes": "Uang memang bukan segalanya, tapi segalanya butuh uang bro"
+    },
+    {
+      "id": 29,
+      "quotes": "Malam minggu di rumah sambil ngopi lebih tenang daripada keluar bikin macet jalanan"
+    },
+    {
+      "id": 30,
+      "quotes": "Hidup itu pilihan, mau jadi penonton atau pemain utama di panggungmu sendiri"
+    },
+    {
+      "id": 31,
+      "quotes": "Jaga lisanmu karena lidah lebih tajam daripada silet"
+    },
+    {
+      "id": 32,
+      "quotes": "Kesabaran adalah kunci utama dalam menghadapi kerasnya dunia"
+    },
+    {
+      "id": 33,
+      "quotes": "Gagal sekali bukan berarti gagal untuk selamanya, bangkit lagi kawan!"
+    },
+    {
+      "id": 34,
+      "quotes": "Syukuri apa yang ada hari ini, esok adalah misteri baru"
+    },
+    {
+      "id": 35,
+      "quotes": "Jangan mudah percaya pada janji manis sebelum ada bukti nyata"
+    },
+    {
+      "id": 36,
+      "quotes": "Mending diam dan bekerja dalam sunyi biarlah kesuksesan yang berbicara"
+    },
+    {
+      "id": 37,
+      "quotes": "Roda itu berputar, kadang di atas kadang di bawah, jalani saja dengan ikhlas"
+    },
+    {
+      "id": 38,
+      "quotes": "Pikiran yang bersih bermula dari hati yang tidak pendendam"
+    },
+    {
+      "id": 39,
+      "quotes": "Secangkir kopi di pagi hari bisa membangkitkan semangat yang sempat padam"
+    },
+    {
+      "id": 40,
+      "quotes": "Belajarlah mengalah untuk menang, kadang keras kepala justru menjatuhkanmu"
+    },
+    {
+      "id": 41,
+      "quotes": "Hargai orang yang menghargai keberadaanmu, abaikan yang tidak peduli"
+    },
+    {
+      "id": 42,
+      "quotes": "Capek ya? Sini istirahat dulu, dunia gak akan kiamat kok kalau kamu rehat sejenak"
+    },
+    {
+      "id": 43,
+      "quotes": "Ilmu padi itu nyata, semakin berisi semakin merunduk"
+    },
+    {
+      "id": 44,
+      "quotes": "Jangan biarkan komentar negatif orang lain menghentikan langkah kakimu"
+    },
+    {
+      "id": 45,
+      "quotes": "Hidup itu singkat, jangan diisi dengan rasa benci dan iri dengki"
+    },
+    {
+      "id": 46,
+      "quotes": "Malam ini udaranya dingin banget, paling enak nyeruput kopi hangat sambil dengerin musik"
+    },
+    {
+      "id": 47,
+      "quotes": "Berani mengambil risiko adalah langkah awal menuju perubahan besar"
+    },
+    {
+      "id": 48,
+      "quotes": "Terkadang diam adalah jawaban terbaik untuk menghadapi orang yang sok tahu"
+    },
+    {
+      "id": 49,
+      "quotes": "Tetaplah rendah hati meskipun kedudukanmu sudah di atas awan"
+    },
+    {
+      "id": 50,
+      "quotes": "Setengah perjalanan hidup ini dihabiskan untuk mencari ketenangan batin"
+    },
+    {
+      "id": 51,
+      "quotes": "Kepercayaan itu seperti kaca, kalau sudah pecah susah disatukan lagi"
+    },
+    {
+      "id": 52,
+      "quotes": "Jangan takut gagal, takutlah jika kamu tidak pernah mencoba sama sekali"
+    },
+    {
+      "id": 53,
+      "quotes": "Waktu luang paling pas digunakan untuk evaluasi diri sendiri"
+    },
+    {
+      "id": 54,
+      "quotes": "Kopi pahit mengajarkan kita bahwa manis itu akan terasa nikmat setelah berjuang"
+    },
+    {
+      "id": 55,
+      "quotes": "Orang hebat tidak lahir dari kenyamanan, melainkan dari tempaan cobaan"
+    },
+    {
+      "id": 56,
+      "quotes": "Jangan biarkan masa lalu yang buruk merusak masa depan yang cerah"
+    },
+    {
+      "id": 57,
+      "quotes": "Lebih baik punya sedikit teman tapi tulus daripada banyak tapi palsu"
+    },
+    {
+      "id": 58,
+      "quotes": "Rezeki anak sholeh itu banyak jalannya, tetap semangat cari cuan!"
+    },
+    {
+      "id": 59,
+      "quotes": "Tersenyumlah walau hatimu sedang tidak baik-baik saja"
+    },
+    {
+      "id": 60,
+      "quotes": "Kebahagiaan sederhana itu saat bisa berkumpul bersama orang tersayang"
+    },
+    {
+      "id": 61,
+      "quotes": "Jangan jadi orang yang mudah diatur oleh omongan orang lain"
+    },
+    {
+      "id": 62,
+      "quotes": "Fokus pada solusi, bukan malah meratapi masalah yang sedang terjadi"
+    },
+    {
+      "id": 63,
+      "quotes": "Hati yang ikhlas akan melahirkan ketenangan jiwa yang luar biasa"
+    },
+    {
+      "id": 64,
+      "quotes": "Jangan pernah meremehkan kekuatan doa di sepertiga malam"
+    },
+    {
+      "id": 65,
+      "quotes": "Nikmati setiap detik waktu bersama keluarga sebelum semuanya tinggal kenangan"
+    },
+    {
+      "id": 66,
+      "quotes": "Hidup itu kaya sirkus, banyak badut tapi seru buat dinikmati"
+    },
+    {
+      "id": 67,
+      "quotes": "Kopi hitam tanpa gula ibarat hidup tanpa tantangan, kurang greget"
+    },
+    {
+      "id": 68,
+      "quotes": "Jangan suka memaksakan kehendak jika orang lain tidak sejalan"
+    },
+    {
+      "id": 69,
+      "quotes": "Jadilah teladan yang baik bagi lingkungan sekitar kita"
+    },
+    {
+      "id": 70,
+      "quotes": "Setiap tetes keringat hari ini adalah tabungan kebahagiaan di masa depan"
+    },
+    {
+      "id": 71,
+      "quotes": "Jangan mudah baper dengan ucapan manis yang sifatnya sementara"
+    },
+    {
+      "id": 72,
+      "quotes": "Ketenangan pikiran datang saat kita berhenti mencampuri urusan orang lain"
+    },
+    {
+      "id": 73,
+      "quotes": "Hujan di sore hari paling pas ditemani secangkir teh manis dan gorengan"
+    },
+    {
+      "id": 74,
+      "quotes": "Belajarlah dari kesalahan kemarin agar tidak jatuh di lubang yang sama"
+    },
+    {
+      "id": 75,
+      "quotes": "Jangan biarkan amarah menguasai akal sehatmu"
+    },
+    {
+      "id": 76,
+      "quotes": "Sahabat yang baik akan menegurmu saat kamu berbuat salah secara langsung"
+    },
+    {
+      "id": 77,
+      "quotes": "Kejujuran adalah perhiasan terbaik yang harus dimiliki seseorang"
+    },
+    {
+      "id": 78,
+      "quotes": "Jangan ragu untuk meminta maaf jika memang kamu terbukti salah"
+    },
+    {
+      "id": 79,
+      "quotes": "Menjadi dewasa itu pilihan, tapi menua adalah kepastian"
+    },
+    {
+      "id": 80,
+      "quotes": "Hidup ini terlalu singkat untuk dihabiskan dengan rasa penyesalan"
+    },
+    {
+      "id": 81,
+      "quotes": "Mimpi yang besar butuh kerja keras yang luar biasa pula untuk mencapainya"
+    },
+    {
+      "id": 82,
+      "quotes": "Jangan lupa bersyukur atas nikmat kecil yang sering kita abaikan"
+    },
+    {
+      "id": 83,
+      "quotes": "Kopi dan rokok adalah sahabat sejati para pejuang malam"
+    },
+    {
+      "id": 84,
+      "quotes": "Tetaplah berbuat baik meskipun kebaikanmu terkadang tidak dihargai"
+    },
+    {
+      "id": 85,
+      "quotes": "Jangan jadikan alasan lelah untuk berhenti mengejar mimpi-mimpimu"
+    },
+    {
+      "id": 86,
+      "quotes": "Kesederhanaan adalah bentuk tertinggi dari keanggunan hidup"
+    },
+    {
+      "id": 87,
+      "quotes": "Sabar itu emang berat, tapi buahnya manis banget bro"
+    },
+    {
+      "id": 88,
+      "quotes": "Jangan suka pamer kelebihan, karena di atas langit masih ada langit"
+    },
+    {
+      "id": 89,
+      "quotes": "Dunia ini panggung sandiwara, mainkan peranmu sebaik mungkin"
+    },
+    {
+      "id": 90,
+      "quotes": "Kopi hangat ini saksi bisu lemburan tugas malam ini"
+    },
+    {
+      "id": 91,
+      "quotes": "Belajarlah untuk ikhlas melepaskan sesuatu yang memang bukan takdirmu"
+    },
+    {
+      "id": 92,
+      "quotes": "Jangan pernah merasa paling benar di antara orang lain"
+    },
+    {
+      "id": 93,
+      "quotes": "Kebahagiaan terbesar berasal dari hati yang selalu merasa cukup"
+    },
+    {
+      "id": 94,
+      "quotes": "Waktu tidak bisa diputar kembali, jadi gunakan sekarang sebaik-baiknya"
+    },
+    {
+      "id": 95,
+      "quotes": "Pikiran positif akan mendatangkan energi positif dalam hidupmu"
+    },
+    {
+      "id": 96,
+      "quotes": "Jangan biarkan rasa takut gagal mengekang potensi terbesarmu"
+    },
+    {
+      "id": 97,
+      "quotes": "Teman sejati tidak akan meninggalkanmu saat badai menerpa"
+    },
+    {
+      "id": 98,
+      "quotes": "Kopi pahit malam ini jadi teman setia merenungi nasib"
+    },
+    {
+      "id": 99,
+      "quotes": "Tetap semangat kawan, badai pasti berlalu dan pelangi akan datang"
+    },
+    {
+      "id": 100,
+      "quotes": "Hidup itu cuma sekali, buatlah berarti sebelum semuanya berakhir"
+    }
+  ]
+}

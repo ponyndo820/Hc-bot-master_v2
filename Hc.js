@@ -1,5 +1,18 @@
+/*
+   * Hc.js
+   * By Heart candy
+   * Sc ini open source
+*/
+import fs from 'fs';
+import path from 'path';
+import chalk from 'chalk'; 
+import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 import { getContentType } from '@whiskeysockets/baileys';
-import settings from './settings.js';
+
+import './settings.js';
+
+
 
 async function Hc(hc, m, db) {
   try {
@@ -34,8 +47,29 @@ async function Hc(hc, m, db) {
     switch (command) {
       case 'tes': {
         await reply('Ya\nsayang');
-        break;
       }
+      break
+      
+      // Quotes Menu
+      case 'quotes': {
+        try {
+          const rawData = fs.readFileSync('./lib/quotes.json', 'utf-8');
+          const data = JSON.parse(rawData);
+          const quotesList = data && data.quotes;
+          if (!Array.isArray(quotesList) || quotesList.length === 0){
+            return await reply('Maaf ada masalah teknis atau data kosong!');
+          }
+          const randomItem = quotesList[Math.floor(Math.random() * quotesList.length)];
+          const textQuote = randomItem.quotes || 'Tidak ada quotes';
+          const caption = `*$By Heart candy\n{textQuote}*`;
+          await reply(caption);
+        } catch (err) {
+          console.error(err);
+          await reply('Terjadi kesalahan saat membaca database❗');
+        }
+      }
+      break;
+      
     }
   } catch (err) {
     console.error("[ERROR HC]", err);
