@@ -59,7 +59,7 @@ async function Hc(hc, m, db) {
           }
           const randomItem = quotesList[Math.floor(Math.random() * quotesList.length)];
           const textQuote = randomItem.quotes || 'Tidak ada quotes';
-          const caption = `*By Heart candy*\n${textQuote}`;
+          const caption = `*By: Heart candy*\n${textQuote}`;
           await reply(caption);
         } catch (err) {
           console.error(err);
