@@ -52,11 +52,11 @@ async function startHcbot() {
   const hc = makeWaSocket.default ? makeWaSocket.default(hcOptions) : makeWaSocket(hcOptions);
   if (!hc.authState.creds.registered) {
     if (settings.pairing_code) {
-      const phoneNumber = await question('Masukin nomor telepon bot Kamu di sini ya sayang (contoh: 628xxx):\n');
+      const phoneNumber = await question(chalk.purple('Masukin nomor telepon bot Kamu di sini ya sayang (contoh: 628xxx):\n'));
       const code = await hc.requestPairingCode(phoneNumber.replace(/[^0-9]/g, ''));
-      console.log(`\n============================\n[INI CODE PAIRING KAMU SAYANG]: ${code}\n============================\n`);
+      console.log(chalk.green.bold(`\n============================\n[INI CODE PAIRING KAMU SAYANG]: ${code}\n============================\n`));
     } else {
-      console.log('[SISTEM] Mode QR Code aktif. silahkan scan QR Code yang muncul di terminal.');
+      console.log(chalk.yellowBright('[SISTEM] Mode QR Code aktif. silahkan scan QR Code yang muncul di terminal.'));
     }
   }
   
@@ -64,10 +64,10 @@ async function startHcbot() {
   hc.ev.on('connection.update', (update) => {
     const { connection } = update;
     if (connection === 'close') {
-      console.log('[SISTEM] Terputus, sedang mencoba menghubungkan ulang...');
+      console.log(chalk.yellowBright('[SISTEM] Terputus, sedang mencoba menghubungkan ulang...'));
       startHcbot();
     } else if (connection === 'open') {
-      console.log(`[SISTEM] ${settings.botName} Berhasil Terhubung!`);
+      console.log(chalk.yellowBright(`[SISTEM] ${settings.botName} Berhasil Terhubung!`));
     }
   });
   
@@ -80,7 +80,7 @@ async function startHcbot() {
       await Hc(hc, m, db);
       saveDatabase(db);
     } catch (err) {
-      console.log("[SYSTEM ERROR]", err);
+      console.log(chalk.red("[SYSTEM ERROR]", err));
     }
   });
 }
