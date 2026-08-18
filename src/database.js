@@ -1,3 +1,8 @@
+/*
+   * database.js
+   * By Heart candy
+   * Sc ini open source
+*/
 import fs from 'fs';
 import path from 'path';
 
