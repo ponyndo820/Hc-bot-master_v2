@@ -52,7 +52,7 @@ async function startHcbot() {
   const hc = makeWaSocket.default ? makeWaSocket.default(hcOptions) : makeWaSocket(hcOptions);
   if (!hc.authState.creds.registered) {
     if (settings.pairing_code) {
-      const phoneNumber = await question(chalk.purple('Masukin nomor telepon bot Kamu di sini ya sayang (contoh: 628xxx):\n'));
+      const phoneNumber = await question(chalk.magenta('Masukin nomor telepon bot Kamu di sini ya sayang (contoh: 628xxx):\n'));
       const code = await hc.requestPairingCode(phoneNumber.replace(/[^0-9]/g, ''));
       console.log(chalk.green.bold(`\n============================\n[INI CODE PAIRING KAMU SAYANG]: ${code}\n============================\n`));
     } else {
