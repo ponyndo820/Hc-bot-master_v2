@@ -20,7 +20,7 @@ Install pkg⬇️
 - [Follow our WhatsApp Channel](https://whatsapp.com/channel/0029Vb6en2iAu3aXA7AcFI0Y)
 
  
-#Hc-bot-master_v2
+# Hc-bot-master_v2
 Alur kerja 
 Membuat sistem pairing code dan qr code 
 Membuat sistem database
