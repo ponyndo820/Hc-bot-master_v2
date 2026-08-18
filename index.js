@@ -7,14 +7,14 @@ import fs from 'fs';
 import os from 'os';
 import pino from 'pino';
 import chalk from 'chalk';
-import readiline from 'readline';
-import makeWASocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
+import readline from 'readline';
+import makeWaSocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
 
 import { printMessageLog } from './lib/function.js';
 import { loadDatabase, saveDatabase } from './src/database.js';
 
-const rl = readiline.createInterface({ input: process.stdin, output: process.stdout });
-const question = (text) => new Promise((resolve) => rl.questinon(text, resoleve));
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+const question = (text) => new Promise((resolve) => rl.question(text, resoleve));
 
 function displaySystemInfo() {
     console.log(chalk.red.bold(`
@@ -32,16 +32,16 @@ function displaySystemInfo() {
 
 async function startHcbot() {
   const { state, saveCreds } = await useMultiFileAuthState('Hc');
-  const { verision } = await fetchLatestBaileysVersion();
+  const { version } = await fetchLatestBaileysVersion();
   let db = loadDatabase();
   
   const hcOptions = {
-    verision,
+    version,
     logger: pino({ level: 'silent' }),
     printQRInTerminal: !settings.pairing_code,
     auth: {
       creds: state.creds,
-      keys: makeCacheableSignalkeyStore(state.keys, pino({ level: 'silent' }))
+      keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' }))
     },
     browser: ['Mac OS', 'Chrome', '10.15.7'],
     generateHighQualityLinkPreview: true
@@ -50,7 +50,7 @@ async function startHcbot() {
   const hc = makeWaSocket.default ? makeWaSocket.default(hcOptions) : makeWaSocket(hcOptions);
   if (!hc.authState.creds.registered) {
     if (settings.pairing_code) {
-      const phoneNumber = await questinon('Masukin nomor telepon bot Kamu di sini ya sayang (contoh: 628xxx):\n');
+      const phoneNumber = await question('Masukin nomor telepon bot Kamu di sini ya sayang (contoh: 628xxx):\n');
       const code = await hc.requestPairingCode(phoneNumber.replace(/[^0-9]/g, ''));
       console.log(`\n============================\n[INI CODE PAIRING KAMU SAYANG]: ${code}\n============================\n`);
     } else {
@@ -73,7 +73,7 @@ async function startHcbot() {
     try {
       const m = chatUpdate.messages[0];
       if (!m.messages) return;
-      await printMessagesLog(hc, m);
+      await printMessageLog(hc, m);
       await handler(hc, m, db);
       saveDatabase(db);
     } catch (err) {
