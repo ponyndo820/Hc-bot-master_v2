@@ -26,10 +26,14 @@ async function Hc(hc, m, db) {
     
     const command = body.slice(prefixUsed.length).trim().split(/ +/).shift().toLowerCase();
     const sender = m.key.remoteJid;
-
+    
+    const reply = async (text) => {
+      return await hc.sendMessage(sender, { text }, { quoted: m });
+    };
+    
     switch (command) {
       case 'tes': {
-        await hc.sendMessage(sender, { text: 'Ya\nsayang' }, { quoted: m });
+        await reply('Ya\nsayang');
         break;
       }
     }
