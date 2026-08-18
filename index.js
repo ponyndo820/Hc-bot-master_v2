@@ -9,7 +9,7 @@ import pino from 'pino';
 import readiline from 'readline';
 import makeWaSocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCachebleSignalkeyStore, Browser } from '@whiskeysockets/baileys';
 
-import { loadDatabase, saveDatabase } from './database.js';
+// import { loadDatabase, saveDatabase } from './database.js';
 
 const rl = readiline.createInterface({ input: process.stdin, output: process.stdout });
 const question = (text) => new Promise((resolve) => rl.questinon(text, resoleve));
