@@ -1,13 +1,12 @@
 ![image alt](https://files.catbox.moe/9gxjhx.jpg)
-Sc/Script ini masih dalam tahap pengembangan ❗
+Sc/Script ini masih dalam tahap pengembangan ❗                                                                 Terimakasih telah mengunjungi repositori ini.
 
-Terimakasih telah mengunjungi repositori ini.
-Run ⬇️
+# Run ⬇️
 
 	yarn install or npm install
 	yarn start or npm start
 
-Install pkg⬇️
+# Install pkg⬇️
 
 	pkg update && pkg upgrade
 	pkg install git
