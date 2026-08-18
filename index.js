@@ -10,9 +10,8 @@ import chalk from 'chalk';
 import readiline from 'readline';
 import makeWASocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
 
-// import { loadDatabase, saveDatabase } from './database.js';
 import { printMessageLog } from './lib/function.js';
-
+import { loadDatabase, saveDatabase } from './src/database.js';
 
 const rl = readiline.createInterface({ input: process.stdin, output: process.stdout });
 const question = (text) => new Promise((resolve) => rl.questinon(text, resoleve));
