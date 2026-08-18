@@ -11,7 +11,7 @@ import readiline from 'readline';
 import makeWASocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
 
 // import { loadDatabase, saveDatabase } from './database.js';
-import { printMessagesLog } from './lib/function.js';
+import { printMessageLog } from './lib/function.js';
 
 
 const rl = readiline.createInterface({ input: process.stdin, output: process.stdout });
