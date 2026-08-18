@@ -1,5 +1,6 @@
 ![image alt](https://files.catbox.moe/9gxjhx.jpg)
-Sc/Script ini masih dalam tahap pengembangan ❗                                                                 Terimakasih telah mengunjungi repositori ini.
+- Sc/Script ini masih dalam tahap pengembangan ❗
+- Terimakasih telah mengunjungi repositori ini.
 
 # Run ⬇️
 
