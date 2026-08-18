@@ -7,7 +7,7 @@ import fs from 'fs';
 import os from 'os';
 import pino from 'pino';
 import readiline from 'readline';
-import makeWaSocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCachebleSignalkeyStore, Browser } from '@whiskeysockets/baileys';
+import makeWASocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
 
 // import { loadDatabase, saveDatabase } from './database.js';
 
