@@ -6,6 +6,7 @@
 import fs from 'fs';
 import os from 'os';
 import pino from 'pino';
+import chalk from 'chalk';
 import readiline from 'readline';
 import makeWASocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
 
