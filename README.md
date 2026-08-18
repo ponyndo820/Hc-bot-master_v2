@@ -14,7 +14,8 @@ Install pkg⬇️
 	pkg install ffmpeg
 	pkg install imagemagick
 	pkg install yarn
-	
+
+# Sosial media
 - [Subscribe](https://youtube.com/@ponyndo?si=rMY2tSN5BbeNZWQ4)
 - [Follow our Instagram account](https://www.instagram.com/ponyndo1_original?igsh=NDZ0dmYwNDltZHFu)
 - [Follow our WhatsApp Channel](https://whatsapp.com/channel/0029Vb6en2iAu3aXA7AcFI0Y)
