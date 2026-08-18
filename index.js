@@ -10,7 +10,7 @@ import chalk from 'chalk';
 import readline from 'readline';
 import makeWaSocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
 
-
+import { handler } from './Hc.js'
 import settings from './settings.js';
 import { printMessageLog } from './lib/function.js';
 import { loadDatabase, saveDatabase } from './src/database.js';
