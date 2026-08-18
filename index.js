@@ -71,12 +71,13 @@ async function startHcbot() {
     }
   });
   
-  hc.ev.on('messages.upsert', async (chatUpdate) => {
+    hc.ev.on('messages.upsert', async (chatUpdate) => {
     try {
       const m = chatUpdate.messages[0];
-      if (!m.messages) return;
+      if (!m.message) return;
+      
       await printMessageLog(hc, m);
-      await handler(hc, m, db);
+      await Hc(hc, m, db);
       saveDatabase(db);
     } catch (err) {
       console.log("[SYSTEM ERROR]", err);
