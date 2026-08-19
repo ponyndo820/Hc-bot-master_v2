@@ -47,6 +47,14 @@ async function Hc(hc, m, db) {
         await reply('Ya\nsayang');
       }
       break
+      // Owner Menu
+      case 'shutdown': case 'off': {
+        if (!isCreator) reply(setting.mess.owner)
+        reply(`*[Bot] Process Shutdown...*`).then(() => {
+          process.exit(0)
+        })
+      }
+      break
       
       // Quotes Menu
       case 'quotes': {
