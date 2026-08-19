@@ -42,6 +42,13 @@ async function Hc(hc, m, db) {
       return await hc.sendMessage(sender, { text }, { quoted: m });
     };
     
+    const isCreator = global.isOwner = ownerNumber.some(owner => {
+			const ownerJid = owner.includes('@') ? owner : owner + '@s.whatsapp.net';
+			const findJid = naze.findJidByLid(jidNormalizedUser(ownerJid), store, true);
+			if (!findJid) return false
+			return findJid === m.sender
+		});
+    
     switch (command) {
       case 'tes': {
         await reply('Ya\nsayang');
@@ -49,7 +56,7 @@ async function Hc(hc, m, db) {
       break
       // Owner Menu
       case 'shutdown': case 'off': {
-        if (!isCreator) reply(setting.mess.owner)
+        if (!isCreator) return reply(setting.mess.owner)
         reply(`*[Bot] Process Shutdown...*`).then(() => {
           process.exit(0)
         })
