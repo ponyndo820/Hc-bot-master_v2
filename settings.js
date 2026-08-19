@@ -10,8 +10,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 
 const settings = {
+  ownerNumber: ['6285823709413'],
   botName: ['Hc-bot-master_v2'],
-  ownerNumber: ['2685823709413'],
   pairing_code: true,
   prefix: ['+', ',', '.', '!'],
   autoRead: false,

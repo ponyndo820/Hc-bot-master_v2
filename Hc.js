@@ -42,9 +42,8 @@ async function Hc(hc, m, db) {
       return await hc.sendMessage(sender, { text }, { quoted: m });
     };
     
-    // Logika isCreator yang sederhana dan berfungsi
     const participant = m.key.participant || sender; 
-    const isCreator = settings.ownerNumber.some(owner => participant.includes(owner));
+    const isCreator = ownerNumber.some(owner => participant.includes(owner));
     
     switch (command) {
       case 'tes': {
@@ -54,7 +53,6 @@ async function Hc(hc, m, db) {
       
       // Owner Menu
       case 'shutdown': case 'off': {
-        // Perbaikan typo "setting" menjadi "settings"
         if (!isCreator) return reply(settings.mess.owner);
         reply(`*[Bot] Process Shutdown...*`).then(() => {
           process.exit(0);
