@@ -78,7 +78,7 @@ async function Hc(hc, m, db) {
       
     }
   } catch (err) {
-    console.error("[ERROR HC]", err);
+    console.error("[ERROR HC.js]", err);
   }
 }
 
