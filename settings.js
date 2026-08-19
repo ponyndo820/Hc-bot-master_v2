@@ -18,7 +18,7 @@ const settings = {
   selfMode: false
 }
 
-setting.mess = {
+settings.mess = {
   owner: "Khusus Owner Ya Sayang❗",
   admin: "Khusus Admin Ya Sayang❗",
 }
