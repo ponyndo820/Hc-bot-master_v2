@@ -45,6 +45,8 @@ async function Hc(hc, m, db) {
     const isCreator = global.isOwner = ownerNumber.some(owner => {
 			const ownerJid = owner.includes('@') ? owner : owner + '@s.whatsapp.net';
 			const findJid = naze.findJidByLid(jidNormalizedUser(ownerJid), store, true);
+			
+			const findJid = hc.findJidByLid(jidNormalizedUser(ownerJid), store, true);
 			if (!findJid) return false
 			return findJid === m.sender
 		});
