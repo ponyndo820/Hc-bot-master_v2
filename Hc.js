@@ -42,28 +42,25 @@ async function Hc(hc, m, db) {
       return await hc.sendMessage(sender, { text }, { quoted: m });
     };
     
-    const isCreator = global.isOwner = ownerNumber.some(owner => {
-			const ownerJid = owner.includes('@') ? owner : owner + '@s.whatsapp.net';
-			const findJid = naze.findJidByLid(jidNormalizedUser(ownerJid), store, true);
-			
-			const findJid = hc.findJidByLid(jidNormalizedUser(ownerJid), store, true);
-			if (!findJid) return false
-			return findJid === m.sender
-		});
+    // Logika isCreator yang sederhana dan berfungsi
+    const participant = m.key.participant || sender; 
+    const isCreator = settings.ownerNumber.some(owner => participant.includes(owner));
     
     switch (command) {
       case 'tes': {
         await reply('Ya\nsayang');
       }
-      break
+      break;
+      
       // Owner Menu
       case 'shutdown': case 'off': {
-        if (!isCreator) return reply(setting.mess.owner)
+        // Perbaikan typo "setting" menjadi "settings"
+        if (!isCreator) return reply(settings.mess.owner);
         reply(`*[Bot] Process Shutdown...*`).then(() => {
-          process.exit(0)
-        })
+          process.exit(0);
+        });
       }
-      break
+      break;
       
       // Quotes Menu
       case 'quotes': {
