@@ -43,7 +43,7 @@ async function Hc(hc, m, db) {
     };
     
     const participant = m.key.participant || sender; 
-    const isCreator = ownerNumber.some(owner => participant.includes(owner));
+    const isCreator = settings.ownerNumber.some(owner => participant.includes(owner));
     
     switch (command) {
       case 'tes': {
