@@ -42,8 +42,8 @@ async function Hc(hc, m, db) {
       return await hc.sendMessage(sender, { text }, { quoted: m });
     };
     
-    const participant = m.key.participant || sender; 
-    const isCreator = settings.ownerNumber.some(owner => participant.includes(owner));
+        const participant = m.key.participant || sender; 
+    const isCreator = m.key.fromMe || settings.ownerNumber.some(owner => participant.includes(owner));
     
     switch (command) {
       case 'tes': {
