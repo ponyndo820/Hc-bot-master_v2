@@ -24,11 +24,11 @@ async function Hc(hc, m, db) {
     const type = getContentType(msg);
     if (!type) return;
     
-    const body = (type === 'conversation') ? msg.conversation 
-               : (type === 'extendedTextMessage') ? msg.extendedTextMessage?.text 
-               : (type === 'imageMessage') ? msg.imageMessage?.caption 
-               : (type === 'videoMessage') ? msg.videoMessage?.caption 
-               : '';
+    const body = (type === 'conversation') ? msg.conversation : 
+    (type === 'extendedTextMessage') ? msg.extendedTextMessage?.tex :
+    (type === 'imageMessage') ? msg.imageMessage?.caption : 
+    (type === 'videoMessage') ? msg.videoMessage?.caption : 
+    (type === 'interactiveResponMessage' && m.quoted) ? (m.message.interactiveResponseMessage?.nativeFlowResponseMessage?.singleSelectReply.selectrdRowId || '') : '';
                
     if (!body) return;
     
@@ -44,7 +44,12 @@ async function Hc(hc, m, db) {
     
         const participant = m.key.participant || sender; 
         const isCreator = m.key.fromMe || settings.ownerNumber.some(owner => participant.includes(owner));
-    
+        const text = global.q = args.join(' ')
+        const mime = (quoted.msg || quoted).mimetype || ''
+        const qmsg = (quoted.msg || quoted)
+        const author = set.author = settings.author || 'Heart candy';
+        const packname = set.packname = settings.packname || 'ponyndo';
+        const botname = set.botname = settings.botName || 'Hc-bot';
     switch (command) {
       case 'tes': {
         await reply('Ya\nsayang');

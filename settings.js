@@ -11,7 +11,9 @@ const __filename = fileURLToPath(import.meta.url);
 
 const settings = {
   ownerNumber: ['6285823709413'],
-  botName: ['Hc-bot-master_v2'],
+  author: 'Heart candy',
+  botName: ['Hc-bot'],
+  packname: 'ponyndo',
   pairing_code: true,
   prefix: ['+', ',', '.', '!'],
   autoRead: false,
