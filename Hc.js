@@ -43,13 +43,13 @@ async function Hc(hc, m, db) {
     };
     
         const participant = m.key.participant || sender; 
-    const isCreator = m.key.fromMe || settings.ownerNumber.some(owner => participant.includes(owner));
+        const isCreator = m.key.fromMe || settings.ownerNumber.some(owner => participant.includes(owner));
     
     switch (command) {
       case 'tes': {
         await reply('Ya\nsayang');
       }
-      break;
+      break
       
       // Owner Menu
       case 'shutdown': case 'off': {
@@ -58,8 +58,15 @@ async function Hc(hc, m, db) {
           process.exit(0);
         });
       }
-      break;
-      
+      break
+      case 'sc': case 'script': {
+        reply return (settings.mess.fitur)
+      }
+      break
+      case 'donasi': case 'donate': {
+        reply('Donasi Dapat Melalui Url Dibawah ini :\nhttps://saweria.co/Ponyndo')
+      }
+      break
       // Quotes Menu
       case 'quotes': {
         try {
@@ -78,7 +85,25 @@ async function Hc(hc, m, db) {
           await reply('Terjadi kesalahan saat membaca database❗');
         }
       }
-      break;
+      break
+      case 'quotesislami': {
+        try {
+          const rawData = fs.readFileSync('./lib/quotesislami.json', 'utf-8');
+          const data = JSON.parse(rawData);
+          if (!data || !Array.isArray(data) || data.length === 0){
+            return reply('Maaf ada masalah teknis atau data kosong❗');
+          }
+          const randomQuote = data[Math.floor(Math.random() * data.length)];
+          const { arabic = 'Tidak ada huruf Arab', arti = 'Tidak ada arti', title = 'Quotes Islami' } = randomQuote;
+          const caption = `*By: Heart candy*\n*{arabic}*\n\n_Artinya: ${arti}_`;
+          reply(caption);
+        } catch (err) {
+          console.error(err);
+          reply('Terjadi Kesalahan saat membaca database❗')
+        }
+      }
+      break
+      
       
     }
   } catch (err) {

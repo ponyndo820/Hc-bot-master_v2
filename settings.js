@@ -21,6 +21,7 @@ const settings = {
 settings.mess = {
   owner: "Khusus Owner Ya Sayang❗",
   admin: "Khusus Admin Ya Sayang❗",
+  fitur: "Fitur Ini Belum Tersedia Ya Syang ❗",
 }
 fs.watchFile(__filename, async () => {
   console.log(chalk.yellowBright(`[UPDATE] ${__filename}`))
