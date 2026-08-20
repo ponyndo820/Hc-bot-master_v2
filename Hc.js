@@ -25,7 +25,7 @@ async function Hc(hc, m, db) {
     if (!type) return;
     
     const body = (type === 'conversation') ? msg.conversation : 
-    (type === 'extendedTextMessage') ? msg.extendedTextMessage?.tex :
+    (type === 'extendedTextMessage') ? msg.extendedTextMessage?.text :
     (type === 'imageMessage') ? msg.imageMessage?.caption : 
     (type === 'videoMessage') ? msg.videoMessage?.caption : 
     (type === 'interactiveResponMessage' && m.quoted) ? (m.message.interactiveResponseMessage?.nativeFlowResponseMessage?.singleSelectReply.selectrdRowId || '') : '';
