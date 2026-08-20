@@ -35,31 +35,29 @@ async function Hc(hc, m, db) {
     const prefixUsed = settings.prefix.find(p => body.startsWith(p));
     if (!prefixUsed) return;
     
-    const prefix = isCreator ? (detectedPrefix || set.authorPrefix) : set.multiprefix ? (detectedPrefix || '¿') : (listMatch || '¿');
-    const args = body.trim().split(/ +/).slice(1)
-    const quoted = m.quoted ? m.quoted : m
+    const sender = m.key.remoteJid;
     const command = body.slice(prefixUsed.length).trim().split(/ +/).shift().toLowerCase();
+    const args = body.trim().split(/ +/).slice(1);
+    const text = args.join(' ');
+    const prefix = prefixUsed;
     
     const reply = async (text) => {
       return await hc.sendMessage(sender, { text }, { quoted: m });
     };
     
-        const participant = m.key.participant || sender; 
-        const isCreator = m.key.fromMe || settings.ownerNumber.some(owner => participant.includes(owner));
-        
-        const text = args.join(' ');
-        const prefix = prefixUsed;
-        
-        const contextInfo = m.message.extendedTextMessage?.contextInfo || m.message.imageMessage?.contextInfo || m.message.videoMessage?.contextInfo;
-        const isQuoted = !!contextInfo?.quotedMessage;
-        const quoted = isQuoted ? contextInfo.quotedMessage : msg;
-        const quotedType = getContentType(quoted);
-        const mime = quoted[quotedType]?.mimetype || '';
-        const qmsg = isQuoted ? { message: quoted } : m;
-        
-        const author = settings.author || 'Heart candy';
-        const packname = settings.packname || 'ponyndo';
-        const botname = settings.botName?.[0] || 'Hc-bot';
+    const participant = m.key.participant || sender; 
+    const isCreator = m.key.fromMe || settings.ownerNumber.some(owner => participant.includes(owner));
+    
+    const contextInfo = m.message.extendedTextMessage?.contextInfo || m.message.imageMessage?.contextInfo || m.message.videoMessage?.contextInfo;
+    const isQuoted = !!contextInfo?.quotedMessage;
+    const quoted = isQuoted ? contextInfo.quotedMessage : msg;
+    const quotedType = getContentType(quoted);
+    const mime = quoted[quotedType]?.mimetype || '';
+    const qmsg = isQuoted ? { message: quoted } : m;
+    
+    const author = settings.author || 'Heart candy';
+    const packname = settings.packname || 'ponyndo';
+    const botname = settings.botName?.[0] || 'Hc-bot';
 
     switch (command) {
       case 'tes': {
