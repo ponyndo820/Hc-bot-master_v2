@@ -60,7 +60,7 @@ async function Hc(hc, m, db) {
       }
       break
       case 'sc': case 'script': {
-        reply return (settings.mess.fitur)
+        reply('settings.mess.fitur')
       }
       break
       case 'donasi': case 'donate': {
