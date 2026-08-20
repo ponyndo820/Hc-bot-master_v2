@@ -44,12 +44,21 @@ async function Hc(hc, m, db) {
     
         const participant = m.key.participant || sender; 
         const isCreator = m.key.fromMe || settings.ownerNumber.some(owner => participant.includes(owner));
-        const text = global.q = args.join(' ')
-        const mime = (quoted.msg || quoted).mimetype || ''
-        const qmsg = (quoted.msg || quoted)
-        const author = set.author = settings.author || 'Heart candy';
-        const packname = set.packname = settings.packname || 'ponyndo';
-        const botname = set.botname = settings.botName || 'Hc-bot';
+        
+        const text = args.join(' ');
+        const prefix = prefixUsed;
+        
+        const contextInfo = m.message.extendedTextMessage?.contextInfo || m.message.imageMessage?.contextInfo || m.message.videoMessage?.contextInfo;
+        const isQuoted = !!contextInfo?.quotedMessage;
+        const quoted = isQuoted ? contextInfo.quotedMessage : msg;
+        const quotedType = getContentType(quoted);
+        const mime = quoted[quotedType]?.mimetype || '';
+        const qmsg = isQuoted ? { message: quoted } : m;
+        
+        const author = settings.author || 'Heart candy';
+        const packname = settings.packname || 'ponyndo';
+        const botname = settings.botName?.[0] || 'Hc-bot';
+
     switch (command) {
       case 'tes': {
         await reply('Ya\nsayang');
@@ -110,7 +119,7 @@ async function Hc(hc, m, db) {
       break
       // Tools Menu
       case 'sticker': case 'stiker': case 's': case 'stickergif': case 'stikergif': case 'sgif': case 'stickerwm': case 'swm': case 'curi': case 'colong': case 'take': case 'stickergifwm': case 'sgifwm': {
-				if (!/image | video | sticker/.test(quoted.type)) return reply(`Kirim/reply gambar/video/gif degan caption ${prefix + command}\nDurasi Image/Video/Gif 1-9 Detik`)
+				if (!/image|video|sticker/.test(quotedType)) return reply(`Kirim/reply gambar/video/gif dengan caption ${prefix + command}\nDurasi Image/Video/Gif 1-9 Detik`);
 				let media = await hc.downloadAndSaveMediaMessage(qmsg);
 				let teks1 = text.split`|`[0] ? text.split`|`[0] : packname
 				let teks2 = text.split`|`[1] ? text.split`|`[1] : author
