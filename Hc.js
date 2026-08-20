@@ -35,12 +35,10 @@ async function Hc(hc, m, db) {
     const prefixUsed = settings.prefix.find(p => body.startsWith(p));
     if (!prefixUsed) return;
     
+    const prefix = isCreator ? (detectedPrefix || set.authorPrefix) : set.multiprefix ? (detectedPrefix || '¿') : (listMatch || '¿');
+    const args = body.trim().split(/ +/).slice(1)
+    const quoted = m.quoted ? m.quoted : m
     const command = body.slice(prefixUsed.length).trim().split(/ +/).shift().toLowerCase();
-    const sender = m.key.remoteJid;
-        const command = body.slice(prefixUsed.length).trim().split(/ +/).shift().toLowerCase();
-        const args = body.trim().split(/ +/).slice(1) 
-        const sender = m.key.remoteJid;
-
     
     const reply = async (text) => {
       return await hc.sendMessage(sender, { text }, { quoted: m });
