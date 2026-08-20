@@ -60,7 +60,7 @@ async function Hc(hc, m, db) {
       }
       break
       case 'sc': case 'script': {
-        reply('settings.mess.fitur')
+        reply(settings.mess.fitur)
       }
       break
       case 'donasi': case 'donate': {
@@ -95,7 +95,7 @@ async function Hc(hc, m, db) {
           }
           const randomQuote = data[Math.floor(Math.random() * data.length)];
           const { arabic = 'Tidak ada huruf Arab', arti = 'Tidak ada arti', title = 'Quotes Islami' } = randomQuote;
-          const caption = `*By: Heart candy*\n*{arabic}*\n\n_Artinya: ${arti}_`;
+          const caption = `*By: Heart candy*\n*${arabic}*\n\n_Artinya: ${arti}_`;
           reply(caption);
         } catch (err) {
           console.error(err);
