@@ -8,7 +8,7 @@ import path from 'path';
 import chalk from 'chalk'; 
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
-import { getContentType } from '@whiskeysockets/baileys';
+import { getContentType, downloadMediaMessage } from '@whiskeysockets/baileys';
 
 import settings from './settings.js';
 
