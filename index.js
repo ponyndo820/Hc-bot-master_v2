@@ -56,7 +56,7 @@ async function startHcbot() {
       const code = await hc.requestPairingCode(phoneNumber.replace(/[^0-9]/g, ''));
       console.log(chalk.green.bold(`\n============================\n[INI CODE PAIRING KAMU SAYANG]: ${code}\n============================\n`));
     } else {
-      console.log(chalk.yellowBright('[SISTEM] Mode QR Code aktif. silahkan scan QR Code yang muncul di terminal.'));
+      console.log(chalk.yellowBright('[SYSTEM] Mode QR Code aktif. silahkan scan QR Code yang muncul di terminal.'));
     }
   }
   
@@ -64,10 +64,10 @@ async function startHcbot() {
   hc.ev.on('connection.update', (update) => {
     const { connection } = update;
     if (connection === 'close') {
-      console.log(chalk.yellowBright('[SISTEM] Terputus, sedang mencoba menghubungkan ulang...'));
+      console.log(chalk.yellowBright('[SYSTEM] Terputus, sedang mencoba menghubungkan ulang...'));
       startHcbot();
     } else if (connection === 'open') {
-      console.log(chalk.yellowBright(`[SISTEM] ${settings.botName} Berhasil Terhubung!`));
+      console.log(chalk.yellowBright(`[SYSTEM] ${settings.botName} Berhasil Terhubung!`));
     }
   });
   

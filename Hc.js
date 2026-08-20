@@ -103,9 +103,23 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      // Tools Menu
+      case 'sticker': case 'stiker': case 's': case 'stickergif': case 'stikergif': case 'sgif': case 'stickerwm': case 'swm': case 'curi': case 'colong': case 'take': case 'stickergifwm': case 'sgifwm': {
+				if (!/image | video | sticker/.test(quoted.type)) return reply(`Kirim/reply gambar/video/gif degan caption ${prefix + command}\nDurasi Image/Video/Gif 1-9 Detik`)
+				let media = await hc.downloadAndSaveMediaMessage(qmsg);
+				let teks1 = text.split`|`[0] ? text.split`|`[0] : packname
+				let teks2 = text.split`|`[1] ? text.split`|`[1] : author
+				if (/image|webp/.test(mime)) {
+				  m.react('⏳')
+				  await hc.sendAsSticker(m.chat, media, m, { packname : teks1, author: teks2 })
+				} else if (/video/.test(mime)) {
+				  if ((qmsg). seconds > 11) return reply('Maksimal 10 detik ya sayang')
+				} else reply(`Kirim/reply gambar/video/gif degan caption ${prefix + command}\nDurasi Video/Gif 1-9 Detik`)
+      }
+      break
       
       
-    }
+    } // Penutup case command
   } catch (err) {
     console.error("[ERROR HC.js]", err);
   }
