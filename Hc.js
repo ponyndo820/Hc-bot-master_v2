@@ -11,6 +11,7 @@ import { createRequire } from 'module';
 import { getContentType, downloadMediaMessage } from '@whiskeysockets/baileys';
 
 import settings from './settings.js';
+import { writeExif } from './lib/converter.js';
 
 async function Hc(hc, m, db) {
   try {
@@ -121,34 +122,16 @@ async function Hc(hc, m, db) {
       case 'sticker': case 'stiker': case 's': case 'stickergif': case 'stikergif': case 'sgif': case 'stickerwm': case 'swm': case 'curi': case 'colong': case 'take': case 'stickergifwm': case 'sgifwm': {
         if (!/image|video|sticker/.test(quotedType)) return reply(`Kirim/reply gambar/video/gif dengan caption ${prefix + command}\nDurasi Image/Video/Gif 1-9 Detik`);
         const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
-        const mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+        let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
         let teks1 = text.split('|')[0] || packname;
         let teks2 = text.split('|')[1] || author;
-        if (/image|webp/.test(mime)) {
-          if (typeof hc.sendAsSticker === 'function') {
-            const tempFile = path.join('./', `${Date.now()}.${mime.split('/')[1] || 'jpg'}`);
-            await fs.promises.writeFile(tempFile, mediaBuffer);
-            await hc.sendAsSticker(sender, tempFile, m, { packname: teks1, author: teks2 });
-            if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
-          } else {
-            await hc.sendMessage(sender, { sticker: mediaBuffer }, { quoted: m });
-          }
-        } else if (/video/.test(mime)) {
-          if (qmsg.seconds > 11) return reply('Maksimal 10 detik ya sayang');
-          if (typeof hc.sendAsSticker === 'function') {
-            const tempFile = path.join('./', `${Date.now()}.mp4`);
-            await fs.promises.writeFile(tempFile, mediaBuffer);
-            await hc.sendAsSticker(sender, tempFile, m, { packname: teks1, author: teks2 });
-            if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
-          } else {
-            reply('Fitur konversi video ke stiker membutuhkan modul tambahan.');
-          }
-        } else {
-          reply(`Kirim/reply gambar/video/gif dengan caption ${prefix + command}\nDurasi Video/Gif 1-9 Detik`);
-        }
+        let stickerFile = await writeExif(mediaBuffer, { packname: teks1, author: teks2 });
+        await hc.sendMessage(sender, { sticker: { url: stickerFile } },
+        { quoted: m });
+        if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
       }
-      break
-
+      break;
+      
       
       
     } // Penutup case command
