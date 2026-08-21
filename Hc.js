@@ -177,9 +177,9 @@ async function Hc(hc, m, db) {
         }
       }
       break
-      // Menu
+           // Menu
       case 'menu': {
-        await reply(`*━━━━━━━━━━━━━━━━━━━━*
+        const menuText = `*━━━━━━━━━━━━━━━━━━━━*
               🌈 *Hc-bot* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
@@ -187,11 +187,107 @@ async function Hc(hc, m, db) {
 │⭔ ${prefix}ownerMenu
 │⭔ ${prefix}quotesMenu
 │⭔ ${prefix}toolsMenu
-╰────❍
-`)
+╰────❍`;
+        const interactiveMsg = generateWAMessageFromContent(sender, {
+          viewOnceMessage: {
+            message: {
+              interactiveMessage: proto.Message.InteractiveMessage.create({
+                body: proto.Message.InteractiveMessage.Body.create({ text: menuText }),
+                footer: proto.Message.InteractiveMessage.Footer.create({ text: 'Tekan tombol di bawah untuk memilih menu' }),
+                header: proto.Message.InteractiveMessage.Header.create({ title: '', hasVideo: false }),
+                nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
+                  buttons: [
+                    {
+                      name: "quick_reply",
+                      buttonParamsJson: JSON.stringify({
+                        display_text: "👑 Owner Menu",
+                        id: `${prefix}ownermenu`
+                      })
+                    },
+                    {
+                      name: "quick_reply",
+                      buttonParamsJson: JSON.stringify({
+                        display_text: "📜 Quotes Menu",
+                        id: `${prefix}quotesmenu`
+                      })
+                    },
+                    {
+                      name: "quick_reply",
+                      buttonParamsJson: JSON.stringify({
+                        display_text: "🛠️ Tools Menu",
+                        id: `${prefix}toolsmenu`
+                      })
+                    }
+                  ]
+                })
+              })
+            }
+          }
+        }, { quoted: m });
+        await hc.relayMessage(sender, interactiveMsg.message, { messageId: interactiveMsg.key.id });
       }
       break
-      
+      case 'botmenu': {
+        await reply(`*━━━━━━━━━━━━━━━━━━━━*
+              🌈 *Hc-bot* 🌈
+               *By Heart candy*
+*━━━━━━━━━━━━━━━━━━━━*
+╭──❍ *BOT MENU*
+│⭔ ${prefix}sc
+│⭔ ${prefix}donasi
+╰────❍`)
+      }
+      break
+      case 'ownermenu': {
+        await reply(`*━━━━━━━━━━━━━━━━━━━━*
+              🌈 *Hc-bot* 🌈
+               *By Heart candy*
+*━━━━━━━━━━━━━━━━━━━━*
+╭──❍ *OWNER MENU*
+│⭔ ${prefix}shutdown
+╰────❍`)
+      }
+      break
+      case 'quotesmenu': {
+       await reply(` *━━━━━━━━━━━━━━━━━━━━*
+              🌈 *Hc-bot* 🌈
+               *By Heart candy*
+*━━━━━━━━━━━━━━━━━━━━*
+╭──❍ *QUOTES MENU*
+│⭔ ${prefix}quotes
+│⭔ ${prefix}quotesislami
+╰────❍`)
+      }
+      break
+      case 'toolsmenu': {
+        await reply(`*━━━━━━━━━━━━━━━━━━━━*
+              🌈 *Hc-bot* 🌈
+               *By Heart candy*
+*━━━━━━━━━━━━━━━━━━━━*
+╭──❍ *TOOLS MENU*
+│⭔ ${prefix}tovn
+│⭔ ${prefix}sticker
+│⭔ ${prefix}speedtest
+╰────❍`)
+      }
+      break
+      case 'allmenu': {
+        await reply(`*━━━━━━━━━━━━━━━━━━━━*
+              🌈 *Hc-bot* 🌈
+               *By Heart candy*
+*━━━━━━━━━━━━━━━━━━━━*
+╭──❍ *ALL MENU*
+│⭔ ${prefix}sc
+│⭔ ${prefix}donasi
+│⭔ ${prefix}shutdown
+│⭔ ${prefix}quotes
+│⭔ ${prefix}quotesislami
+│⭔ ${prefix}tovn
+│⭔ ${prefix}sticker
+│⭔ ${prefix}speedtes
+╰────❍`)
+      }
+      break
       
     } // Penutup case command
   } catch (err) {
