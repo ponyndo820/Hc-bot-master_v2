@@ -156,7 +156,8 @@ async function Hc(hc, m, db) {
       case 'tovn': case 'toptt': case 'tovoice': {
         if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin Dijadikan Audio Dengan Caption ${prefix + command}`);
         await react('⏳')
-        let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {})
+        const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
+        let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
         try {
           let audioRes = await toPTT(media, 'mp4');
           let audioData = typeof audioRes === 'string' ? { url: audioRes } : audioRes;
