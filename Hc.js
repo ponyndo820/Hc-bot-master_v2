@@ -9,6 +9,7 @@ import chalk from 'chalk';
 import speed from 'performance-now';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
+import { exec, spawn, execSync } from 'child_process';
 import { getContentType, downloadMediaMessage } from '@whiskeysockets/baileys';
 
 import settings from './settings.js';
