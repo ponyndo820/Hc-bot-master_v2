@@ -176,60 +176,26 @@ async function Hc(hc, m, db) {
           await reply('Gagal mengonversi media ke Voice Note!');
         }
       }
-      break      
+      break
       // Menu
       case 'menu': {
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
               🌈 *Hc-bot* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
-╭──❍ *Menu*
-│⭔ ${prefix}ownerMenu
-│⭔ ${prefix}quotesMenu
-│⭔ ${prefix}toolsMenu
-╰────❍`;
+Silakan pilih menu dengan menekan opsi di bawah ini:`;
 
-        const msg = generateWAMessageFromContent(sender, {
-          viewOnceMessage: {
-            message: {
-              interactiveMessage: proto.Message.InteractiveMessage.create({
-                body: proto.Message.InteractiveMessage.Body.create({ text: menuText }),
-                footer: proto.Message.InteractiveMessage.Footer.create({ text: 'Pilih menu melalui tombol di bawah' }),
-                nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
-                  buttons: [
-                    {
-                      name: "quick_reply",
-                      buttonParamsJson: JSON.stringify({
-                        display_text: "👑 Owner Menu",
-                        id: `${prefix}ownermenu`
-                      })
-                    },
-                    {
-                      name: "quick_reply",
-                      buttonParamsJson: JSON.stringify({
-                        display_text: "📜 Quotes Menu",
-                        id: `${prefix}quotesmenu`
-                      })
-                    },
-                    {
-                      name: "quick_reply",
-                      buttonParamsJson: JSON.stringify({
-                        display_text: "🛠️ Tools Menu",
-                        id: `${prefix}toolsmenu`
-                      })
-                    }
-                  ]
-                }),
-                messageContextInfo: {
-                  deviceListMetadata: {},
-                  deviceListMetadataVersion: 2
-                }
-              })
-            }
+        await hc.sendMessage(sender, {
+          poll: {
+            name: menuText,
+            values: [
+              `${prefix}ownermenu`,
+              `${prefix}quotesmenu`,
+              `${prefix}toolsmenu`
+            ],
+            selectableCount: 1 // Membatasi agar pengguna hanya bisa memilih 1 opsi
           }
         }, { quoted: m });
-
-        await hc.relayMessage(sender, msg.message, { messageId: msg.key.id });
       }
       break
       case 'botmenu': {
