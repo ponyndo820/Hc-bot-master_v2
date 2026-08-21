@@ -125,13 +125,13 @@ async function Hc(hc, m, db) {
       // Tools Menu
       case 'sticker': case 'stiker': case 's': case 'stickergif': case 'stikergif': case 'sgif': case 'stickerwm': case 'swm': case 'curi': case 'colong': case 'take': case 'stickergifwm': case 'sgifwm': {
         if (!/image|video|sticker/.test(quotedType)) return reply(`Kirim/reply gambar/video/gif dengan caption ${prefix + command}\nDurasi Image/Video/Gif 1-9 Detik`);
+        await react('⏳');
         const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
         let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
         let teks1 = text.split('|')[0] || packname;
         let teks2 = text.split('|')[1] || author;
         let stickerFile = await writeExif(mediaBuffer, { packname: teks1, author: teks2 });
-        await hc.sendMessage(sender, { sticker: { url: stickerFile } },
-        { quoted: m });
+        await hc.sendMessage(sender, { sticker: { url: stickerFile } }, { quoted: m });
         if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
       }
       break
@@ -151,14 +151,25 @@ async function Hc(hc, m, db) {
       }
       break
       case 'tovn': case 'toptt': case 'tovoice': {
-        if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin DijadikanAudio Dengan Caption ${prefix + command}`)
-        react('⏳')
-        let media = await hc.downloadAndSaveMediaMessage(qmsg)
+        if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin Dijadikan Audio Dengan Caption ${prefix + command}`);
+        await react('⏳');
+        let media = await hc.downloadAndSaveMediaMessage(qmsg);
         try {
-          let audioBuffer = await toPTT(meda, 'mp4')
-          await reply({ audio: audioBuffer, mimetype: 'audio/ogg; codecs=opus', ptt: true });
+          let audioRes = await toPTT(media, 'mp4');
+          let audioData = typeof audioRes === 'string' ? { url: audioRes } : audioRes;
+          await hc.sendMessage(sender, { 
+            audio: audioData, 
+            mimetype: 'audio/ogg; codecs=opus', 
+            ptt: true 
+          }, { quoted: m });
+          if (typeof audioRes === 'string' && fs.existsSync(audioRes)) {
+            fs.unlinkSync(audioRes);
+          }
+        } catch (e) {
+          console.error(e);
+          await reply('Gagal mengonversi media ke Voice Note!');
         } finally {
-          if (fs.existsSync(media)) fs.unlinkSync(media)
+          if (fs.existsSync(media)) fs.unlinkSync(media);
         }
       }
       break
