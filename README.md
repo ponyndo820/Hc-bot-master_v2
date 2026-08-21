@@ -24,18 +24,20 @@
  
 ## 🗂 Structure Project
 ```
-├── src
-└── database.js
 ├── database
 │       └── database.json
 ├── lib
 │   ├── converter.js
 │   ├── function.js
 │   └── quotes.js
+├── src
+│   └── database.js
 ├── Hc.js
-├── package.json
-├── settings.js
 ├── LICENSE
 ├── README.md
 ├── index.js
+├── main.js
+├── package.json
+├── settings.js
+├── speed.py
 ```
