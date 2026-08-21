@@ -176,7 +176,7 @@ async function Hc(hc, m, db) {
           await reply('Gagal mengonversi media ke Voice Note!');
         }
       }
-      break     
+      break      
       // Menu
       case 'menu': {
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
@@ -219,7 +219,11 @@ async function Hc(hc, m, db) {
                       })
                     }
                   ]
-                })
+                }),
+                messageContextInfo: {
+                  deviceListMetadata: {},
+                  deviceListMetadataVersion: 2
+                }
               })
             }
           }
