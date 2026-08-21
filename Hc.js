@@ -177,54 +177,29 @@ async function Hc(hc, m, db) {
         }
       }
       break
-           // Menu
+      // Menu
       case 'menu': {
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
               🌈 *Hc-bot* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *Menu*
-│⭔ ${prefix}ownerMenu
-│⭔ ${prefix}quotesMenu
-│⭔ ${prefix}toolsMenu
+│⭔ ${prefix}ownermenu
+│⭔ ${prefix}toolsmenu
+│⭔ ${prefix}quotesmenu
 ╰────❍`;
-        const interactiveMsg = generateWAMessageFromContent(sender, {
-          viewOnceMessage: {
-            message: {
-              interactiveMessage: proto.Message.InteractiveMessage.create({
-                body: proto.Message.InteractiveMessage.Body.create({ text: menuText }),
-                footer: proto.Message.InteractiveMessage.Footer.create({ text: 'Tekan tombol di bawah untuk memilih menu' }),
-                header: proto.Message.InteractiveMessage.Header.create({ title: '', hasVideo: false }),
-                nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
-                  buttons: [
-                    {
-                      name: "quick_reply",
-                      buttonParamsJson: JSON.stringify({
-                        display_text: "👑 Owner Menu",
-                        id: `${prefix}ownermenu`
-                      })
-                    },
-                    {
-                      name: "quick_reply",
-                      buttonParamsJson: JSON.stringify({
-                        display_text: "📜 Quotes Menu",
-                        id: `${prefix}quotesmenu`
-                      })
-                    },
-                    {
-                      name: "quick_reply",
-                      buttonParamsJson: JSON.stringify({
-                        display_text: "🛠️ Tools Menu",
-                        id: `${prefix}toolsmenu`
-                      })
-                    }
-                  ]
-                })
-              })
-            }
-          }
-        }, { quoted: m });
-        await hc.relayMessage(sender, interactiveMsg.message, { messageId: interactiveMsg.key.id });
+        const buttons = [
+          { buttonId: `${prefix}ownermenu`, buttonText: { displayText: '👑 Owner Menu' }, type: 1 },
+          { buttonId: `${prefix}toolsmenu`, buttonText: { displayText: '🛠️ Tools Menu' }, type: 1 },
+          { buttonId: `${prefix}quotesmenu`, buttonText: { displayText: '📜 Quotes Menu' }, type: 1 }
+        ];
+        const buttonMessage = {
+          text: menuText,
+          footer: 'Tekan tombol di bawah untuk memilih menu',
+          buttons: buttons,
+          headerType: 1
+        };
+        await hc.sendMessage(sender, buttonMessage, { quoted: m });
       }
       break
       case 'botmenu': {
