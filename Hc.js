@@ -63,7 +63,15 @@ async function Hc(hc, m, db) {
     const author = settings.author || 'Heart candy';
     const packname = settings.packname || 'ponyndo';
     const botname = settings.botName?.[0] || 'Hc-bot';
-
+    
+    const reply = async (text) => {
+      return await hc.sendMessage(sender, { text }, { quoted: m });
+    };
+    
+    const react = async (emoji) => {
+      return await hc.sendMessage(sender, { react: { text: emoji, key: m.key } });
+    };
+    
     switch (command) {
       case 'tes': {
         await reply('Ya\nsayang');
@@ -152,7 +160,7 @@ async function Hc(hc, m, db) {
       break
       case 'tovn': case 'toptt': case 'tovoice': {
         if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin Dijadikan Audio Dengan Caption ${prefix + command}`);
-        await react('⏳');
+        await react('⏳')
         let media = await hc.downloadAndSaveMediaMessage(qmsg);
         try {
           let audioRes = await toPTT(media, 'mp4');
