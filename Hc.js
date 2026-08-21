@@ -4,8 +4,10 @@
    * Sc ini open source
 */
 import fs from 'fs';
+import util from 'util';
 import path from 'path';
 import chalk from 'chalk'; 
+import { promisify } from 'util';
 import speed from 'performance-now';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
@@ -134,22 +136,21 @@ async function Hc(hc, m, db) {
       }
       break
       case 'speedtest': case 'speed': {
-        reply('Testing Speed...')
-        let cp = require('child_process')
-        let { promisify } = require('util')
-        let exec = promisify(cp.exec).bind(cp)
-        let o
+        reply('Testing Speed...');
+        let o;
         try {
-          o = await exec('python3 speed.py --share')
+          const execPromise = promisify(exec);
+          o = await execPromise('python3 speed.py --share');
         } catch (e) {
-          o = e
+          o = e;
         } finally {
-          let { stdout, stderr } = o
-          if (stdout.trim()) reply(stdout)
-          if (stderr.trim()) reply(stderr)
+          let { stdout, stderr } = o || {};
+          if (stdout && stdout.trim()) reply(stdout);
+          if (stderr && stderr.trim()) reply(stderr);
         }
       }
       break
+
       
       
     } // Penutup case command
