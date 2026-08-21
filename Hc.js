@@ -183,19 +183,26 @@ async function Hc(hc, m, db) {
               🌈 *Hc-bot* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
-Silakan pilih menu dengan menekan opsi di bawah ini:`;
+╭──❍ *Menu*
+│⭔ ${prefix}ownerMenu
+│⭔ ${prefix}quotesMenu
+│⭔ ${prefix}toolsMenu
+╰────❍`;
 
-        await hc.sendMessage(sender, {
-          poll: {
-            name: menuText,
-            values: [
-              `${prefix}ownermenu`,
-              `${prefix}quotesmenu`,
-              `${prefix}toolsmenu`
-            ],
-            selectableCount: 1 // Membatasi agar pengguna hanya bisa memilih 1 opsi
-          }
-        }, { quoted: m });
+        const buttons = [
+          { buttonId: `${prefix}ownermenu`, buttonText: { displayText: '👑 Owner Menu' }, type: 1 },
+          { buttonId: `${prefix}quotesmenu`, buttonText: { displayText: '📜 Quotes Menu' }, type: 1 },
+          { buttonId: `${prefix}toolsmenu`, buttonText: { displayText: '🛠️ Tools Menu' }, type: 1 }
+        ];
+
+        const buttonMessage = {
+          text: menuText,
+          footer: 'Tekan tombol di bawah untuk memilih menu',
+          buttons: buttons,
+          headerType: 1
+        };
+
+        await hc.sendMessage(sender, buttonMessage, { quoted: m });
       }
       break
       case 'botmenu': {
