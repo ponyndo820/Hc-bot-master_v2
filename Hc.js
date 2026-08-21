@@ -155,11 +155,11 @@ async function Hc(hc, m, db) {
       break
       case 'tovn': case 'toptt': case 'tovoice': {
         if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin Dijadikan Audio Dengan Caption ${prefix + command}`);
-        await react('⏳')
+        await react('⏳');
         const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
         let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
         try {
-          let audioRes = await toPTT(media, 'mp4');
+          let audioRes = await toPTT(mediaBuffer, 'mp4');
           let audioData = typeof audioRes === 'string' ? { url: audioRes } : audioRes;
           await hc.sendMessage(sender, { 
             audio: audioData, 
@@ -172,8 +172,6 @@ async function Hc(hc, m, db) {
         } catch (e) {
           console.error(e);
           await reply('Gagal mengonversi media ke Voice Note!');
-        } finally {
-          if (fs.existsSync(media)) fs.unlinkSync(media);
         }
       }
       break
