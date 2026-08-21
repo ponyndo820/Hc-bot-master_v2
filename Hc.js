@@ -49,6 +49,9 @@ async function Hc(hc, m, db) {
     const reply = async (text) => {
       return await hc.sendMessage(sender, { text }, { quoted: m });
     };
+    const react = async (emoji) => {
+      return await hc.sendMessage(sender, { react: { text: emoji, key: m.key } });
+    };
     
     const participant = m.key.participant || sender; 
     const isCreator = m.key.fromMe || settings.ownerNumber.some(owner => participant.includes(owner));
@@ -63,14 +66,6 @@ async function Hc(hc, m, db) {
     const author = settings.author || 'Heart candy';
     const packname = settings.packname || 'ponyndo';
     const botname = settings.botName?.[0] || 'Hc-bot';
-    
-    const reply = async (text) => {
-      return await hc.sendMessage(sender, { text }, { quoted: m });
-    };
-    
-    const react = async (emoji) => {
-      return await hc.sendMessage(sender, { react: { text: emoji, key: m.key } });
-    };
     
     switch (command) {
       case 'tes': {
