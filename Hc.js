@@ -161,11 +161,15 @@ async function Hc(hc, m, db) {
         try {
           let audioRes = await toPTT(mediaBuffer, 'mp4');
           let audioData = typeof audioRes === 'string' ? { url: audioRes } : audioRes;
+          
+          const waveform = new Uint8Array(Array.from({ length: 64 }, () => Math.floor(Math.random() * 100)));
           await hc.sendMessage(sender, { 
             audio: audioData, 
             mimetype: 'audio/ogg; codecs=opus', 
-            ptt: true 
+            ptt: true,
+            waveform: waveform
           }, { quoted: m });
+          
           if (typeof audioRes === 'string' && fs.existsSync(audioRes)) {
             fs.unlinkSync(audioRes);
           }
