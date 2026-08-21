@@ -15,7 +15,7 @@ import { exec, spawn, execSync } from 'child_process';
 import { getContentType, downloadMediaMessage } from '@whiskeysockets/baileys';
 
 import settings from './settings.js';
-import { writeExif } from './lib/converter.js';
+import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
 
 async function Hc(hc, m, db) {
   try {
@@ -150,7 +150,18 @@ async function Hc(hc, m, db) {
         }
       }
       break
-
+      case 'tovn': case 'toptt': case 'tovoice': {
+        if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin DijadikanAudio Dengan Caption ${prefix + command}`)
+        react('⏳')
+        let media = await hc.downloadAndSaveMediaMessage(qmsg)
+        try {
+          let audioBuffer = await toPTT(meda, 'mp4')
+          await reply({ audio: audioBuffer, mimetype: 'audio/ogg; codecs=opus', ptt: true });
+        } finally {
+          if (fs.existsSync(media)) fs.unlinkSync(media)
+        }
+      }
+      break
       
       
     } // Penutup case command
