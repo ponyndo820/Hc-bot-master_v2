@@ -12,7 +12,7 @@ import speed from 'performance-now';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import { exec, spawn, execSync } from 'child_process';
-import { getContentType, downloadMediaMessage } from '@whiskeysockets/baileys';
+import { getContentType, downloadMediaMessage, generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
 
 import settings from './settings.js';
 import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
@@ -176,7 +176,7 @@ async function Hc(hc, m, db) {
           await reply('Gagal mengonversi media ke Voice Note!');
         }
       }
-      break
+      break     
       // Menu
       case 'menu': {
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
@@ -184,22 +184,48 @@ async function Hc(hc, m, db) {
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *Menu*
-│⭔ ${prefix}ownermenu
-│⭔ ${prefix}toolsmenu
-│⭔ ${prefix}quotesmenu
+│⭔ ${prefix}ownerMenu
+│⭔ ${prefix}quotesMenu
+│⭔ ${prefix}toolsMenu
 ╰────❍`;
-        const buttons = [
-          { buttonId: `${prefix}ownermenu`, buttonText: { displayText: '👑 Owner Menu' }, type: 1 },
-          { buttonId: `${prefix}toolsmenu`, buttonText: { displayText: '🛠️ Tools Menu' }, type: 1 },
-          { buttonId: `${prefix}quotesmenu`, buttonText: { displayText: '📜 Quotes Menu' }, type: 1 }
-        ];
-        const buttonMessage = {
-          text: menuText,
-          footer: 'Tekan tombol di bawah untuk memilih menu',
-          buttons: buttons,
-          headerType: 1
-        };
-        await hc.sendMessage(sender, buttonMessage, { quoted: m });
+
+        const msg = generateWAMessageFromContent(sender, {
+          viewOnceMessage: {
+            message: {
+              interactiveMessage: proto.Message.InteractiveMessage.create({
+                body: proto.Message.InteractiveMessage.Body.create({ text: menuText }),
+                footer: proto.Message.InteractiveMessage.Footer.create({ text: 'Pilih menu melalui tombol di bawah' }),
+                nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
+                  buttons: [
+                    {
+                      name: "quick_reply",
+                      buttonParamsJson: JSON.stringify({
+                        display_text: "👑 Owner Menu",
+                        id: `${prefix}ownermenu`
+                      })
+                    },
+                    {
+                      name: "quick_reply",
+                      buttonParamsJson: JSON.stringify({
+                        display_text: "📜 Quotes Menu",
+                        id: `${prefix}quotesmenu`
+                      })
+                    },
+                    {
+                      name: "quick_reply",
+                      buttonParamsJson: JSON.stringify({
+                        display_text: "🛠️ Tools Menu",
+                        id: `${prefix}toolsmenu`
+                      })
+                    }
+                  ]
+                })
+              })
+            }
+          }
+        }, { quoted: m });
+
+        await hc.relayMessage(sender, msg.message, { messageId: msg.key.id });
       }
       break
       case 'botmenu': {
