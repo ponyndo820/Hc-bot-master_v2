@@ -178,33 +178,32 @@ async function Hc(hc, m, db) {
       }
       break
       // Menu
-      case 'menu': {
-        const menuText = `*━━━━━━━━━━━━━━━━━━━━*
-              🌈 *Hc-bot* 🌈
-               *By Heart candy*
-*━━━━━━━━━━━━━━━━━━━━*
+      case 'menu': {const menuText = `*━━━━━━━━━━━━*
+        🌈 *Hc-bot* 🌈
+         *By Heart candy*
+*━━━━━━━━━━━━*
 ╭──❍ *Menu*
 │⭔ ${prefix}ownerMenu
 │⭔ ${prefix}quotesMenu
 │⭔ ${prefix}toolsMenu
+│⭔ ${prefix}sticker
 ╰────❍`;
 
-        const buttons = [
-          { buttonId: `${prefix}ownermenu`, buttonText: { displayText: '👑 Owner Menu' }, type: 1 },
-          { buttonId: `${prefix}quotesmenu`, buttonText: { displayText: '📜 Quotes Menu' }, type: 1 },
-          { buttonId: `${prefix}toolsmenu`, buttonText: { displayText: '🛠️ Tools Menu' }, type: 1 }
-        ];
+  const buttons = [
+    { buttonId: `${prefix}ownermenu`, buttonText: { displayText: '👑 Owner Menu' }, type: 1 },
+    { buttonId: `${prefix}quotesmenu`, buttonText: { displayText: '📜 Quotes Menu' }, type: 1 },
+    { buttonId: `${prefix}toolsmenu`, buttonText: { displayText: '🛠️ Tools Menu' }, type: 1 }
+  ];
 
-        const buttonMessage = {
-          text: menuText,
-          footer: 'Tekan tombol di bawah untuk memilih menu',
-          buttons: buttons,
-          headerType: 1
-        };
-
-        await hc.sendMessage(sender, buttonMessage, { quoted: m });
-      }
-      break
+  await hc.sendMessage(sender, {
+    image: { url: 'https://link-gambar-kamu.jpg' }, // ganti link logo bot
+    caption: menuText,
+    footer: 'Tekan tombol di bawah untuk memilih menu',
+    buttons: buttons,
+    headerType: 4 // 4 = ada gambar
+  }, { quoted: m })
+}
+break
       case 'botmenu': {
         await reply(`*━━━━━━━━━━━━━━━━━━━━*
               🌈 *Hc-bot* 🌈
