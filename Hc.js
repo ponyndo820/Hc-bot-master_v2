@@ -6,6 +6,7 @@
 import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk'; 
+import speed from 'performance-now';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import { getContentType, downloadMediaMessage } from '@whiskeysockets/baileys';
@@ -130,8 +131,24 @@ async function Hc(hc, m, db) {
         { quoted: m });
         if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
       }
-      break;
-      
+      break
+      case 'speedtest': case 'speed': {
+        reply('Testing Speed...')
+        let cp = require('child_process')
+        let { promisify } = require('util')
+        let exec = promisify(cp.exec).bind(cp)
+        let o
+        try {
+          o = await exec('python3 speed.py --share')
+        } catch (e) {
+          o = e
+        } finally {
+          let { stdout, stderr } = o
+          if (stdout.trim()) reply(stdout)
+          if (stderr.trim()) reply(stderr)
+        }
+      }
+      break
       
       
     } // Penutup case command

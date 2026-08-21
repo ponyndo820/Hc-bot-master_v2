@@ -25,6 +25,21 @@ settings.mess = {
   admin: "Khusus Admin Ya Sayang❗",
   fitur: "Fitur Ini Belum Tersedia Ya Syang ❗",
 }
+
+settings.limit = {
+  free: 15,
+  premium: 999,
+  vip: 9999
+}
+
+settings.money = {
+  free: 10000,
+  premium: 1000000,
+  vip: 100000000
+  
+}
+
+
 fs.watchFile(__filename, async () => {
   console.log(chalk.yellowBright(`[UPDATE] ${__filename}`))
 });
