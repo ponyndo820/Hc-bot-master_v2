@@ -196,7 +196,7 @@ async function Hc(hc, m, db) {
   ];
 
   await hc.sendMessage(sender, {
-    image: { url: 'https://link-gambar-kamu.jpg' }, // ganti link logo bot
+    image: { url: 'https://files.catbox.moe/9gxjhx.jpg' }, // ganti link logo bot
     caption: menuText,
     footer: 'Tekan tombol di bawah untuk memilih menu',
     buttons: buttons,
