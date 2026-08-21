@@ -176,34 +176,35 @@ async function Hc(hc, m, db) {
           await reply('Gagal mengonversi media ke Voice Note!');
         }
       }
-      break
+      break      
       // Menu
-      case 'menu': {const menuText = `*━━━━━━━━━━━━*
-        🌈 *Hc-bot* 🌈
-         *By Heart candy*
-*━━━━━━━━━━━━*
+      case 'menu': {
+        const menuText = `*━━━━━━━━━━━━━━━━━━━━*
+              🌈 *Hc-bot* 🌈
+               *By Heart candy*
+*━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *Menu*
-│⭔ ${prefix}ownerMenu
-│⭔ ${prefix}quotesMenu
-│⭔ ${prefix}toolsMenu
-│⭔ ${prefix}sticker
+│⭔ ${prefix}ownermenu
+│⭔ ${prefix}quotesmenu
+│⭔ ${prefix}toolsmenu
 ╰────❍`;
 
-  const buttons = [
-    { buttonId: `${prefix}ownermenu`, buttonText: { displayText: '👑 Owner Menu' }, type: 1 },
-    { buttonId: `${prefix}quotesmenu`, buttonText: { displayText: '📜 Quotes Menu' }, type: 1 },
-    { buttonId: `${prefix}toolsmenu`, buttonText: { displayText: '🛠️ Tools Menu' }, type: 1 }
-  ];
+        const buttons = [
+          { buttonId: `${prefix}ownermenu`, buttonText: { displayText: '👑 Owner Menu' }, type: 1 },
+          { buttonId: `${prefix}quotesmenu`, buttonText: { displayText: '📜 Quotes Menu' }, type: 1 },
+          { buttonId: `${prefix}toolsmenu`, buttonText: { displayText: '🛠️ Tools Menu' }, type: 1 }
+        ];
 
-  await hc.sendMessage(sender, {
-    image: { url: 'https://files.catbox.moe/9gxjhx.jpg' }, // ganti link logo bot
-    caption: menuText,
-    footer: 'Tekan tombol di bawah untuk memilih menu',
-    buttons: buttons,
-    headerType: 4 // 4 = ada gambar
-  }, { quoted: m })
-}
-break
+        const buttonMessage = {
+          text: menuText,
+          footer: 'Tekan tombol di bawah untuk memilih menu',
+          buttons: buttons,
+          headerType: 1
+        };
+
+        await hc.sendMessage(sender, buttonMessage, { quoted: m });
+      }
+      break
       case 'botmenu': {
         await reply(`*━━━━━━━━━━━━━━━━━━━━*
               🌈 *Hc-bot* 🌈
