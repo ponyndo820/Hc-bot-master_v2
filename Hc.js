@@ -177,6 +177,20 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      // Menu
+      case 'menu': {
+        await reply(`*━━━━━━━━━━━━━━━━━━━━*
+              🌈 *Hc-bot* 🌈
+               *By Heart candy*
+*━━━━━━━━━━━━━━━━━━━━*
+╭──❍ *Menu*
+│⭔ ${prefix}ownerMenu
+│⭔ ${prefix}quotesMenu
+│⭔ ${prefix}toolsMenu
+╰────❍
+`)
+      }
+      break
       
       
     } // Penutup case command
