@@ -179,9 +179,10 @@ async function Hc(hc, m, db) {
       }
       break
       case 'tagme': {
-        await reply(`@${m.sender.split('@')[0]}`, { mentions: [m.sender] })
+        await hc.sendMessage(sender, { text: `@${sender.split('@')[0]}`, mentions: [sender] }, { quoted: m });
       }
       break
+
       // Menu
       case 'menu': {
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
