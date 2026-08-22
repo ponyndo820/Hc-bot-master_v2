@@ -181,13 +181,16 @@ async function Hc(hc, m, db) {
       case 'tagme': {
         await hc.sendMessage(sender, { text: `@${sender.split('@')[0]}`, mentions: [sender] }, { quoted: m });
       }
-      break
+      break      
       case 'req': case 'request': {
-        if (!text) return reply('Mau Request apa ke Owner?')
-        await reply(`*Request Telah Terkirim Ke Owner*\n_Terima Kasih🙏_Telah Menyusahkan Owner`)
-        await hc.sendFromOwner(ownerNumber, `Pesan Dari : @${sender.split('@')[0]}\nUntuk Owner\n\nRequest ${text}`, m, { contextInfo: { mentionedjid: [sender], isForwarded: true }})
+        if (!text) return reply('Mau Request apa ke Owner?');
+        await reply(`*Request Telah Terkirim Ke Owner*\n_Terima Kasih🙏_ Telah Menyusahkan Owner`);
+        const targetOwner = settings.ownerNumber[0] + '@s.whatsapp.net';
+        await hc.sendMessage(targetOwner, { 
+          text: `Pesan Dari : @${sender.split('@')[0]}\nUntuk Owner\n\nRequest: ${text}`, mentions: [sender] });
       }
       break
+
       // Menu
       case 'menu': {
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
