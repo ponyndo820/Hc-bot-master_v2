@@ -15,6 +15,7 @@ import { exec, spawn, execSync } from 'child_process';
 import { getContentType, downloadMediaMessage, generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
 
 import settings from './settings.js';
+import { getRandomImage } from './function.js';
 import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
 
 async function Hc(hc, m, db) {
@@ -190,7 +191,24 @@ async function Hc(hc, m, db) {
           text: `Pesan Dari : @${sender.split('@')[0]}\nUntuk Owner\n\nRequest: ${text}`, mentions: [sender] });
       }
       break
-
+      // Random Images Menu
+      case 'randomimage': case 'randomimg': {
+        await react('⏳');
+        try {
+          const imageBuffer = await getRandomImage();
+          if (!imageBuffer) {
+            return reply('Maaf, server gambar sedang sibuk atau down.');
+          }
+          await hc.sendMessage(sender, { 
+            image: imageBuffer, 
+            caption: `*By: Heart candy*\nIni dia gambar random-nya!` 
+          }, { quoted: m });
+        } catch (err) {
+          console.error(err);
+          await reply('Terjadi kesalahan saat memproses gambar❗');
+        }
+      }
+      break
       // Menu
       case 'menu': {
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
@@ -230,6 +248,7 @@ async function Hc(hc, m, db) {
 │⭔ ${prefix}sc
 │⭔ ${prefix}tagme
 │⭔ ${prefix}donasi
+│⭔ ${prefix}request
 ╰────❍`)
       }
       break
@@ -273,13 +292,13 @@ async function Hc(hc, m, db) {
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *ALL MENU*
 │⭔ ${prefix}sc
-│⭔ ${prefix}donasi
-│⭔ ${prefix}shutdown
-│⭔ ${prefix}quotes
-│⭔ ${prefix}quotesislami
 │⭔ ${prefix}tovn
+│⭔ ${prefix}tagme
+│⭔ ${prefix}donasi
+│⭔ ${prefix}quotes
+│⭔ ${prefix}request
 │⭔ ${prefix}sticker
-│⭔ ${prefix}speedtes
+│⭔ ${prefix}quotesislami
 ╰────❍`)
       }
       break
