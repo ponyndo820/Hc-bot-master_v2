@@ -16,7 +16,7 @@ import { getContentType, downloadMediaMessage, generateWAMessageFromContent, pro
 
 import settings from './settings.js';
 import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
-import { getRandomImage, getRandomWaifu, searchWaifu } from './lib/function.js';
+import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer } from './lib/function.js';
 
 async function Hc(hc, m, db) {
   try {
@@ -170,42 +170,39 @@ async function Hc(hc, m, db) {
         }
       }
       break
-      // Waifu Menu
-      case 'randomwaifu': case 'waifu': {
+      case 'brat': {
+        if (!text) return reply(`Teksnya mana?\nContoh: *${prefix}brat halo semua*`);
         await react('⏳');
         try {
-          const imageBuffer = await getRandomWaifu();
-          if (!imageBuffer) return reply('Maaf, server sedang sibuk atau gambar tidak ditemukan.');
+          const media = await getBuffer(`https://api.siputzx.my.id/api/m/brat?text=${encodeURIComponent(text)}`);
+          const stickerFile = await writeExif(media, { packname: packname, author: author });
           
-          await hc.sendMessage(sender, { 
-            image: imageBuffer, 
-            caption: `*By: Heart candy*\nIstri online-mu sudah datang!` 
-          }, { quoted: m });
-        } catch (err) {
-          console.error(err);
-          await reply('Terjadi kesalahan saat memproses gambar❗');
-        }
-      }
-      break
-      case 'cariwaifu': {
-        if (!text) return reply(`Ketik nama karakter yang ingin dicari!\nContoh: *${prefix}waifu nurse redheart*`);
+          await hc.sendMessage(sender, { sticker: { url: stickerFile } }, { quoted: m });
         
-        await react('⏳');
-        try {
-          const imageBuffer = await searchWaifu(text);
-          if (!imageBuffer) return reply(`Maaf, gambar untuk *${text}* tidak ditemukan. Coba gunakan nama bahasa Inggris atau nama lengkapnya.`);
-          
-          await hc.sendMessage(sender, { 
-            image: imageBuffer, 
-            caption: `*By: Heart candy*\nHasil pencarian untuk: *${text}*` 
-          }, { quoted: m });
+          if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
         } catch (err) {
           console.error(err);
-          await reply('Terjadi kesalahan saat mencari gambar❗');
+          await reply('Terjadi kesalahan saat memproses stiker brat❗');
         }
       }
       break
-
+      case 'bratvid': case 'bratvideo': {
+        if (!text) return reply(`Teksnya mana?\nContoh: *${prefix}bratvid halo semua*`);
+        await react('⏳');
+        try {
+          const media = await getBuffer(`https://api.siputzx.my.id/api/m/bratvideo?text=${encodeURIComponent(text)}`);
+          
+          const stickerFile = await writeExif(media, { packname: packname, author: author });
+          
+          await hc.sendMessage(sender, { sticker: { url: stickerFile } }, { quoted: m });
+          
+          if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
+        } catch (err) {
+          console.error(err);
+          await reply('Terjadi kesalahan saat memproses stiker video brat❗');
+        }
+      }
+      break
       //Bot Menu
       case 'sc': case 'script': {
         reply(settings.mess.fitur)
@@ -245,6 +242,41 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      // Waifu Menu
+      case 'randomwaifu': case 'waifu': {
+        await react('⏳');
+        try {
+          const imageBuffer = await getRandomWaifu();
+          if (!imageBuffer) return reply('Maaf, server sedang sibuk atau gambar tidak ditemukan.');
+          
+          await hc.sendMessage(sender, { 
+            image: imageBuffer, 
+            caption: `*By: Heart candy*\nIstri online-mu sudah datang!` 
+          }, { quoted: m });
+        } catch (err) {
+          console.error(err);
+          await reply('Terjadi kesalahan saat memproses gambar❗');
+        }
+      }
+      break
+      case 'cariwaifu': {
+        if (!text) return reply(`Ketik nama karakter yang ingin dicari!\nContoh: *${prefix}waifu nurse redheart*`);
+        
+        await react('⏳');
+        try {
+          const imageBuffer = await searchWaifu(text);
+          if (!imageBuffer) return reply(`Maaf, gambar untuk *${text}* tidak ditemukan. Coba gunakan nama bahasa Inggris atau nama lengkapnya.`);
+          
+          await hc.sendMessage(sender, { 
+            image: imageBuffer, 
+            caption: `*By: Heart candy*\nHasil pencarian untuk: *${text}*` 
+          }, { quoted: m });
+        } catch (err) {
+          console.error(err);
+          await reply('Terjadi kesalahan saat mencari gambar❗');
+        }
+      }
+      break
       // Menu
       case 'menu': {
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
@@ -255,7 +287,7 @@ async function Hc(hc, m, db) {
 │⭔ ${prefix}botmenu
 │⭔ ${prefix}allmenu
 │⭔ ${prefix}toolsmenu
-│⭔ ${prefix}Ownermenu
+│⭔ ${prefix}ownermenu
 │⭔ ${prefix}quotesmenu
 ╰────❍`;
 
