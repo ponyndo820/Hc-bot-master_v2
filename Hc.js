@@ -190,18 +190,17 @@ async function Hc(hc, m, db) {
         if (!text) return reply(`Teksnya mana?\nContoh: *${prefix}bratvid halo semua*`);
         await react('⏳');
         try {
-          const media = await getBuffer(`https://api.siputzx.my.id/api/m/bratvideo?text=${encodeURIComponent(text)}`);
-          
+          const media = await getBuffer(`https://api.siputzx.my.id/api/m/bratvid?text=${encodeURIComponent(text)}`);
+          if (!media) return reply('Gagal mengambil video brat dari server.');
           const stickerFile = await writeExif(media, { packname: packname, author: author });
-          
           await hc.sendMessage(sender, { sticker: { url: stickerFile } }, { quoted: m });
-          
           if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
         } catch (err) {
           console.error(err);
-          await reply('Terjadi kesalahan saat memproses stiker video brat❗');
+          await reply('Maaf, fitur stiker video brat sedang gangguan dari server penyedia API-nya. Silakan gunakan .brat untuk versi gambarnya saja!');
         }
       }
+      break
       break
       //Bot Menu
       case 'sc': case 'script': {
