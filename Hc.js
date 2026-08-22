@@ -171,7 +171,7 @@ async function Hc(hc, m, db) {
       }
       break
       // Waifu Menu
-      case 'randomwaifu': {
+      case 'randomwaifu': case 'waifu': {
         await react('⏳');
         try {
           const imageBuffer = await getRandomWaifu();
@@ -187,7 +187,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
-      case 'waifu': {
+      case 'cariwaifu': {
         if (!text) return reply(`Ketik nama karakter yang ingin dicari!\nContoh: *${prefix}waifu nurse redheart*`);
         
         await react('⏳');
@@ -326,18 +326,31 @@ async function Hc(hc, m, db) {
               🌈 *Hc-bot* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
-╭──❍ *ALL MENU*
+╭──❍ *BOT*
 │⭔ ${prefix}sc
-│⭔ ${prefix}tovn
 │⭔ ${prefix}tagme
 │⭔ ${prefix}donasi
-│⭔ ${prefix}quotes
 │⭔ ${prefix}request
-│⭔ ${prefix}sticker
+╰┬───❍
+╭┴─❍ *OWMER*
+│⭔ ${prefix}shutdown
+╰┬──❍
+╭┴─❍ *QUOTES*
+│⭔ ${prefix}quotes
 │⭔ ${prefix}quotesislami
+╰┬───❍
+╭┴─❍ *RANDOM IMAGE*
+│⭔ ${prefix}randomimage
+╰┬──❍
+╭┴─❍ *ANIME*
+│⭔ ${prefix}cariwaifu
+│⭔ ${prefix}randomwaifu
+╰┬───❍
+╭┴─❍ *TOOLS*
+│⭔ ${prefix}tovn
+│⭔ ${prefix}sticker
+│⭔ ${prefix}speedtest
 ╰────❍`)
-      }
-      break
       
     } // Penutup case command
   } catch (err) {
