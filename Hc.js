@@ -81,14 +81,6 @@ async function Hc(hc, m, db) {
         });
       }
       break
-      case 'sc': case 'script': {
-        reply(settings.mess.fitur)
-      }
-      break
-      case 'donasi': case 'donate': {
-        reply('Donasi Dapat Melalui Url Dibawah ini :\nhttps://saweria.co/Ponyndo')
-      }
-      break
       // Quotes Menu
       case 'quotes': {
         try {
@@ -176,7 +168,20 @@ async function Hc(hc, m, db) {
           await reply('Gagal mengonversi media ke Voice Note!');
         }
       }
-      break      
+      break
+      //Bot Menu
+      case 'sc': case 'script': {
+        reply(settings.mess.fitur)
+      }
+      break
+      case 'donasi': case 'donate': {
+        reply('Donasi Dapat Melalui Url Dibawah ini :\nhttps://saweria.co/Ponyndo')
+      }
+      break
+      case 'tagme': {
+        await reply(`@${m.sender.split('@')[0]}`, { mentions: [m.sender] })
+      }
+      break
       // Menu
       case 'menu': {
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
@@ -187,6 +192,7 @@ async function Hc(hc, m, db) {
 │⭔ ${prefix}ownermenu
 │⭔ ${prefix}quotesmenu
 │⭔ ${prefix}toolsmenu
+│⭔ ${prefix}allmenu
 ╰────❍`;
 
         const buttons = [
