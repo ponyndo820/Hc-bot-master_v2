@@ -237,7 +237,7 @@ async function Hc(hc, m, db) {
           }
           await hc.sendMessage(sender, { 
             image: imageBuffer, 
-            caption: `*By: Heart candy*\nIni dia gambar random-nya!` 
+            caption: `Nih gambar random-nya!` 
           }, { quoted: m });
         } catch (err) {
           console.error(err);
