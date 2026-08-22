@@ -331,15 +331,18 @@ async function Hc(hc, m, db) {
         }
       }
       break
-
-
       // Menu
       case 'menu': {
+        await react('✨');
+        
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
-              🌈 *Hc-bot* 🌈
-               *By Heart candy*
+              🌈 *HC-BOT* 🌈
+               *By ponyndo*
 *━━━━━━━━━━━━━━━━━━━━*
-╭──❍ *Menu*
+
+Halo! Selamat datang di sistem utama Hc-bot. 🦄✨
+
+╭──❍ *Kategori Menu*
 │⭔ ${prefix}botmenu
 │⭔ ${prefix}allmenu
 │⭔ ${prefix}toolsmenu
@@ -347,22 +350,21 @@ async function Hc(hc, m, db) {
 │⭔ ${prefix}quotesmenu
 ╰────❍`;
 
-        const buttons = [
-          { buttonId: `${prefix}ownermenu`, buttonText: { displayText: '👑 Owner Menu' }, type: 1 },
-          { buttonId: `${prefix}quotesmenu`, buttonText: { displayText: '📜 Quotes Menu' }, type: 1 },
-          { buttonId: `${prefix}toolsmenu`, buttonText: { displayText: '🛠️ Tools Menu' }, type: 1 }
-        ];
-
-        const buttonMessage = {
-          text: menuText,
-          footer: 'Tekan tombol di bawah untuk memilih menu',
-          buttons: buttons,
-          headerType: 1
-        };
-
-        await hc.sendMessage(sender, buttonMessage, { quoted: m });
+        try {
+          const animasiMenu = fs.readFileSync('./src/media/menu.mp4');
+          await hc.sendMessage(sender, {
+            video: animasiMenu,
+            caption: menuText,
+            gifPlayback: true
+          }, { quoted: m });
+          
+        } catch (err) {
+          console.error("Gagal memuat animasi menu:", err);
+          await reply(menuText);
+        }
       }
       break
+
       case 'botmenu': {
         await reply(`*━━━━━━━━━━━━━━━━━━━━*
               🌈 *Hc-bot* 🌈
