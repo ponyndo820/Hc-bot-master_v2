@@ -15,7 +15,7 @@ import { exec, spawn, execSync } from 'child_process';
 import { getContentType, downloadMediaMessage, generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
 
 import settings from './settings.js';
-import { getRandomImage } from './function.js';
+import { getRandomImage } from './lib/function.js';
 import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
 
 async function Hc(hc, m, db) {
