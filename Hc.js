@@ -310,7 +310,8 @@ async function Hc(hc, m, db) {
         await react('⏳');
         try {
           const output = await youtubedl(text, {
-            format: 'best[ext=mp4]/best',
+            format: 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+            mergeOutputFormat: 'mp4',
             output: './lib/temp_video.mp4',
             noCheckCertificates: true,
             noWarnings: true,
@@ -326,10 +327,11 @@ async function Hc(hc, m, db) {
           }
         } catch (err) {
           console.error(err);
-          await reply('Gagal mengunduh video dari YouTube!');
+          await reply('Gagal mengunduh video dari YouTube! Pastikan link valid dan video tidak dibatasi umur.');
         }
       }
       break
+
 
       // Menu
       case 'menu': {
