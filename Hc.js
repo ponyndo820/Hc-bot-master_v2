@@ -182,7 +182,12 @@ async function Hc(hc, m, db) {
         await hc.sendMessage(sender, { text: `@${sender.split('@')[0]}`, mentions: [sender] }, { quoted: m });
       }
       break
-
+      case 'req': case 'request': {
+        if (!text) return reply('Mau Request apa ke Owner?')
+        await reply(`*Request Telah Terkirim Ke Owner*\n_Terima Kasih🙏_Telah Menyusahkan Owner`)
+        await hc.sendFromOwner(ownerNumber, `Pesan Dari : @${sender.split('@')[0]}\nUntuk Owner\n\nRequest ${text}`, m, { contextInfo: { mentionedjid: [sender], isForwarded: true }})
+      }
+      break
       // Menu
       case 'menu': {
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
@@ -190,10 +195,11 @@ async function Hc(hc, m, db) {
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *Menu*
-│⭔ ${prefix}ownermenu
-│⭔ ${prefix}quotesmenu
-│⭔ ${prefix}toolsmenu
+│⭔ ${prefix}botmenu
 │⭔ ${prefix}allmenu
+│⭔ ${prefix}toolsmenu
+│⭔ ${prefix}Ownermenu
+│⭔ ${prefix}quotesmenu
 ╰────❍`;
 
         const buttons = [
@@ -219,6 +225,7 @@ async function Hc(hc, m, db) {
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *BOT MENU*
 │⭔ ${prefix}sc
+│⭔ ${prefix}tagme
 │⭔ ${prefix}donasi
 ╰────❍`)
       }
