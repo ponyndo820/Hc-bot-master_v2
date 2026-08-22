@@ -378,10 +378,12 @@ async function Hc(hc, m, db) {
 │⭔ ${prefix}randomwaifu
 ╰┬───❍
 ╭┴─❍ *TOOLS*
+│⭔ ${prefix}brat
 │⭔ ${prefix}tovn
 │⭔ ${prefix}sticker
 │⭔ ${prefix}speedtest
-╰────❍`)
+╰────❍
+Bot ini masih di kembangkan.\n\nTerima kasih telah menggunakan bot whatsapp kami.`)
       }
       break
       
