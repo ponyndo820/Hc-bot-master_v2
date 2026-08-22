@@ -15,8 +15,8 @@ import { exec, spawn, execSync } from 'child_process';
 import { getContentType, downloadMediaMessage, generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
 
 import settings from './settings.js';
-import { getRandomImage } from './lib/function.js';
 import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
+import { getRandomImage, searchWaifu, searchWaifu } from './lib/function.js';
 
 async function Hc(hc, m, db) {
   try {
@@ -170,6 +170,42 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      // Waifu Menu
+      case 'randomwaifu': {
+        await react('⏳');
+        try {
+          const imageBuffer = await getRandomWaifu();
+          if (!imageBuffer) return reply('Maaf, server sedang sibuk atau gambar tidak ditemukan.');
+          
+          await hc.sendMessage(sender, { 
+            image: imageBuffer, 
+            caption: `*By: Heart candy*\nIstri online-mu sudah datang!` 
+          }, { quoted: m });
+        } catch (err) {
+          console.error(err);
+          await reply('Terjadi kesalahan saat memproses gambar❗');
+        }
+      }
+      break
+      case 'waifu': {
+        if (!text) return reply(`Ketik nama karakter yang ingin dicari!\nContoh: *${prefix}waifu nurse redheart*`);
+        
+        await react('⏳');
+        try {
+          const imageBuffer = await searchWaifu(text);
+          if (!imageBuffer) return reply(`Maaf, gambar untuk *${text}* tidak ditemukan. Coba gunakan nama bahasa Inggris atau nama lengkapnya.`);
+          
+          await hc.sendMessage(sender, { 
+            image: imageBuffer, 
+            caption: `*By: Heart candy*\nHasil pencarian untuk: *${text}*` 
+          }, { quoted: m });
+        } catch (err) {
+          console.error(err);
+          await reply('Terjadi kesalahan saat mencari gambar❗');
+        }
+      }
+      break
+
       //Bot Menu
       case 'sc': case 'script': {
         reply(settings.mess.fitur)
@@ -192,7 +228,7 @@ async function Hc(hc, m, db) {
       }
       break
       // Random Images Menu
-      case 'randomimage': case 'randomimg': {
+      case 'randomimage': case 'randomimg': case 'randomimages': {
         await react('⏳');
         try {
           const imageBuffer = await getRandomImage();
