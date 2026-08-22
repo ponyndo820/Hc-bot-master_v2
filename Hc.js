@@ -351,6 +351,8 @@ async function Hc(hc, m, db) {
 │⭔ ${prefix}sticker
 │⭔ ${prefix}speedtest
 ╰────❍`)
+      }
+      break
       
     } // Penutup case command
   } catch (err) {
