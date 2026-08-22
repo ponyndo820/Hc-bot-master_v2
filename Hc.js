@@ -7,6 +7,7 @@ import fs from 'fs';
 import util from 'util';
 import path from 'path';
 import chalk from 'chalk'; 
+import yts from 'yt-search';
 import { promisify } from 'util';
 import speed from 'performance-now';
 import { fileURLToPath } from 'url';
@@ -331,6 +332,42 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      // Search Menu
+      case 'search': case 'yts': case 'ytsearch': {
+        if (!text) return reply(`Masukkan kata kunci pencarian!\nContoh: *${prefix}search mlp*`);
+        await react('🔍');
+        
+        try {
+          const searchResults = await yts(text);
+          const videos = searchResults.videos.slice(0, 5);
+          
+          if (videos.length === 0) return reply('Maaf, video yang kamu cari tidak ditemukan.');
+          let resultText = `*━━━━━━━━━━━━━━━━━━━━*\n`;
+          resultText += ` 🔍 *YOUTUBE SEARCH* 🔍\n`;
+          resultText += `*━━━━━━━━━━━━━━━━━━━━*\n\n`;
+          resultText += `Hasil pencarian untuk: *${text}*\n\n`;
+          for (let i = 0; i < videos.length; i++) {
+            let vid = videos[i];
+            resultText += `*${i + 1}. ${vid.title}*\n`;
+            resultText += `⏱️ *Durasi:* ${vid.timestamp}\n`;
+            resultText += `👁️ *Views:* ${vid.views}\n`;
+            resultText += `🔗 *Link:* ${vid.url}\n`;
+            resultText += `\n*📥 Opsi Download:*\n`;
+            resultText += `🎧 Audio ➔ *${prefix}ytmp3 ${vid.url}*\n`;
+            resultText += `🎥 Video ➔ *${prefix}ytmp4 ${vid.url}*\n`;
+            resultText += `──────────────────\n\n`;
+          }
+          await hc.sendMessage(sender, {
+            image: { url: videos[0].thumbnail },
+            caption: resultText.trim()
+          }, { quoted: m });
+        } catch (err) {
+          console.error("Error pada fitur search:", err);
+          await reply('Terjadi kesalahan saat mencari video di YouTube.');
+        }
+      }
+      break
+
       // Menu
       case 'menu': {
         await react('✨');
