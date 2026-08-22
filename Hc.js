@@ -336,7 +336,7 @@ async function Hc(hc, m, db) {
         await react('✨');
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
               🌈 *HC-BOT* 🌈
-               *By ponyndo*
+               *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 
 ╭──❍ **
