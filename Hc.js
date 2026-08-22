@@ -334,20 +334,19 @@ async function Hc(hc, m, db) {
       // Menu
       case 'menu': {
         await react('✨');
-        
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
               🌈 *HC-BOT* 🌈
                *By ponyndo*
 *━━━━━━━━━━━━━━━━━━━━*
 
-Halo! Selamat datang di sistem utama Hc-bot. 🦄✨
-
-╭──❍ *Kategori Menu*
+╭──❍ **
 │⭔ ${prefix}botmenu
 │⭔ ${prefix}allmenu
+│⭔ ${prefix}animemenu
 │⭔ ${prefix}toolsmenu
 │⭔ ${prefix}ownermenu
 │⭔ ${prefix}quotesmenu
+│⭔ ${prefix}downloadermenu
 ╰────❍`;
 
         try {
@@ -374,7 +373,7 @@ Halo! Selamat datang di sistem utama Hc-bot. 🦄✨
 │⭔ ${prefix}sc
 │⭔ ${prefix}tagme
 │⭔ ${prefix}donasi
-│⭔ ${prefix}request
+│⭔ ${prefix}request (text)
 ╰────❍`)
       }
       break
@@ -405,14 +404,38 @@ Halo! Selamat datang di sistem utama Hc-bot. 🦄✨
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *TOOLS MENU*
-│⭔ ${prefix}tovn
-│⭔ ${prefix}sticker
+│⭔ ${prefix}tovn (reply pesan)
+│⭔ ${prefix}sticker (send/reply img/vid)
 │⭔ ${prefix}speedtest
 ╰────❍`)
       }
       break
-      case 'allmenu': {
+      break
+      case 'animemenu': {
         await reply(`*━━━━━━━━━━━━━━━━━━━━*
+              🌈 *Hc-bot* 🌈
+               *By Heart candy*
+*━━━━━━━━━━━━━━━━━━━━*
+╭──❍ *DOWNLOADER*
+│⭔ ${prefix}cariwaifu (query)
+│⭔ ${prefix}randomwaifu
+╰────❍`)
+      }
+      break
+      case 'downloadermenu': {
+        await reply(`*━━━━━━━━━━━━━━━━━━━━*
+              🌈 *Hc-bot* 🌈
+               *By Heart candy*
+*━━━━━━━━━━━━━━━━━━━━*
+╭──❍ *DOWNLOADER*
+│⭔ ${prefix}ytmp4 (url)
+│⭔ ${prefix}ytmp3 (url)
+╰────❍`)
+      }
+      break
+      case 'allmenu': {
+        await react('✨');
+        const menuText =`*━━━━━━━━━━━━━━━━━━━━*
               🌈 *Hc-bot* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
@@ -420,7 +443,7 @@ Halo! Selamat datang di sistem utama Hc-bot. 🦄✨
 │⭔ ${prefix}sc
 │⭔ ${prefix}tagme
 │⭔ ${prefix}donasi
-│⭔ ${prefix}request
+│⭔ ${prefix}request (text)
 ╰┬───❍
 ╭┴─❍ *OWMER*
 │⭔ ${prefix}shutdown
@@ -433,16 +456,31 @@ Halo! Selamat datang di sistem utama Hc-bot. 🦄✨
 │⭔ ${prefix}randomimage
 ╰┬──❍
 ╭┴─❍ *ANIME*
-│⭔ ${prefix}cariwaifu
+│⭔ ${prefix}cariwaifu (query)
 │⭔ ${prefix}randomwaifu
+╰┬───❍
+╭┴─❍ *DOWNLOADER*
+│⭔ ${prefix}ytmp4 (url)
+│⭔ ${prefix}ytmp3 (url)
 ╰┬───❍
 ╭┴─❍ *TOOLS*
 │⭔ ${prefix}brat
-│⭔ ${prefix}tovn
-│⭔ ${prefix}sticker
+│⭔ ${prefix}tovn (reply pesan)
+│⭔ ${prefix}sticker (send/reply img/vid)
 │⭔ ${prefix}speedtest
 ╰────❍
-Bot ini masih di kembangkan.\n\nTerima kasih telah menggunakan bot whatsapp kami.`)
+Bot ini masih di kembangkan.\n\nTerima kasih telah menggunakan bot whatsapp kami.`;
+       try {
+          const animasiMenu = fs.readFileSync('./src/media/menu.mp4');
+          await hc.sendMessage(sender, {
+            video: animasiMenu,
+            caption: menuText,
+            gifPlayback: true
+          }, { quoted: m });
+        } catch (err) {
+          console.error("Gagal memuat animasi menu:", err);
+          await reply(menuText);
+        }
       }
       break
       
