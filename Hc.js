@@ -11,6 +11,7 @@ import { promisify } from 'util';
 import speed from 'performance-now';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
+import youtubedl from 'youtube-dl-exec';
 import { exec, spawn, execSync } from 'child_process';
 import { getContentType, downloadMediaMessage, generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
 
@@ -276,6 +277,60 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      // Downloader Menu
+      case 'ytmp3': case 'play': {
+        if (!text) return reply(`Masukkan link YouTube atau judul lagu yang ingin dicari!\nContoh: *${prefix}ytmp3 https://youtu.com/xxxxx*`);
+        await react('⏳');
+        try {
+          const output = await youtubedl(text, {
+            extractAudio: true,
+            audioFormat: 'mp3',
+            output: './lib/temp_audio.mp3',
+            noCheckCertificates: true,
+            noWarnings: true,
+            preferFreeFormats: true,
+            addHeader: ['referer:https://www.youtube.com']
+          });
+          await hc.sendMessage(sender, { 
+            audio: { url: './lib/temp_audio.mp3' }, 
+            mimetype: 'audio/mpeg', 
+            ptt: false 
+          }, { quoted: m });
+          if (fs.existsSync('./lib/temp_audio.mp3')) {
+            fs.unlinkSync('./lib/temp_audio.mp3');
+          }
+        } catch (err) {
+          console.error(err);
+          await reply('Gagal mengunduh audio dari YouTube. Pastikan link-nya benar!');
+        }
+      }
+      break
+      case 'ytmp4': case 'video': {
+        if (!text) return reply(`Masukkan link YouTube!\nContoh: *${prefix}ytmp4 https://youtu.com/xxxxx*`);
+        await react('⏳');
+        try {
+          const output = await youtubedl(text, {
+            format: 'best[ext=mp4]/best',
+            output: './lib/temp_video.mp4',
+            noCheckCertificates: true,
+            noWarnings: true,
+            preferFreeFormats: true,
+            addHeader: ['referer:https://www.youtube.com']
+          });
+          await hc.sendMessage(sender, { 
+            video: { url: './lib/temp_video.mp4' }, 
+            caption: `*By: Heart candy*\nNih videonya!` 
+          }, { quoted: m });
+          if (fs.existsSync('./lib/temp_video.mp4')) {
+            fs.unlinkSync('./lib/temp_video.mp4');
+          }
+        } catch (err) {
+          console.error(err);
+          await reply('Gagal mengunduh video dari YouTube!');
+        }
+      }
+      break
+
       // Menu
       case 'menu': {
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*

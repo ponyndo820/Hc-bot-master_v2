@@ -11,10 +11,11 @@
 
 	pkg update && pkg upgrade
 	pkg install git
+	pkg install yarn
 	pkg install nodejs
 	pkg install ffmpeg
 	pkg install imagemagick
-	pkg install yarn
+	pkg install python ffmpeg
 
 # Sosial media
 - [Subscribe](https://youtube.com/@ponyndo?si=rMY2tSN5BbeNZWQ4)
