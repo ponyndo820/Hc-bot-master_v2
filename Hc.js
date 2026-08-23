@@ -376,7 +376,7 @@ async function Hc(hc, m, db) {
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 
-╭──❍ **
+╭──❍ *MENU*
 │⭔ ${prefix}botmenu
 │⭔ ${prefix}allmenu
 │⭔ ${prefix}animemenu
@@ -385,7 +385,6 @@ async function Hc(hc, m, db) {
 │⭔ ${prefix}quotesmenu
 │⭔ ${prefix}downloadermenu
 ╰────❍`;
-
         try {
           const animasiMenu = fs.readFileSync('./src/media/menu.mp4');
           await hc.sendMessage(sender, {
@@ -400,13 +399,12 @@ async function Hc(hc, m, db) {
         }
       }
       break
-
       case 'botmenu': {
         await reply(`*━━━━━━━━━━━━━━━━━━━━*
               🌈 *Hc-bot* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
-╭──❍ *BOT MENU*
+╭──❍ *BOT*
 │⭔ ${prefix}sc
 │⭔ ${prefix}tagme
 │⭔ ${prefix}donasi
@@ -419,7 +417,7 @@ async function Hc(hc, m, db) {
               🌈 *Hc-bot* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
-╭──❍ *OWNER MENU*
+╭──❍ *OWNER*
 │⭔ ${prefix}shutdown
 ╰────❍`)
       }
@@ -429,7 +427,7 @@ async function Hc(hc, m, db) {
               🌈 *Hc-bot* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
-╭──❍ *QUOTES MENU*
+╭──❍ *QUOTES*
 │⭔ ${prefix}quotes
 │⭔ ${prefix}quotesislami
 ╰────❍`)
@@ -440,7 +438,7 @@ async function Hc(hc, m, db) {
               🌈 *Hc-bot* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
-╭──❍ *TOOLS MENU*
+╭──❍ *TOOLS*
 │⭔ ${prefix}tovn (reply pesan)
 │⭔ ${prefix}sticker (send/reply img/vid)
 │⭔ ${prefix}speedtest
@@ -453,7 +451,7 @@ async function Hc(hc, m, db) {
               🌈 *Hc-bot* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
-╭──❍ *DOWNLOADER*
+╭──❍ *ANIME*
 │⭔ ${prefix}cariwaifu (query)
 │⭔ ${prefix}randomwaifu
 ╰────❍`)
@@ -467,6 +465,16 @@ async function Hc(hc, m, db) {
 ╭──❍ *DOWNLOADER*
 │⭔ ${prefix}ytmp4 (url)
 │⭔ ${prefix}ytmp3 (url)
+╰────❍`)
+      }
+      break
+      case 'Searchmenu': {
+        await reply(`*━━━━━━━━━━━━━━━━━━━━*
+              🌈 *Hc-bot* 🌈
+               *By Heart candy*
+*━━━━━━━━━━━━━━━━━━━━*
+╭──❍ *SEARCH*
+│⭔ ${prefix}ytsearch (query)
 ╰────❍`)
       }
       break
@@ -495,6 +503,9 @@ async function Hc(hc, m, db) {
 ╭┴─❍ *ANIME*
 │⭔ ${prefix}cariwaifu (query)
 │⭔ ${prefix}randomwaifu
+╰┬───❍
+╭┴─❍ *Search*
+│⭔ ${prefix}ytsearch (query)
 ╰┬───❍
 ╭┴─❍ *DOWNLOADER*
 │⭔ ${prefix}ytmp4 (url)
