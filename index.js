@@ -13,7 +13,7 @@ import makeWaSocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCac
 import { Hc } from './Hc.js'
 import settings from './settings.js';
 import { printMessageLog } from './lib/function.js';
-import { loadDatabase, saveDatabase } from './src/database.js';
+import { dataBase, cmdDel, checkStatus} from './src/database.js';
 
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 const question = (text) => new Promise((resolve) => rl.question(text, resolve));
