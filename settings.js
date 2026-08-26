@@ -24,6 +24,7 @@ settings.mess = {
   owner: "Khusus Owner Ya Sayang❗",
   admin: "Khusus Admin Ya Sayang❗",
   fitur: "Fitur Ini Belum Tersedia Ya Syang ❗",
+  don: "selesai✅",
 }
 
 settings.limit = {

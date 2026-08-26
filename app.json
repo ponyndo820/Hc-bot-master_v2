@@ -1,0 +1,19 @@
+{
+  "name": "Hc-bot-master",
+  "description": "MLP Themed WhatsApp Bot Using Lib Baileys Multi Device",
+  "repository": "https://github.com/ponyndo820/Hc-bot-master_v2.git",
+  "keywords": [
+    "multi-device",
+    "whatsapp-bot",
+    "baileys-md",
+    "run-termux",
+    "bot-wa"
+  ],
+  "addons": [],
+  "env": {
+    "SESSION_ID": {
+      "description": "Token sesi login bot WhatsApp",
+      "required": false
+    }
+  }
+}
