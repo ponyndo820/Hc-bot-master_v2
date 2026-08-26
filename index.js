@@ -33,9 +33,46 @@ function displaySystemInfo() {
 }
 
 async function startHcbot() {
-  const { state, saveCreds } = await useMultiFileAuthState('Hc');
+  const dbConnector = dataBase(settings.tempatDB || 'database.json');
+  const { state, saveCreds } = await useMultiFileAuthState('sessions');
   const { version } = await fetchLatestBaileysVersion();
-  let db = loadDatabase();
+
+  try {
+    const loadData = await dbConnector.read();
+    if (!loadData || Object.keys(loadData).length === 0) {
+      global.db = {
+        hit: {},
+        set: {},
+        cmd: {},
+        game: {},
+        store: {},
+        users: {},
+        groups: {},
+        database: {},
+        sewa: [],
+        premium: [],
+        ...(loadData || {}),
+      };
+      await dbConnector.write(global.db);
+    } else {
+      global.db = loadData;
+    }
+    
+    global.loadMessage = function (remotejid, id) {
+      const messages = store.messages?.[remotejid]?.array;
+      if (!messages) return null;
+      return messages.find(msg => msg?.key?.id === id) || null;
+    };
+
+    if (!global._dbInterval) {
+      global._dbInterval = setInterval(async () => {
+        if (global.db) await dbConnector.write(global.db);
+      }, 30 * 1000);
+    }
+  } catch (e) {
+    console.log(e);
+    process.exit(1);
+  }
   
   const hcOptions = {
     version,
@@ -71,14 +108,14 @@ async function startHcbot() {
     }
   });
   
-    hc.ev.on('messages.upsert', async (chatUpdate) => {
+  hc.ev.on('messages.upsert', async (chatUpdate) => {
     try {
       const m = chatUpdate.messages[0];
       if (!m.message) return;
       
       await printMessageLog(hc, m);
-      await Hc(hc, m, db);
-      saveDatabase(db);
+      await Hc(hc, m, global.db);
+      await dbConnector.write(global.db);
     } catch (err) {
       console.log(chalk.red("[SYSTEM ERROR]", err));
     }
