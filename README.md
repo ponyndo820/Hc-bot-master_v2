@@ -53,5 +53,5 @@ PM2 adalah manajer proses (process manager) tingkat produksi untuk aplikasi berb
 
 *Cara install dan menggunakannya*
 
-1 -Instal PM2 secara global
+1 - Instal PM2 secara global
 	Jalankan perintah ini di Termux untuk memasang PM2: 
