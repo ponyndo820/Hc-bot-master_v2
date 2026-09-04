@@ -54,6 +54,23 @@ PM2 adalah manajer proses (process manager) tingkat produksi untuk aplikasi berb
 *Cara install dan menggunakannya*
 
 - Instal PM2 secara global
-  Jalankan perintah ini di Termux untuk memasang PM2:
+  Jalankan perintah ini di Termux untuk memasang PM2
   
       npm install g pm2
+
+- Menjalankan bot dengan PM2
+Masuk ke direktori folder bot, lalu jalankan perintah berikut untuk mulai menyalakannya
+
+      pm2 start index.js --name "Hc-bot-master_v2"
+
+- Melihat log/aktivitas bot secara real-time
+
+      pm2 logs Hc-bot-master_v2
+
+- Merestart bot (misalnya setelah update)
+
+      pm2 restart Hc-bot-master_v2
+
+- Menghentikan bot sementara
+
+      pm2 stop Hc-bot-master_v2
