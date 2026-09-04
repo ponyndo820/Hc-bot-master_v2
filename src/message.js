@@ -27,7 +27,7 @@ const botStartTime = Date.now();
 const groupMetadataTimers = {};
 const reloadHandler = async () => {
   try {
-    chHandler = (await import(`../Hc.js?update=${Date.now()}`)).default;
+    hcHandler = (await import(`../Hc.js?update=${Date.now()}`)).default;
   } catch (err) {
     console.error(chalk.redBright(`[ERROR] ${err}`));
   }
