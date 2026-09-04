@@ -215,7 +215,11 @@ async function Hc(hc, m, db) {
       }
       break
       case 'tagme': {
-        await hc.sendMessage(sender, { text: `@${sender.split('@')[0]}`, mentions: [sender] }, { quoted: m });
+        const userTag = participant.includes('@s.whatsapp.net') ? participant : m.sender;
+        await hc.sendMessage(sender, { 
+          text: `Nih @${userTag.split('@')[0]}`, 
+          mentions: [userTag] 
+        }, { quoted: m });
       }
       break      
       case 'req': case 'request': {
