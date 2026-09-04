@@ -42,3 +42,7 @@
 ├── settings.js
 ├── speed.py
 ```
+
+
+# pm2
+PM2 adalah manajer proses (process manager) tingkat produksi untuk aplikasi berbasis Node.js yang dilengkapi dengan fitur load balancer bawaan. Alat ini dirancang untuk membantu menjaga aplikasi agar tetap berjalan terus-menerus (24/7), melakukan restart otomatis jika terjadi crash, serta memudahkan pengelolaan aplikasi di latar belakang server tanpa takut terputus meskipun terminal ditutup.
