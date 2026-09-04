@@ -18,7 +18,7 @@ import { imageToWebp, videoToWebp, writeExif, gifToWebp, getBuffer, getSizeMedia
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const hcPath = fileURLToPath(new URL('../Hc.js', import.mete.url));
+const hcPath = fileURLToPath(new URL('../Hc.js', import.meta.url));
 
 let hcHandler = null;
 const botStartTime = Date.now();
