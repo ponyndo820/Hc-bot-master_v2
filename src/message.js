@@ -14,7 +14,9 @@ import { jidNormalizedUser, proto, getBinaryNodeChildren, getBinaryNodeChildStri
 
 import '../settings.js';
 import { checkStatus } from './database.js';
-import { imageToWebp, videoToWebp, writeExif, gifToWebp, getBuffer, getSizeMedia, fetchJson, sleep, axiosss, fixBytes } from '../lib/converter.js';
+import { imageToWebp, videoToWebp, writeExif, gifToWebp,} from '../lib/converter.js';
+import { getBuffer, getSizeMedia, fetchJson, sleep, axiosss, fixBytes } from '../lid/function.js'
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
