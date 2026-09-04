@@ -6,7 +6,7 @@ import axios from 'axios';
 import chalk from 'chalk';
 import crypto from 'crypto';
 import chokidar from 'chokidar';
-import FileType from 'file-type';
+// import FileType from 'file-type';
 import { fileURLToPath } from 'url';
 import PhoneNumber from 'awesome-phonenumber';
 import { jidNormalizedUser, proto, getBinaryNodeChildren, getBinaryNodeChildString, getBinaryNodeChild, generateMessageIDV2, jidEncode, encodeSignedDeviceIdentity, generateWAMessageContent, generateForwardMessageContent, prepareWAMessageMedia, delay, areJidsSameUser, extractMessageContent, generateMessageID, downloadContentFromMessage, generateWAMessageFromContent, jidDecode, generateWAMessage, toBuffer, getContentType, getDevice } from '@whiskeysockets/baileys';
