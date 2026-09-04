@@ -218,7 +218,7 @@ async function Hc(hc, m, db) {
         const userTag = m.key.participant || m.sender || sender;
         const userNumber = typeof userTag === 'string' ? userTag.split('@')[0] : sender.split('@')[0];
         await hc.sendMessage(sender, { 
-          text: `Nih @${userNumber}`, 
+          text: `@${userNumber}`, 
           mentions: [userTag] 
         }, { quoted: m });
       }
