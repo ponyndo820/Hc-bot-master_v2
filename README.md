@@ -61,6 +61,7 @@ PM2 adalah manajer proses (process manager) tingkat produksi untuk aplikasi berb
 - Menjalankan bot dengan PM2
 Masuk ke direktori folder bot, lalu jalankan perintah berikut untuk mulai menyalakannya
 
+      cd Hc-bot-master-v2
       pm2 start index.js --name "Hc-bot-master_v2"
 
 - Melihat log/aktivitas bot secara real-time
