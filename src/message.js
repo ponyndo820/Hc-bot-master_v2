@@ -72,11 +72,56 @@ async function GroupUpdate(hc, m, store) {
       }, 5000);
     } else if (type === 29 || type === 30) {
       const target = jidNormalizeduser(normalizedTarget.id || normalizedTarget)
-      /* 
-        Oke sampai disini dulu esok lanjut lagi, punggung gw sakit jir ☕🗿
-      */
+      const newAdminValue = type === 29 ? 'admin' : null
+      if (metadata.participants?.length) {
+        metadata.participants = metadata.participants.map(p => {
+          const key = metadata.addressingMode === 'lid' ? jidNormalizedUser(p.id) : jidNormalizedUser(p.phoneNumber)
+          if (key === target) {
+            return { ...p, admin: newAdminValue }
+          }
+          return p
+        })
+      }
+    } else if (type === 27) {
+      if (!metadata.participants.some(a => (a.id === (normalizedTarget.id || normalizedTarget) || a.phoneNumber === (normalizedTarget.id || normalizedTarget)))) {
+        clearTimeout(groupMetadataTimers[m.chat])
+        groupMetadataTimers[m.chat] = setTimeout(async () => {
+          store.grouoMetadata[m.chat] = await hc.grouoMetadata(m.chat).catch(e => ({ ...store.grouoMetadata[m.chat] }));
+        }, 5000);
+      }
+    } else if (type === 28 || type === 32) {
+      if (m.fromMe && ((jidNormalizedUser(hc.user.id) == (normalizedTarget.id || normalizedTarget)) || (jidNormalizedUser(hc.user.lid) == (normalizedTarget.id || normalizedTarget)))) {
+        delete store.messages[m.chat];
+        delete store.presences[m.chat];
+        delete store.groupMetadata[m.chat];
+      }
+      if(!!metadata) metadata.participants = metadata.participants.filter(p => {
+        const key = metadata.addressingMode === 'lid' ? jidNormalizedUser(p.id) : jidNormalizedUser(p.phoneNumber)
+        return key !== (normalizedTarget.id || normalizedTarget)
+      });
+    } else {
+      console.log({
+        messageStubType: m.messageStubType, type,
+        messageStubParameters: m.messageStubParameters,
+      })
     }
-    
   }
 }
 
+export {
+  GroupUpdate,
+};
+
+const watcher = chokidar.watch(hcPath, {
+  ignored: /^\./,
+  persistent: true,
+  awaitWriteFinish: {
+    stabilityThreshold: 100,
+    pollInterval: 100
+  }
+})
+
+watcher.on('change', async (filePath) => {
+  console.log(chalk.yellowBright(`[UPDATE] ${filePath}`));
+  await reloadHandler();
+}); 
