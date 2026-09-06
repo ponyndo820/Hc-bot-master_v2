@@ -150,18 +150,40 @@ async function Hc(hc, m, db) {
       }
       break
       case 'readviewonce': case 'readviewone': case 'rvo': {
-        if (!m.quoted) return reply(settings.mess.quoted)
+        if (!isQuoted) return reply('settings.mess.quoted');
         try {
-          if (m.quoted.msg.viewOnce) {
-            delete m.quoted.chat
-            m.quoted.msg.viewOnce = false
-            await reply({ forward: m.quoted })
-          } else m.reply(`Reply view once message\nExample: ${prefix + command}`)
+          let viewOnceMsg = quoted;
+          if (viewOnceMsg.viewOnceMessage) viewOnceMsg = viewOnceMsg.viewOnceMessage.message;
+          else if (viewOnceMsg.viewOnceMessageV2) viewOnceMsg = viewOnceMsg.viewOnceMessageV2.message;
+          else if (viewOnceMsg.viewOnceMessageV2Extension) viewOnceMsg = viewOnceMsg.viewOnceMessageV2Extension.message;
+
+          const mediaType = getContentType(viewOnceMsg);
+          if (!mediaType || !/imageMessage|videoMessage|audioMessage/.test(mediaType)) {
+            return reply(`Reply pesan media View Once!\nContoh: *${prefix + command}*`);
+          }
+
+          await react('⏳');
+          const targetMsg = { key: m.key, message: viewOnceMsg };
+          const mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+
+          if (!mediaBuffer) return reply('Gagal mengunduh media View Once.');
+
+          const caption = viewOnceMsg[mediaType]?.caption || '';
+
+          if (/imageMessage/.test(mediaType)) {
+            await hc.sendMessage(sender, { image: mediaBuffer, caption: caption }, { quoted: m });
+          } else if (/videoMessage/.test(mediaType)) {
+            await hc.sendMessage(sender, { video: mediaBuffer, caption: caption }, { quoted: m });
+          } else if (/audioMessage/.test(mediaType)) {
+            await hc.sendMessage(sender, { audio: mediaBuffer, mimetype: 'audio/mp4', ptt: true }, { quoted: m });
+          }
         } catch (e) {
-          reply('Media Tidak Valid❗')
+          console.error(e);
+          await reply('Media Tidak Valid atau gagal diproses❗');
         }
       }
       break
+
       case 'tovn': case 'toptt': case 'tovoice': {
         if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin Dijadikan Audio Dengan Caption ${prefix + command}`);
         await react('⏳');
