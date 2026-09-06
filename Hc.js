@@ -122,7 +122,7 @@ async function Hc(hc, m, db) {
       }
       break
       // Tools Menu
-      case 'sticker': case 'stiker': case 's': case 'stickergif': case 'stikergif': case 'sgif': case 'stickerwm': case 'swm': case 'curi': case 'colong': case 'take': case 'stickergifwm': case 'sgifwm': {
+      case 'sticker': case 'stiker': case 's': case 'stickergif': case 'stikergif': case 'sgif': case 'stickerwm': case 'swm': case 'curi': case 'colong': case 'take': case 'stickergifwm': case 'sgifwm': case 'wm': {
         if (!/image|video|sticker/.test(quotedType)) return reply(`Kirim/reply gambar/video/gif dengan caption ${prefix + command}\nDurasi Image/Video/Gif 1-9 Detik`);
         await react('⏳');
         const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
