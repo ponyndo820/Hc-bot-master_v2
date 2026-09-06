@@ -267,7 +267,7 @@ async function Hc(hc, m, db) {
           }, paperW, paperH);
           
           // 2. Putar teks sedikit ke kiri (-5 derajat) mengikuti sudut kemiringan kertas
-          textCanvas.rotate(-5, false);
+          textCanvas.rotate(+5, false);
           
           // 3. Tentukan posisi koordinat penempelan di atas gambar utama
           const posX = Math.round(width * 0.21);
