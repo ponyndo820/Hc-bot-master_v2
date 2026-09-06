@@ -237,7 +237,7 @@ async function Hc(hc, m, db) {
       break
       //Bot Menu
       case 'sc': case 'script': {
-        reply('Donasi dulu di .donasi')
+        reply('Donasi dulu')
       }
       break
       case 'donasi': case 'donate': {
@@ -546,7 +546,7 @@ async function Hc(hc, m, db) {
 ╰┬───❍
 ╭┴─❍ *DOWNLOADER*
 │${setv} ${prefix}ytmp4 (url)
-│${stv} ${prefix}ytmp3 (url)
+│${setv} ${prefix}ytmp3 (url)
 ╰┬───❍
 ╭┴─❍ *TOOLS*
 │${setv} ${prefix}rvo (reply pesan viewone)
