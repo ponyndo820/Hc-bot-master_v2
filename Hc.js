@@ -246,26 +246,35 @@ async function Hc(hc, m, db) {
           
           const imageUrl = 'https://files.catbox.moe/5zv26f.jpg';
           const image = await Jimp.default.read(imageUrl);
-          
-          // Resize gambar ke lebar 512px agar font bawaan Jimp terlihat besar dan proporsional
           image.resize(512, Jimp.default.AUTO);
-          
-          const font = await Jimp.default.loadFont(Jimp.default.FONT_SANS_64_BLACK);
           
           const width = image.bitmap.width;
           const height = image.bitmap.height;
           
-          // Penyesuaian koordinat pada ukuran 512px agar pas di tengah kertas
-          const x = width * 0.21;
-          const y = height * 0.58;
-          const maxWidth = width * 0.58;
-          const maxHeight = height * 0.20;
-
-          image.print(font, x, y, {
+          // Ukuran area kertas pada gambar
+          const paperW = Math.round(width * 0.58);
+          const paperH = Math.round(height * 0.20);
+          
+          // 1. Buat canvas transparan khusus untuk menampung teks agar bisa di-wrap dan di-rotate
+          const textCanvas = new Jimp.default(paperW, paperH, 0x00000000);
+          const font = await Jimp.default.loadFont(Jimp.default.FONT_SANS_64_BLACK);
+          
+          // Cetak teks dengan auto-wrap ke dalam canvas teks
+          textCanvas.print(font, 0, 0, {
             text: text,
             alignmentX: Jimp.default.HORIZONTAL_ALIGN_CENTER,
             alignmentY: Jimp.default.VERTICAL_ALIGN_MIDDLE
-          }, maxWidth, maxHeight);
+          }, paperW, paperH);
+          
+          // 2. Putar teks sedikit ke kiri (-5 derajat) mengikuti sudut kemiringan kertas
+          textCanvas.rotate(-5, false);
+          
+          // 3. Tentukan posisi koordinat penempelan di atas gambar utama
+          const posX = Math.round(width * 0.21);
+          const posY = Math.round(height * 0.58);
+          
+          // Tempelkan gambar teks yang sudah dimiringkan ke gambar utama
+          image.composite(textCanvas, posX, posY);
           
           const buffer = await image.getBufferAsync(Jimp.default.MIME_JPEG);
           
@@ -279,7 +288,6 @@ async function Hc(hc, m, db) {
         }
       }
       break
-
 
       //Bot Menu
       case 'sc': case 'script': {
