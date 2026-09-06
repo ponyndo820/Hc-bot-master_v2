@@ -19,7 +19,7 @@ import { getContentType, downloadMediaMessage, generateWAMessageFromContent, pro
 import settings from './settings.js';
 import { GroupUpdate } from './src/message.js';
 import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
-import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer } from './lib/function.js';
+import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom } from './lib/function.js';
 
 async function Hc(hc, m, db) {
   try {
