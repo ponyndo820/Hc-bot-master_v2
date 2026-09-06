@@ -223,7 +223,7 @@ async function Hc(hc, m, db) {
         if (!text) return reply(`Teksnya mana?\nContoh: *${prefix}bratvid halo semua*`);
         await react('⏳');
         try {
-          const media = await getBuffer(`https://api.siputzx.my.id/api/m/bratvid?text=${encodeURIComponent(text)}`);
+          const media = await getBuffer(`https://brat.siputzx.my.id/mp4?tex=${encodeURIComponent(text)}`);
           if (!media) return reply('Gagal mengambil video brat dari server.');
           const stickerFile = await writeExif(media, { packname: packname, author: author });
           await hc.sendMessage(sender, { sticker: { url: stickerFile } }, { quoted: m });
