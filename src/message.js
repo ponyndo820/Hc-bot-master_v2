@@ -110,7 +110,7 @@ async function GroupUpdate(hc, m, store) {
   }
 }
 
-async function GroupParticipantsUpdate(hc,update store) {
+/* async function GroupParticipantsUpdate(hc,update store) {
   try {
     const { id, participants, author, action } = update;
     function updateAdmminStatus(participants,metadataParticipants, status) {
@@ -149,7 +149,7 @@ async function GroupParticipantsUpdate(hc,update store) {
     }
   }
 }
-
+*/
 export {
   GroupUpdate,
 };
