@@ -238,13 +238,11 @@ async function Hc(hc, m, db) {
         }
       }
       break
-            case 'alyabrat': {
+      case 'alyabrat': {
         if (!text) return reply(`Teksnya mana?\nContoh: *${prefix}alyabrat halo*`);
         await react('⏳');
         try {
-          const { createCanvas, loadImage, registerFont } = await import('canvas');
-          // Pastikan file font ini tersedia di folder penyimpanan botmu
-          // registerFont('./data/assets/FontsFree-Net-SFProDisplay-Bold.ttf', { family: 'SF Bold' });
+          const { createCanvas, loadImage } = await import('canvas');
 
           const imageUrl = 'https://files.catbox.moe/5zv26f.jpg';
           const res = await axios.get(imageUrl, { responseType: 'arraybuffer' });
@@ -285,15 +283,16 @@ async function Hc(hc, m, db) {
           let lines = [];
           let lineHeight = 0;
 
+          // Menggunakan font default bawaan canvas jika file .ttf kustom tidak ada
           while (fontSize > 32) {
-            ctx.font = `${fontSize}px "SF Bold"`;
+            ctx.font = `${fontSize}px sans-serif`;
             lines = wrapLines(ctx, text, textAreaW);
             lineHeight = fontSize * 1.2;
             if (lines.length <= 2 && lines.length * lineHeight <= paperH) break;
             fontSize -= 2;
           }
 
-          ctx.font = `${fontSize}px "SF Bold"`;
+          ctx.font = `${fontSize}px sans-serif`;
           lineHeight = fontSize * 1.2;
           const offsetY = paperH * 0.40;
           const offsetX = paperW * -0.10;
@@ -312,7 +311,7 @@ async function Hc(hc, m, db) {
 
           const buffer = canvas.toBuffer();
           
-          // Memanfaatkan fungsi writeExif bawaan botmu agar konsisten
+          // Menggunakan writeExif bawaan bot yang sudah aman di Termux
           const stickerFile = await writeExif(buffer, { packname: packname, author: author });
           await hc.sendMessage(sender, { sticker: { url: stickerFile } }, { quoted: m });
           
@@ -323,6 +322,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
+
       //Bot Menu
       case 'sc': case 'script': {
         reply('Donasi dulu')
