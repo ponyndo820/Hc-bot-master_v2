@@ -150,26 +150,23 @@ async function Hc(hc, m, db) {
       }
       break
       case 'readviewonce': case 'readviewone': case 'rvo': {
-        if (!isQuoted) return reply('settings.mess.quoted');
+        if (!isQuoted) return reply(settings.mess.quoted);
         try {
           let viewOnceMsg = quoted;
           if (viewOnceMsg.viewOnceMessage) viewOnceMsg = viewOnceMsg.viewOnceMessage.message;
           else if (viewOnceMsg.viewOnceMessageV2) viewOnceMsg = viewOnceMsg.viewOnceMessageV2.message;
           else if (viewOnceMsg.viewOnceMessageV2Extension) viewOnceMsg = viewOnceMsg.viewOnceMessageV2Extension.message;
-
           const mediaType = getContentType(viewOnceMsg);
           if (!mediaType || !/imageMessage|videoMessage|audioMessage/.test(mediaType)) {
             return reply(`Reply pesan media View Once!\nContoh: *${prefix + command}*`);
           }
-
+          
           await react('⏳');
           const targetMsg = { key: m.key, message: viewOnceMsg };
           const mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
-
           if (!mediaBuffer) return reply('Gagal mengunduh media View Once.');
-
           const caption = viewOnceMsg[mediaType]?.caption || '';
-
+          
           if (/imageMessage/.test(mediaType)) {
             await hc.sendMessage(sender, { image: mediaBuffer, caption: caption }, { quoted: m });
           } else if (/videoMessage/.test(mediaType)) {
@@ -183,7 +180,6 @@ async function Hc(hc, m, db) {
         }
       }
       break
-
       case 'tovn': case 'toptt': case 'tovoice': {
         if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin Dijadikan Audio Dengan Caption ${prefix + command}`);
         await react('⏳');
@@ -483,6 +479,7 @@ async function Hc(hc, m, db) {
 │⭔ ${prefix}tovn (reply pesan)
 │⭔ ${prefix}sticker (send/reply img/vid)
 │⭔ ${prefix}speedtest
+│⭔ ${prefix}rvo (reply pesan viewone)
 ╰────❍`)
       }
       break
@@ -553,6 +550,7 @@ async function Hc(hc, m, db) {
 │⭔ ${prefix}ytmp3 (url)
 ╰┬───❍
 ╭┴─❍ *TOOLS*
+│⭔ ${prefix}rvo (reply pesan viewone)
 │⭔ ${prefix}brat
 │⭔ ${prefix}tovn (reply pesan)
 │⭔ ${prefix}sticker (send/reply img/vid)
