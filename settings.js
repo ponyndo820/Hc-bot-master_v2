@@ -20,13 +20,21 @@ const settings = {
   selfMode: false,
   tempatDB: 'database.json',
   tempatStore: 'baileys_store.json',
+  listv: ['•','●','■','✿','▲','➩','➢','➣','➤','✦','✧','△','❀','○','□','♤','♡','◇','♧','々','〆']
+}
+
+settings.my = {
+  yt: '',
+  gh: '',
+  gc: '',
+  ch: '',
 }
 
 settings.mess = {
-  owner: "Khusus Owner Ya Sayang❗",
-  admin: "Khusus Admin Ya Sayang❗",
-  fitur: "Fitur Ini Belum Tersedia Ya Syang ❗",
-  quoted: "Reply pesannya ya Sayang❗",
+  owr: "Khusus Owner Ya Sayang❗",
+  adm: "Khusus Admin Ya Sayang❗",
+  fit: "Fitur Ini Belum Tersedia Ya Syang ❗",
+  qud: "Reply pesannya ya Sayang❗",
   don: "selesai✅",
 }
 
@@ -42,6 +50,17 @@ settings.money = {
   vip: 100000000
   
 }
+
+settings.jadwalSholat = {
+  Subuh: '04:30',
+  Dzuhur: '12:06',
+  Ashar: '15:21',
+  Maghrib: '18:08',
+  Isya: '19:00'
+}
+
+settings.badWords = ['dongo','kontol'] // input kata-kata toxic di sini ya Sayang. ex: ['dongo','dongonya']
+settings.chatLength = 1000
 
 
 fs.watchFile(__filename, async () => {

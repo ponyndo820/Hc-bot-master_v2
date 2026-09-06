@@ -167,3 +167,5 @@ watcher.on('change', async (filePath) => {
   console.log(chalk.yellowBright(`[UPDATE] ${filePath}`));
   await reloadHandler();
 }); 
+
+// Tanda ini // untuk mematikan fitur yang belum selesai di buat

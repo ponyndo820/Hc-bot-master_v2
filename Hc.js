@@ -73,13 +73,13 @@ async function Hc(hc, m, db) {
     
     switch (command) {
       case 'tes': {
-        await reply('Ya\nsayang');
+        await reply('Ya\ssayang');
       }
       break
       
       // Owner Menu
       case 'shutdown': case 'off': {
-        if (!isCreator) return reply(settings.mess.owner);
+        if (!isCreator) return reply(settings.mess.owr);
         reply(`*[Bot] Process Shutdown...*`).then(() => {
           process.exit(0);
         });
@@ -150,7 +150,7 @@ async function Hc(hc, m, db) {
       }
       break
       case 'readviewonce': case 'readviewone': case 'rvo': {
-        if (!isQuoted) return reply(settings.mess.quoted);
+        if (!isQuoted) return reply(settings.mess.qud);
         try {
           let viewOnceMsg = quoted;
           if (viewOnceMsg.viewOnceMessage) viewOnceMsg = viewOnceMsg.viewOnceMessage.message;
@@ -238,7 +238,7 @@ async function Hc(hc, m, db) {
       break
       //Bot Menu
       case 'sc': case 'script': {
-        reply(settings.mess.fitur)
+        reply(settings.mess.fit)
       }
       break
       case 'donasi': case 'donate': {
