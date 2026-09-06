@@ -223,19 +223,22 @@ async function Hc(hc, m, db) {
         if (!text) return reply(`Teksnya mana?\nContoh: *${prefix}bratvid halo semua*`);
         await react('⏳');
         try {
-          const media = await getBuffer(`https://brat.siputzx.my.id/mp4?tex=${encodeURIComponent(text)}`);
-          if (!media) return reply('Gagal mengambil video brat dari server.');
+          
+          const media = await getBuffer(`https://brat.siputzx.my.id/mp4?text=${encodeURIComponent(text)}`);
+          if (!media || media.length < 1000) {
+             return reply('Gagal mengambil video brat! Server API mungkin sedang down atau merespons error.');
+          }
           const stickerFile = await writeExif(media, { packname: packname, author: author });
           await hc.sendMessage(sender, { sticker: { url: stickerFile } }, { quoted: m });
+          
           if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
         } catch (err) {
           console.error(err);
-          await reply('Maaf, fitur stiker video brat sedang gangguan dari server penyedia API-nya. Silakan gunakan .brat untuk versi gambarnya saja!');
+          await reply('Maaf, fitur stiker video brat sedang mengalami gangguan teknis.');
         }
       }
       break
-      break
-      //Bot Menu
+//Bot Menu
       case 'sc': case 'script': {
         reply('Donasi dulu')
       }
