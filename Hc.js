@@ -247,20 +247,16 @@ async function Hc(hc, m, db) {
           const imageUrl = 'https://files.catbox.moe/5zv26f.jpg';
           const image = await Jimp.default.read(imageUrl);
           
-          // 1. Ubah ukuran gambar menjadi persegi (1x1 / square) berdasarkan sisi terkecilnya
-          const size = Math.min(image.bitmap.width, image.bitmap.height);
-          const cropX = (image.bitmap.width - size) / 2;
-          const cropY = (image.bitmap.height - size) / 2;
-          image.crop(cropX, cropY, size, size);
-          
-          // 2. Memuat font ukuran besar untuk stiker kotak
           const font = await Jimp.default.loadFont(Jimp.default.FONT_SANS_64_BLACK);
           
-          // 3. Menyesuaikan posisi koordinat di atas kertas untuk ukuran 1x1
-          const x = size * 0.23;
-          const y = size * 0.61;
-          const maxWidth = size * 0.54;
-          const maxHeight = size * 0.15;
+          const width = image.bitmap.width;
+          const height = image.bitmap.height;
+          
+          // Koordinat berdasarkan ukuran asli gambar (full size)
+          const x = width * 0.23;
+          const y = height * 0.61;
+          const maxWidth = width * 0.54;
+          const maxHeight = height * 0.15;
 
           image.print(font, x, y, {
             text: text,
@@ -276,11 +272,10 @@ async function Hc(hc, m, db) {
           if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
         } catch (err) {
           console.error(err);
-          reply('❌ Error saat membuat stiker alyabrat 1x1');
+          reply('❌ Error saat membuat stiker alyabrat');
         }
       }
       break
-
 
       //Bot Menu
       case 'sc': case 'script': {
