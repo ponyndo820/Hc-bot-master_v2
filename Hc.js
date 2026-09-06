@@ -323,6 +323,7 @@ async function Hc(hc, m, db) {
       }
       break
 
+
       //Bot Menu
       case 'sc': case 'script': {
         reply('Donasi dulu')
