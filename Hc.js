@@ -244,39 +244,43 @@ async function Hc(hc, m, db) {
         try {
           const Jimp = await import('jimp');
           
-          // 1. Download background image dari Catbox
           const imageUrl = 'https://files.catbox.moe/5zv26f.jpg';
           const image = await Jimp.default.read(imageUrl);
           
-          // 2. Load font bawaan Jimp (bisa disesuaikan ukuran/tipenya)
-          const font = await Jimp.default.loadFont(Jimp.default.FONT_SANS_32_BLACK);
+          // 1. Ubah ukuran gambar menjadi persegi (1x1 / square) berdasarkan sisi terkecilnya
+          const size = Math.min(image.bitmap.width, image.bitmap.height);
+          const cropX = (image.bitmap.width - size) / 2;
+          const cropY = (image.bitmap.height - size) / 2;
+          image.crop(cropX, cropY, size, size);
           
-          // 3. Menulis teks ke atas gambar
-          // Sesuaikan kordinat x, y, alignment sesuai posisi kotak putih di gambarmu
-          const x = image.bitmap.width * 0.25;
-          const y = image.bitmap.height * 0.63;
-          const maxWidth = image.bitmap.width * 0.50;
+          // 2. Memuat font ukuran besar untuk stiker kotak
+          const font = await Jimp.default.loadFont(Jimp.default.FONT_SANS_64_BLACK);
           
+          // 3. Menyesuaikan posisi koordinat di atas kertas untuk ukuran 1x1
+          const x = size * 0.23;
+          const y = size * 0.61;
+          const maxWidth = size * 0.54;
+          const maxHeight = size * 0.15;
+
           image.print(font, x, y, {
             text: text,
             alignmentX: Jimp.default.HORIZONTAL_ALIGN_CENTER,
             alignmentY: Jimp.default.VERTICAL_ALIGN_MIDDLE
-          }, maxWidth);
+          }, maxWidth, maxHeight);
           
-          // 4. Konversi ke buffer untuk dijadikan stiker
           const buffer = await image.getBufferAsync(Jimp.default.MIME_JPEG);
           
-          // 5. Kirim sebagai stiker menggunakan writeExif
           const stickerFile = await writeExif(buffer, { packname: packname, author: author });
           await hc.sendMessage(sender, { sticker: { url: stickerFile } }, { quoted: m });
           
           if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
         } catch (err) {
           console.error(err);
-          reply('❌ Error saat membuat stiker alyabrat menggunakan Jimp');
+          reply('❌ Error saat membuat stiker alyabrat 1x1');
         }
       }
       break
+
 
       //Bot Menu
       case 'sc': case 'script': {
