@@ -17,13 +17,16 @@ const settings = {
   pairing_code: true,
   prefix: ['+', ',', '.', '!'],
   autoRead: false,
-  selfMode: false
+  selfMode: false,
+  tempatDB: 'database.json',
+  tempatStore: 'baileys_store.json',
 }
 
 settings.mess = {
   owner: "Khusus Owner Ya Sayang❗",
   admin: "Khusus Admin Ya Sayang❗",
   fitur: "Fitur Ini Belum Tersedia Ya Syang ❗",
+  quoted: "Reply pesannya ya Sayang❗",
   don: "selesai✅",
 }
 

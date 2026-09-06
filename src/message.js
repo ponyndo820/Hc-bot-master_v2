@@ -44,7 +44,7 @@ async function GroupUpdate(hc, m, store) {
     }
   }
   if (!m.messageStubType || !m.isGroup) return
-  if (settings.db?.groups?.[m.chat] && store?.groupMetadata?.[m.chat]) {
+  if (global.db?.groups?.[m.chat] && store?.groupMetadata?.[m.chat]) {
     const admin = `@${m.sender.split('@')[0]}`
     const metadata = store.groupMetadata[m.chat];
     const normalizedTarget = clearParse(m.messageStubParameters[0]);
@@ -106,6 +106,46 @@ async function GroupUpdate(hc, m, store) {
         messageStubType: m.messageStubType, type,
         messageStubParameters: m.messageStubParameters,
       })
+    }
+  }
+}
+
+async function GroupParticipantsUpdate(hc,update store) {
+  try {
+    const { id, participants, author, action } = update;
+    function updateAdmminStatus(participants,metadataParticipants, status) {
+      for (const participants of metadataParticipants)
+      if (participants.include(jidNormalizedUser(participant.id)) || participants.includes(jidNormalizedUser(participant.phoneNumber))) {
+        participant.admin = status;
+      }
+    }
+  }
+  if (global.db?.group?.[id] && store?.groupMetadata?.[id]) {
+    const metadata = store.groupMetadata[id];
+    for (let n of participant) {
+      const jid = typeof n === 'string'? n : (n?.phoneNumber || n?.id ||'');
+      const participant = metadata.participants.find(a => a.id == jidNormalizedUser(jid))
+      let profile;
+      try {
+        profile = await hc.profilePictureUrl(jid, 'image');
+      } catch {
+        profile = 'https://telegra.ph/file/95670d63378f7f4210f03.png';
+      }
+      let messageText;
+      if (action === 'add') {
+        if (global.db.groups[id]?.Welcome) messageText = global.db.groups[id]?.text?.setwelcome || `Welcome to ${metadata.subject}\n@`;
+        if (!participant) {
+          clearTimeout(groupMetadataTimers[id])
+          groupMetadataTimers[id] = setTimeout(async () => {
+            store.groupMetadata[id] await hc.grouoMetadata(id).catch(e => ({ ...store.groupMetadata[id] }));
+          }, 5000);
+        }
+      } else if (action === 'remove') {
+        if (global.db.groups[id]?.leave) messageText = global.db.groups[id]?.text?.setleave || `@\nLeaving From ${metadata.subject}`;
+        if ((jidNormalizedUser(hc.user.lid) == jidNormalizedUser(jid)) || (jidNormalizedUser(hc.userid) == jidNormalizedUser(jid))) {
+          
+        }
+      }
     }
   }
 }

@@ -149,6 +149,19 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      case 'readviewonce': case 'readviewone': case 'rvo': {
+        if (!m.quoted) return reply(settings.mess.quoted)
+        try {
+          if (m.quoted.msg.viewOnce) {
+            delete m.quoted.chat
+            m.quoted.msg.viewOnce = false
+            await reply({ forward: m.quoted })
+          } else m.reply(`Reply view once message\nExample: ${prefix + command}`)
+        } catch (e) {
+          reply('Media Tidak Valid❗')
+        }
+      }
+      break
       case 'tovn': case 'toptt': case 'tovoice': {
         if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin Dijadikan Audio Dengan Caption ${prefix + command}`);
         await react('⏳');
@@ -523,7 +536,7 @@ async function Hc(hc, m, db) {
 │⭔ ${prefix}sticker (send/reply img/vid)
 │⭔ ${prefix}speedtest
 ╰────❍
-Bot ini masih di kembangkan.\n\nTerima kasih telah menggunakan bot whatsapp kami.`;
+Bot ini masih di kembangkan.\nTerima kasih telah menggunakan bot whatsapp kami.`;
        try {
           const animasiMenu = fs.readFileSync('./src/media/menu.mp4');
           await hc.sendMessage(sender, {
