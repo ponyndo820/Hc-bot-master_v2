@@ -239,90 +239,44 @@ async function Hc(hc, m, db) {
       }
       break
       case 'alyabrat': {
-        if (!text) return reply(`Teksnya mana?\nContoh: *${prefix}alyabrat halo*`);
+        if (!text) return reply(`Teksnya mana bang?\nContoh: *${prefix}alyabrat halo*`);
         await react('⏳');
         try {
-          const { createCanvas, loadImage } = await import('canvas');
-
-          const imageUrl = 'https://files.catbox.moe/5zv26f.jpg';
-          const res = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-          const img = await loadImage(res.data);
-          const canvas = createCanvas(img.width, img.height);
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0);
-
-          const paperX = img.width * 0.21;
-          const paperY = img.height * 0.60;
-          const paperW = img.width * 0.58;
-          const paperH = img.height * 0.17;
-          const padding = paperW * 0.08;
-          const textAreaW = paperW - padding * 2;
-
-          ctx.fillStyle = '#3b2f2f';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-
-          function wrapLines(context, str, maxWidth) {
-            const words = str.split(' ');
-            let lines = [];
-            let line = '';
-            for (let w of words) {
-              const test = line + w + ' ';
-              if (context.measureText(test).width > maxWidth && line !== '') {
-                lines.push(line.trim());
-                line = w + ' ';
-              } else {
-                line = test;
-              }
-            }
-            lines.push(line.trim());
-            return lines;
-          }
-
-          let fontSize = 450;
-          let lines = [];
-          let lineHeight = 0;
-
-          // Menggunakan font default bawaan canvas jika file .ttf kustom tidak ada
-          while (fontSize > 32) {
-            ctx.font = `${fontSize}px sans-serif`;
-            lines = wrapLines(ctx, text, textAreaW);
-            lineHeight = fontSize * 1.2;
-            if (lines.length <= 2 && lines.length * lineHeight <= paperH) break;
-            fontSize -= 2;
-          }
-
-          ctx.font = `${fontSize}px sans-serif`;
-          lineHeight = fontSize * 1.2;
-          const offsetY = paperH * 0.40;
-          const offsetX = paperW * -0.10;
-          const startY = paperY + (paperH / 2) - ((lines.length - 1) * lineHeight / 2) + offsetY;
-          const rotateRad = (-5 * Math.PI) / 180;
-
-          lines.forEach((line, i) => {
-            const x = (paperX + paperW / 2) - offsetX;
-            const y = startY + (i * lineHeight);
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(rotateRad);
-            ctx.fillText(line, 0, 0);
-            ctx.restore();
-          });
-
-          const buffer = canvas.toBuffer();
+          const Jimp = await import('jimp');
           
-          // Menggunakan writeExif bawaan bot yang sudah aman di Termux
+          // 1. Download background image dari Catbox
+          const imageUrl = 'https://files.catbox.moe/5zv26f.jpg';
+          const image = await Jimp.default.read(imageUrl);
+          
+          // 2. Load font bawaan Jimp (bisa disesuaikan ukuran/tipenya)
+          const font = await Jimp.default.loadFont(Jimp.default.FONT_SANS_32_BLACK);
+          
+          // 3. Menulis teks ke atas gambar
+          // Sesuaikan kordinat x, y, alignment sesuai posisi kotak putih di gambarmu
+          const x = image.bitmap.width * 0.25;
+          const y = image.bitmap.height * 0.63;
+          const maxWidth = image.bitmap.width * 0.50;
+          
+          image.print(font, x, y, {
+            text: text,
+            alignmentX: Jimp.default.HORIZONTAL_ALIGN_CENTER,
+            alignmentY: Jimp.default.VERTICAL_ALIGN_MIDDLE
+          }, maxWidth);
+          
+          // 4. Konversi ke buffer untuk dijadikan stiker
+          const buffer = await image.getBufferAsync(Jimp.default.MIME_JPEG);
+          
+          // 5. Kirim sebagai stiker menggunakan writeExif
           const stickerFile = await writeExif(buffer, { packname: packname, author: author });
           await hc.sendMessage(sender, { sticker: { url: stickerFile } }, { quoted: m });
           
           if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
         } catch (err) {
           console.error(err);
-          reply('❌ Error saat membuat stiker alyabrat');
+          reply('❌ Error saat membuat stiker alyabrat menggunakan Jimp');
         }
       }
       break
-
 
       //Bot Menu
       case 'sc': case 'script': {
