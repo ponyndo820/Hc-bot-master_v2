@@ -247,16 +247,19 @@ async function Hc(hc, m, db) {
           const imageUrl = 'https://files.catbox.moe/5zv26f.jpg';
           const image = await Jimp.default.read(imageUrl);
           
+          // Resize gambar ke lebar 512px agar font bawaan Jimp terlihat besar dan proporsional
+          image.resize(512, Jimp.default.AUTO);
+          
           const font = await Jimp.default.loadFont(Jimp.default.FONT_SANS_64_BLACK);
           
           const width = image.bitmap.width;
           const height = image.bitmap.height;
           
-          // Koordinat berdasarkan ukuran asli gambar (full size)
-          const x = width * 0.23;
-          const y = height * 0.61;
-          const maxWidth = width * 0.54;
-          const maxHeight = height * 0.15;
+          // Penyesuaian koordinat pada ukuran 512px agar pas di tengah kertas
+          const x = width * 0.21;
+          const y = height * 0.58;
+          const maxWidth = width * 0.58;
+          const maxHeight = height * 0.20;
 
           image.print(font, x, y, {
             text: text,
@@ -276,6 +279,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
+
 
       //Bot Menu
       case 'sc': case 'script': {
