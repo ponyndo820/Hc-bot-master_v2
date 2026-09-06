@@ -237,7 +237,7 @@ async function Hc(hc, m, db) {
       break
       //Bot Menu
       case 'sc': case 'script': {
-        reply(settings.mess.fit)
+        reply('Donasi dulu di .donasi')
       }
       break
       case 'donasi': case 'donate': {
@@ -419,7 +419,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}toolsmenu
 │${setv} ${prefix}ownermenu
 │${setv} ${prefix}quotesmenu
-│${setv} {prefix}downloadermenu
+│${setv} ${prefix}downloadermenu
 ╰────❍`;
         try {
           const animasiMenu = fs.readFileSync('./src/media/menu.mp4');
@@ -535,7 +535,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}quotesislami
 ╰┬───❍
 ╭┴─❍ *RANDOM IMAGE*
-│${setv}{prefix}randomimage
+│${setv} ${prefix}randomimage
 ╰┬──❍
 ╭┴─❍ *ANIME*
 │${setv} ${prefix}cariwaifu (query)
@@ -546,7 +546,7 @@ async function Hc(hc, m, db) {
 ╰┬───❍
 ╭┴─❍ *DOWNLOADER*
 │${setv} ${prefix}ytmp4 (url)
-│⭔ ${prefix}ytmp3 (url)
+│${stv} ${prefix}ytmp3 (url)
 ╰┬───❍
 ╭┴─❍ *TOOLS*
 │${setv} ${prefix}rvo (reply pesan viewone)
