@@ -59,21 +59,20 @@ async function Hc(hc, m, db) {
     
     const participant = m.key.participant || sender; 
     const isCreator = m.key.fromMe || settings.ownerNumber.some(owner => participant.includes(owner));
-    
     const contextInfo = m.message.extendedTextMessage?.contextInfo || m.message.imageMessage?.contextInfo || m.message.videoMessage?.contextInfo;
     const isQuoted = !!contextInfo?.quotedMessage;
     const quoted = isQuoted ? contextInfo.quotedMessage : msg;
     const quotedType = getContentType(quoted);
     const mime = quoted[quotedType]?.mimetype || '';
     const qmsg = isQuoted ? { message: quoted } : m;
-    
     const author = settings.author || 'Heart candy';
     const packname = settings.packname || 'ponyndo';
     const botname = settings.botName?.[0] || 'Hc-bot';
+    const setv = pickRandom(settings.listv)
     
     switch (command) {
       case 'tes': {
-        await reply('Ya\ssayang');
+        await reply('Ya sayang');
       }
       break
       
@@ -414,13 +413,13 @@ async function Hc(hc, m, db) {
 *━━━━━━━━━━━━━━━━━━━━*
 
 ╭──❍ *MENU*
-│⭔ ${prefix}botmenu
-│⭔ ${prefix}allmenu
-│⭔ ${prefix}animemenu
-│⭔ ${prefix}toolsmenu
-│⭔ ${prefix}ownermenu
-│⭔ ${prefix}quotesmenu
-│⭔ ${prefix}downloadermenu
+│${setv} ${prefix}botmenu
+│${setv} ${prefix}allmenu
+│${setv} ${prefix}animemenu
+│${setv} ${prefix}toolsmenu
+│${setv} ${prefix}ownermenu
+│${setv} ${prefix}quotesmenu
+│${setv} {prefix}downloadermenu
 ╰────❍`;
         try {
           const animasiMenu = fs.readFileSync('./src/media/menu.mp4');
@@ -442,10 +441,10 @@ async function Hc(hc, m, db) {
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *BOT*
-│⭔ ${prefix}sc
-│⭔ ${prefix}tagme
-│⭔ ${prefix}donasi
-│⭔ ${prefix}request (text)
+│${setv} ${prefix}sc
+│${setv} ${prefix}tagme
+│${setv} ${prefix}donasi
+│${setv} ${prefix}request (text)
 ╰────❍`)
       }
       break
@@ -455,7 +454,7 @@ async function Hc(hc, m, db) {
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *OWNER*
-│⭔ ${prefix}shutdown
+|${setv} ${prefix}shutdown
 ╰────❍`)
       }
       break
@@ -465,8 +464,8 @@ async function Hc(hc, m, db) {
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *QUOTES*
-│⭔ ${prefix}quotes
-│⭔ ${prefix}quotesislami
+│${setv} ${prefix}quotes
+│${setv} ${prefix}quotesislami
 ╰────❍`)
       }
       break
@@ -476,10 +475,10 @@ async function Hc(hc, m, db) {
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *TOOLS*
-│⭔ ${prefix}tovn (reply pesan)
-│⭔ ${prefix}sticker (send/reply img/vid)
-│⭔ ${prefix}speedtest
-│⭔ ${prefix}rvo (reply pesan viewone)
+│${setv} ${prefix}tovn (reply pesan)
+│${setv} ${prefix}sticker (send/reply img/vid)
+│${setv} ${prefix}speedtest
+│${setv} ${prefix}rvo (reply pesan viewone)
 ╰────❍`)
       }
       break
@@ -490,8 +489,8 @@ async function Hc(hc, m, db) {
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *ANIME*
-│⭔ ${prefix}cariwaifu (query)
-│⭔ ${prefix}randomwaifu
+│${setv} ${prefix}cariwaifu (query)
+│${setv} ${prefix}randomwaifu
 ╰────❍`)
       }
       break
@@ -501,8 +500,8 @@ async function Hc(hc, m, db) {
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *DOWNLOADER*
-│⭔ ${prefix}ytmp4 (url)
-│⭔ ${prefix}ytmp3 (url)
+│${setv} ${prefix}ytmp4 (url)
+│${setv} ${prefix}ytmp3 (url)
 ╰────❍`)
       }
       break
@@ -512,7 +511,7 @@ async function Hc(hc, m, db) {
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *SEARCH*
-│⭔ ${prefix}ytsearch (query)
+│${setv} ${prefix}ytsearch (query)
 ╰────❍`)
       }
       break
@@ -523,38 +522,38 @@ async function Hc(hc, m, db) {
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *BOT*
-│⭔ ${prefix}sc
-│⭔ ${prefix}tagme
-│⭔ ${prefix}donasi
-│⭔ ${prefix}request (text)
+│${setv} ${prefix}sc
+│${setv} ${prefix}tagme
+│${setv} ${prefix}donasi
+│${setv} ${prefix}request (text)
 ╰┬───❍
 ╭┴─❍ *OWMER*
-│⭔ ${prefix}shutdown
+│${setv} ${prefix}shutdown
 ╰┬──❍
 ╭┴─❍ *QUOTES*
-│⭔ ${prefix}quotes
-│⭔ ${prefix}quotesislami
+│${setv} ${prefix}quotes
+│${setv} ${prefix}quotesislami
 ╰┬───❍
 ╭┴─❍ *RANDOM IMAGE*
-│⭔ ${prefix}randomimage
+│${setv}{prefix}randomimage
 ╰┬──❍
 ╭┴─❍ *ANIME*
-│⭔ ${prefix}cariwaifu (query)
-│⭔ ${prefix}randomwaifu
+│${setv} ${prefix}cariwaifu (query)
+│${setv} ${prefix}randomwaifu
 ╰┬───❍
 ╭┴─❍ *Search*
-│⭔ ${prefix}ytsearch (query)
+│${setv} ${prefix}ytsearch (query)
 ╰┬───❍
 ╭┴─❍ *DOWNLOADER*
-│⭔ ${prefix}ytmp4 (url)
+│${setv} ${prefix}ytmp4 (url)
 │⭔ ${prefix}ytmp3 (url)
 ╰┬───❍
 ╭┴─❍ *TOOLS*
-│⭔ ${prefix}rvo (reply pesan viewone)
-│⭔ ${prefix}brat
-│⭔ ${prefix}tovn (reply pesan)
-│⭔ ${prefix}sticker (send/reply img/vid)
-│⭔ ${prefix}speedtest
+│${setv} ${prefix}rvo (reply pesan viewone)
+│${setv} ${prefix}brat
+│${setv} ${prefix}tovn (reply pesan)
+│${setv} ${prefix}sticker (send/reply img/vid)
+│${setv} ${prefix}speedtest
 ╰────❍
 Bot ini masih di kembangkan.\nTerima kasih telah menggunakan bot whatsapp kami.`;
        try {
