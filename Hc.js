@@ -238,7 +238,92 @@ async function Hc(hc, m, db) {
         }
       }
       break
-//Bot Menu
+            case 'alyabrat': {
+        if (!text) return reply(`Teksnya mana?\nContoh: *${prefix}alyabrat halo*`);
+        await react('⏳');
+        try {
+          const { createCanvas, loadImage, registerFont } = await import('canvas');
+          // Pastikan file font ini tersedia di folder penyimpanan botmu
+          // registerFont('./data/assets/FontsFree-Net-SFProDisplay-Bold.ttf', { family: 'SF Bold' });
+
+          const imageUrl = 'https://files.catbox.moe/5zv26f.jpg';
+          const res = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+          const img = await loadImage(res.data);
+          const canvas = createCanvas(img.width, img.height);
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          const paperX = img.width * 0.21;
+          const paperY = img.height * 0.60;
+          const paperW = img.width * 0.58;
+          const paperH = img.height * 0.17;
+          const padding = paperW * 0.08;
+          const textAreaW = paperW - padding * 2;
+
+          ctx.fillStyle = '#3b2f2f';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          function wrapLines(context, str, maxWidth) {
+            const words = str.split(' ');
+            let lines = [];
+            let line = '';
+            for (let w of words) {
+              const test = line + w + ' ';
+              if (context.measureText(test).width > maxWidth && line !== '') {
+                lines.push(line.trim());
+                line = w + ' ';
+              } else {
+                line = test;
+              }
+            }
+            lines.push(line.trim());
+            return lines;
+          }
+
+          let fontSize = 450;
+          let lines = [];
+          let lineHeight = 0;
+
+          while (fontSize > 32) {
+            ctx.font = `${fontSize}px "SF Bold"`;
+            lines = wrapLines(ctx, text, textAreaW);
+            lineHeight = fontSize * 1.2;
+            if (lines.length <= 2 && lines.length * lineHeight <= paperH) break;
+            fontSize -= 2;
+          }
+
+          ctx.font = `${fontSize}px "SF Bold"`;
+          lineHeight = fontSize * 1.2;
+          const offsetY = paperH * 0.40;
+          const offsetX = paperW * -0.10;
+          const startY = paperY + (paperH / 2) - ((lines.length - 1) * lineHeight / 2) + offsetY;
+          const rotateRad = (-5 * Math.PI) / 180;
+
+          lines.forEach((line, i) => {
+            const x = (paperX + paperW / 2) - offsetX;
+            const y = startY + (i * lineHeight);
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rotateRad);
+            ctx.fillText(line, 0, 0);
+            ctx.restore();
+          });
+
+          const buffer = canvas.toBuffer();
+          
+          // Memanfaatkan fungsi writeExif bawaan botmu agar konsisten
+          const stickerFile = await writeExif(buffer, { packname: packname, author: author });
+          await hc.sendMessage(sender, { sticker: { url: stickerFile } }, { quoted: m });
+          
+          if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
+        } catch (err) {
+          console.error(err);
+          reply('❌ Error saat membuat stiker alyabrat');
+        }
+      }
+      break
+      //Bot Menu
       case 'sc': case 'script': {
         reply('Donasi dulu')
       }
