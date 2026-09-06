@@ -33,7 +33,7 @@ settings.my = {
 settings.mess = {
   owr: "Khusus Owner Ya Sayang❗",
   adm: "Khusus Admin Ya Sayang❗",
-  fit: "Fitur Ini Belum Tersedia Ya Syang ❗",
+  fit: "Fitur Ini Belum Tersedia Ya Sayang ❗",
   qud: "Reply pesannya ya Sayang❗",
   don: "selesai✅",
 }

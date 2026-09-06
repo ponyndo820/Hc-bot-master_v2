@@ -24,7 +24,7 @@ const hcPath = fileURLToPath(new URL('../Hc.js', import.meta.url));
 
 let hcHandler = null;
 const botStartTime = Date.now();
-const groupMetadataTimers = {};
+const Timers = {};
 const reloadHandler = async () => {
   try {
     hcHandler = (await import(`../Hc.js?update=${Date.now()}`)).default;
@@ -65,15 +65,15 @@ async function GroupUpdate(hc, m, store) {
 			172: `@${normalizedTarget?.pn?.split('@')?.[0]} meminta bergabung`,
     }
     if (hc.public && settings.db?.groups?.[m.chat]?.setinfo && messages[type]) {
-      await hc.sendMessage(m.chat, { text: `${admin} ${messages[type]}`, mentions: [m.sender, ...((normalizedTarget?.id || normalizedTarget)?.include('@')?[`${normalizedTarget.id || normalizedTarget}`] : [])].filter(Boolean)}, { ephemeralExpiration: m.expiration || m?.metadata?.ephemeralDuration || store?.messages[m.chat]?.array?.slice(-1)[0]?.metadata?.ephemeralDuration || 0 })
+      await hc.sendMessage(m.chat, { text: `${admin} ${messages[type]}`, mentions: [m.sender, ...((normalizedTarget?.id || normalizedTarget)?.includes('@')?[`${normalizedTarget.id || normalizedTarget}`] : [])].filter(Boolean)}, { ephemeralExpiration: m.expiration || m?.metadata?.ephemeralDuration || store?.messages[m.chat]?.array?.slice(-1)[0]?.metadata?.ephemeralDuration || 0 })
     }
     if (type === 20) {
       clearTimeout(groupMetadataTimers[m.chat])
-      groupsMetadataTimers[m.chat] = setTimeout(async () => {
-        store.groupMetadata[m.chat] = await ch.groupsMetadata(m.chat).catch(e => ({ ...store.groupMetadata[m.chat] }));
+      groupMetadataTimers[m.chat] = setTimeout(async () => {
+        store.groupMetadata[m.chat] = await hc.groupMetadata(m.chat).catch(e => ({ ...store.groupMetadata[m.chat] }));
       }, 5000);
     } else if (type === 29 || type === 30) {
-      const target = jidNormalizeduser(normalizedTarget.id || normalizedTarget)
+      const target = (normalizedTarget.id || normalizedTarget)
       const newAdminValue = type === 29 ? 'admin' : null
       if (metadata.participants?.length) {
         metadata.participants = metadata.participants.map(p => {
@@ -88,7 +88,7 @@ async function GroupUpdate(hc, m, store) {
       if (!metadata.participants.some(a => (a.id === (normalizedTarget.id || normalizedTarget) || a.phoneNumber === (normalizedTarget.id || normalizedTarget)))) {
         clearTimeout(groupMetadataTimers[m.chat])
         groupMetadataTimers[m.chat] = setTimeout(async () => {
-          store.grouoMetadata[m.chat] = await hc.grouoMetadata(m.chat).catch(e => ({ ...store.grouoMetadata[m.chat] }));
+          store.groupMetadata[m.chat] = await hc.groupMetadata(m.chat).catch(e => ({ ...store?.[m.chat] }));
         }, 5000);
       }
     } else if (type === 28 || type === 32) {
@@ -137,7 +137,7 @@ async function GroupUpdate(hc, m, store) {
         if (!participant) {
           clearTimeout(groupMetadataTimers[id])
           groupMetadataTimers[id] = setTimeout(async () => {
-            store.groupMetadata[id] await hc.grouoMetadata(id).catch(e => ({ ...store.groupMetadata[id] }));
+            store.groupMetadata[id] await (id).catch(e => ({ ...store.[id] }));
           }, 5000);
         }
       } else if (action === 'remove') {
