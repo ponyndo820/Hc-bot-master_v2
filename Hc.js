@@ -71,26 +71,29 @@ async function Hc(hc, m, db) {
     const packname = settings.packname || 'ponyndo';
     const botname = settings.botName?.[0] || 'Hc-bot';
     const setv = pickRandom(settings.listv)
-    if (!m.isGroup && global.activeAutoAI.has(sender) && !isCmd) {
+        if (!m.isGroup && global.activeAutoAI.has(sender) && !isCmd && !m.key.fromMe) {
         if (text) {
             await react('🤖');
             try {
                 const { GoogleGenerativeAI } = await import('@google/generative-ai');
                 const apiKey = settings.APIKeys;
+                
                 if (!apiKey || apiKey === 'YOUR_API_KEY') {
                     return reply(`⚠️ API Key Gemini belum diatur!\nSilakan atur terlebih dahulu menggunakan perintah:\n*${prefix}setapikeygemini <API_KEY_KAMU>*`);
                 }
+                
                 const genAI = new GoogleGenerativeAI(apiKey);
-               const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+                const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
                 
                 const result = await model.generateContent(text);
                 return await reply(result.response.text());
             } catch (err) {
                 console.error(err);
-                return await reply('❌ Error: Gagal merespons pesan AI.');
+                return await reply('❌ Error: API Key tidak valid atau terjadi gangguan pada layanan AI.');
             }
         }
     }
+
     
     switch (command) {
       case 'tes': {
