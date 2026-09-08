@@ -72,7 +72,7 @@ async function Hc(hc, m, db) {
     const packname = settings.packname || 'ponyndo';
     const botname = settings.botName?.[0] || 'Hc-bot';
     const setv = pickRandom(settings.listv)
-    if (!m.isGroup && global.activeAutoAI.has(sender) && !isCmd) {
+    if (!isGroup && global.activeAutoAI.has(sender) && !isCmd) {
         if (m.key.id?.startsWith('3EB0') || m.key.id?.startsWith('BAE5') || text.startsWith('❌') || text.startsWith('✅')) return;
         if (text) {
             await react('🤖');
@@ -474,7 +474,7 @@ async function Hc(hc, m, db) {
       break
       // Ai Menu
       case 'autoai': {
-        if (m.isGroup) return reply(settings.mess.priv);
+        if (isGroup) return reply(settings.mess.priv);
         if (global.activeAutoAI.has(sender)) return reply('🤖 Mode Auto AI sudah aktif di chat ini.');
         
         global.activeAutoAI.add(sender);
@@ -482,7 +482,7 @@ async function Hc(hc, m, db) {
       }
       break
       case 'delautoai': {
-        if (m.isGroup) return reply(settings.mess.priv);
+        if (isGroup) return reply(settings.mess.priv);
         if (!global.activeAutoAI.has(sender)) return reply('⚠️ Mode Auto AI belum aktif.');
         
         global.activeAutoAI.delete(sender);
