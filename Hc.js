@@ -77,6 +77,9 @@ async function Hc(hc, m, db) {
             try {
                 const { GoogleGenerativeAI } = await import('@google/generative-ai');
                 const apiKey = settings.APIKeys;
+                if (!apiKey || apiKey === 'YOUR_API_KEY') {
+                    return reply(`⚠️ API Key Gemini belum diatur!\nSilakan atur terlebih dahulu menggunakan perintah:\n*${prefix}setapikeygemini <API_KEY_KAMU>*`);
+                }
                 const genAI = new GoogleGenerativeAI(apiKey);
                 const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
                 
@@ -481,6 +484,17 @@ async function Hc(hc, m, db) {
         reply('❌ Mode Auto AI dimatikan.');
       }
       break
+      // Set API_KEY
+        case 'setapikeygemini': case 'setgemini': {
+        if (!text) return reply(`Masukkan API Key Gemini-nya!\nContoh: *${prefix}setapikeygemini AIzaSy...*`);
+        
+        // Simpan API key ke global atau tulis ke file settings/database
+        settings.APIKeys = text.trim();
+        
+        reply('✅ API Key Gemini berhasil disimpan untuk sesi ini!\nSekarang kamu bisa menggunakan *.autoai* atau mode AI.');
+      }
+      break
+
       // Menu
       case 'menu': {
         await react('✨');
