@@ -474,7 +474,7 @@ async function Hc(hc, m, db) {
       }
       break
       // Ai Menu
-      case 'autoai': {
+      case 'cai': case 'autoai': case 'roomai': case 'chatai': {
         if (isGroup) return reply(settings.mess.priv);
         if (global.activeAutoAI.has(sender)) return reply('🤖 Mode Auto AI sudah aktif di chat ini.');
         
@@ -513,7 +513,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
-      case 'ai': case 'gemini': {
+      case 'ai': case 'gemini': case 'google': case 'bard': case 'ia': {
         if (!text) return reply(`Mau tanya apa?\nContoh: *${prefix + command} Bagaimana cuaca hari ini?*`);
         await react('🤖');
         try {
@@ -699,7 +699,7 @@ async function Hc(hc, m, db) {
 ╰┬───❍
 ╭┴─❍ *TOOLS*
 │${setv} ${prefix}rvo (reply pesan viewone)
-│${setv} ${prefix}brat
+|${setv} ${prefix}brat
 |${setv} ${prefix}bratvid
 │${setv} ${prefix}tovn (reply pesan)
 │${setv} ${prefix}sticker (send/reply img/vid)
