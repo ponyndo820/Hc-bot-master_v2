@@ -496,7 +496,7 @@ async function Hc(hc, m, db) {
         if (!text) return reply(`Masukkan API Key Gemini-nya!\nContoh: *${prefix}setapikeygemini AIzaSy...*`);
         
         const key = text.trim();
-        settings.APIKeys = key; // Update di RAM
+        settings.APIKeys = key;
         
         try {
           let settingsContent = fs.readFileSync('./settings.js', 'utf-8');
@@ -513,6 +513,31 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      case 'ai': case 'gemini': {
+        if (!text) return reply(`Mau tanya apa?\nContoh: *${prefix + command} Bagaimana cuaca hari ini?*`);
+        await react('🤖');
+        try {
+          const { GoogleGenerativeAI } = await import('@google/generative-ai');
+          const apiKey = settings.APIKeys;
+          
+          if (!apiKey || apiKey === 'YOUR_API_KEY') {
+            return reply('⚠️ Fitur AI belum bisa digunakan karena API Key belum diatur oleh Owner!');
+            
+          }
+          
+          const genAI = new GoogleGenerativeAI(apiKey);
+          const model = genAI.getGenerativeModel({ model: 'gemini-3.6-flash' });
+          const result = await model.generateContent(text);
+          await reply(result.response.text());
+          
+        } catch (err) {
+          console.error("Error dari Gemini API (AI):", err);
+          await reply('❌ Error: Terjadi kesalahan saat memproses permintaan AI.');
+          
+        }
+        
+      }
+      break
       // Menu
       case 'menu': {
         await react('✨');
@@ -524,6 +549,7 @@ async function Hc(hc, m, db) {
 ╭──❍ *MENU*
 │${setv} ${prefix}botmenu
 │${setv} ${prefix}allmenu
+|${setv} ${prefix}aimenu
 │${setv} ${prefix}animemenu
 │${setv} ${prefix}toolsmenu
 │${setv} ${prefix}ownermenu
@@ -564,6 +590,7 @@ async function Hc(hc, m, db) {
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *OWNER*
 |${setv} ${prefix}shutdown
+|${setv} ${prefix}setapikeygemini
 ╰────❍`)
       }
       break
@@ -624,6 +651,16 @@ async function Hc(hc, m, db) {
 ╰────❍`)
       }
       break
+      case 'aimenu': {
+        await reply(`*━━━━━━━━━━━━━━━━━━━━*
+              🌈 *Hc-bot* 🌈
+               *By Heart candy*
+*━━━━━━━━━━━━━━━━━━━━*
+╭──❍ *AI*
+|${setv} ${prefix}autoai
+╰────❍`)
+      }
+      break
       case 'allmenu': {
         await react('✨');
         const menuText =`*━━━━━━━━━━━━━━━━━━━━*
@@ -645,6 +682,9 @@ async function Hc(hc, m, db) {
 ╰┬───❍
 ╭┴─❍ *RANDOM IMAGE*
 │${setv} ${prefix}randomimage
+╰┬──❍
+╭┴─❍ *AI*
+│${setv} ${prefix}autoai
 ╰┬──❍
 ╭┴─❍ *ANIME*
 │${setv} ${prefix}cariwaifu (query)
