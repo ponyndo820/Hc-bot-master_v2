@@ -42,6 +42,7 @@ async function Hc(hc, m, db) {
     if (!body) return;
     
     const sender = m.key.remoteJid;
+    const isGroup = sender.endsWith('@g.us');
     
     global.activeAutoAI = global.activeAutoAI || new Set();
     
@@ -72,7 +73,7 @@ async function Hc(hc, m, db) {
     const packname = settings.packname || 'ponyndo';
     const botname = settings.botName?.[0] || 'Hc-bot';
     const setv = pickRandom(settings.listv)
-    if (!isGroup && global.activeAutoAI.has(sender) && !isCmd) {
+    if (!!m.isGroup && global.activeAutoAI.has(sender) && !isCmd) {
         if (m.key.id?.startsWith('3EB0') || m.key.id?.startsWith('BAE5') || text.startsWith('❌') || text.startsWith('✅')) return;
         if (text) {
             await react('🤖');
