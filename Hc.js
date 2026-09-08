@@ -431,8 +431,8 @@ async function Hc(hc, m, db) {
             caption: `*By: Heart candy*\nNih videonya!` 
           }, { quoted: m });
           
-          if (fs.existsSync('./lib/temp_video.mp4')) {
-            fs.unlinkSync('./lib/temp_video.mp4');
+          if (fs.existsSync('./database/temp_video.mp4')) {
+            fs.unlinkSync('./database/temp_video.mp4');
           }
         } catch (err) {
           console.error(err);
