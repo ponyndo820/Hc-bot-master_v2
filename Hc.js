@@ -81,7 +81,7 @@ async function Hc(hc, m, db) {
                     return reply(`⚠️ API Key Gemini belum diatur!\nSilakan atur terlebih dahulu menggunakan perintah:\n*${prefix}setapikeygemini <API_KEY_KAMU>*`);
                 }
                 const genAI = new GoogleGenerativeAI(apiKey);
-                const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+               const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
                 
                 const result = await model.generateContent(text);
                 return await reply(result.response.text());
