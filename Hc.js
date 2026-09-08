@@ -14,6 +14,7 @@ import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import youtubedl from 'youtube-dl-exec';
 import { exec, spawn, execSync } from 'child_process';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getContentType, downloadMediaMessage, generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
 
 import settings from './settings.js';
@@ -71,7 +72,8 @@ async function Hc(hc, m, db) {
     const packname = settings.packname || 'ponyndo';
     const botname = settings.botName?.[0] || 'Hc-bot';
     const setv = pickRandom(settings.listv)
-        if (!m.isGroup && global.activeAutoAI.has(sender) && !isCmd && !m.key.fromMe) {
+    if (!m.isGroup && global.activeAutoAI.has(sender) && !isCmd) {
+        if (m.key.id?.startsWith('3EB0') || m.key.id?.startsWith('BAE5') || text.startsWith('❌') || text.startsWith('✅')) return;
         if (text) {
             await react('🤖');
             try {
@@ -79,21 +81,20 @@ async function Hc(hc, m, db) {
                 const apiKey = settings.APIKeys;
                 
                 if (!apiKey || apiKey === 'YOUR_API_KEY') {
-                    return reply(`⚠️ API Key Gemini belum diatur!\nSilakan atur terlebih dahulu menggunakan perintah:\n*${prefix}setapikeygemini <API_KEY_KAMU>*`);
+                    return reply(`⚠️ API Key Gemini belum diatur!\nSilakan atur menggunakan perintah:\n*${prefix}setgemini <API_KEY>*`);
                 }
                 
                 const genAI = new GoogleGenerativeAI(apiKey);
-                const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-                
+                const model = genAI.getGenerativeModel({ model: 'gemini-3.6-flash' });
                 const result = await model.generateContent(text);
                 return await reply(result.response.text());
             } catch (err) {
-                console.error(err);
-                return await reply('❌ Error: API Key tidak valid atau terjadi gangguan pada layanan AI.');
+                console.error("Error dari Gemini API:", err);
+                global.activeAutoAI.delete(sender);
+                return await reply('❌ Error: Terjadi kesalahan saat menghubungi layanan AI. (Mode Auto AI dimatikan otomatis)');
             }
         }
     }
-
     
     switch (command) {
       case 'tes': {
@@ -488,15 +489,31 @@ async function Hc(hc, m, db) {
       }
       break
       // Set API_KEY
-        case 'setapikeygemini': case 'setgemini': {
+      case 'setapikeygemini': case 'setgemini': {
+        if (!isCreator) return reply(settings.mess.owr);
         if (!text) return reply(`Masukkan API Key Gemini-nya!\nContoh: *${prefix}setapikeygemini AIzaSy...*`);
         
-        // Simpan API key ke global atau tulis ke file settings/database
-        settings.APIKeys = text.trim();
+        const key = text.trim();
+        settings.APIKeys = key; // Update di RAM
         
-        reply('✅ API Key Gemini berhasil disimpan untuk sesi ini!\nSekarang kamu bisa menggunakan *.autoai* atau mode AI.');
+        try {
+          let settingsContent = fs.readFileSync('./settings.js', 'utf-8');
+          
+          // Mengganti struktur settings.APIKeys di settings.js secara fisik
+          settingsContent = settingsContent.replace(
+            /settings\.APIKeys\s*=\s*\{[\s\S]*?\}/,
+            `settings.APIKeys = '${key}'`
+          );
+          
+          fs.writeFileSync('./settings.js', settingsContent, 'utf-8');
+          reply('✅ API Key Gemini berhasil disimpan secara permanen ke *settings.js*!');
+        } catch (err) {
+          console.error(err);
+          reply('❌ Gagal menulis API Key ke settings.js');
+        }
       }
       break
+
 
       // Menu
       case 'menu': {
