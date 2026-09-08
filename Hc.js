@@ -532,6 +532,10 @@ async function Hc(hc, m, db) {
           
         } catch (err) {
           console.error("Error dari Gemini API (AI):", err);
+          if (err.status === 429 || err.message?.includes('429') || err.message?.includes('Quota exceeded')) {
+            return await reply('⚠️ Limit penggunaan AI sedang habis atau mencapai batas harian. Silakan coba lagi nanti atau ganti API Key!');
+            
+          }
           await reply('❌ Error: Terjadi kesalahan saat memproses permintaan AI.');
           
         }
@@ -549,7 +553,7 @@ async function Hc(hc, m, db) {
 ╭──❍ *MENU*
 │${setv} ${prefix}botmenu
 │${setv} ${prefix}allmenu
-|${setv} ${prefix}aimenu
+${setv} ${prefix}aimenu
 │${setv} ${prefix}animemenu
 │${setv} ${prefix}toolsmenu
 │${setv} ${prefix}ownermenu
@@ -699,8 +703,8 @@ async function Hc(hc, m, db) {
 ╰┬───❍
 ╭┴─❍ *TOOLS*
 │${setv} ${prefix}rvo (reply pesan viewone)
-|${setv} ${prefix}brat
-|${setv} ${prefix}bratvid
+│${setv} ${prefix}brat
+│${setv} ${prefix}bratvid
 │${setv} ${prefix}tovn (reply pesan)
 │${setv} ${prefix}sticker (send/reply img/vid)
 │${setv} ${prefix}speedtest
