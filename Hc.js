@@ -553,7 +553,7 @@ async function Hc(hc, m, db) {
 ╭──❍ *MENU*
 │${setv} ${prefix}botmenu
 │${setv} ${prefix}allmenu
-${setv} ${prefix}aimenu
+│${setv} ${prefix}aimenu
 │${setv} ${prefix}animemenu
 │${setv} ${prefix}toolsmenu
 │${setv} ${prefix}ownermenu
