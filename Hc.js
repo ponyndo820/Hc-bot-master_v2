@@ -48,11 +48,9 @@ async function Hc(hc, m, db) {
     const prefixUsed = settings.prefix.find(p => body.startsWith(p));
     const isCmd = !!prefixUsed;
     const prefix = isCmd ? prefixUsed : '';
-    if (!isCmd && !m.isGroup && global.activeAutoAI.has(sender)) {
-    } else if (!isCmd && !global.activeAutoAI.has(sender)) {
-        return;
-    }
+    
     if (!isCmd && !global.activeAutoAI.has(sender)) return;
+    
     const command = isCmd ? body.slice(prefix.length).trim().split(/ +/).shift().toLowerCase() : '';
     const args = isCmd ? body.trim().split(/ +/).slice(1) : [];
     const text = isCmd ? args.join(' ') : body;
@@ -97,7 +95,6 @@ async function Hc(hc, m, db) {
             }
         }
     }
-
     
     switch (command) {
       case 'tes': {
@@ -332,6 +329,7 @@ async function Hc(hc, m, db) {
           text: `Pesan Dari : @${sender.split('@')[0]}\nUntuk Owner\n\nRequest: ${text}`, mentions: [sender] });
       }
       break
+      
       // Random Images Menu
       case 'randomimage': case 'randomimg': case 'randomimages': {
         await react('⏳');
