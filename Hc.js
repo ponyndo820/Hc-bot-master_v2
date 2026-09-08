@@ -425,14 +425,14 @@ async function Hc(hc, m, db) {
             addHeader: ['referer:https://www.youtube.com']
           });
           
-          const videoBuffer = fs.readFileSync('./database/temp_video.mp4');
+          const videoBuffer = fs.readFileSync('./database/temp');
           await hc.sendMessage(sender, { 
             video: videoBuffer, 
             caption: `*By: Heart candy*\nNih videonya!` 
           }, { quoted: m });
           
-          if (fs.existsSync('./database/temp_video.mp4')) {
-            fs.unlinkSync('./database/temp_video.mp4');
+          if (fs.existsSync('./database/temp')) {
+            fs.unlinkSync('./database/temp');
           }
         } catch (err) {
           console.error(err);
