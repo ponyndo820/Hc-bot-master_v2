@@ -424,10 +424,13 @@ async function Hc(hc, m, db) {
             preferFreeFormats: true,
             addHeader: ['referer:https://www.youtube.com']
           });
+          
+          const videoBuffer = fs.readFileSync('./database/temp_video.mp4');
           await hc.sendMessage(sender, { 
-            video: { url: './lib/temp_video.mp4' }, 
+            video: videoBuffer, 
             caption: `*By: Heart candy*\nNih videonya!` 
           }, { quoted: m });
+          
           if (fs.existsSync('./lib/temp_video.mp4')) {
             fs.unlinkSync('./lib/temp_video.mp4');
           }
@@ -438,7 +441,7 @@ async function Hc(hc, m, db) {
       }
       break
       // Search Menu
-      case 'search': case 'yts': case 'ytsearch': {
+      case 'search': case 'yts': case 'ytsearch': case 'play': {
         if (!text) return reply(`Masukkan kata kunci pencarian!\nContoh: *${prefix}search mlp*`);
         await react('🔍');
         
