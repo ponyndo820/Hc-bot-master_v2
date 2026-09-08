@@ -415,28 +415,30 @@ async function Hc(hc, m, db) {
         if (!text) return reply(`Masukkan link YouTube!\nContoh: *${prefix}ytmp4 https://youtu.com/xxxxx*`);
         await react('⏳');
         try {
+          if (fs.existsSync('./lib/temp_video.mp4')) {
+            fs.rmSync('./lib/temp_video.mp4', { recursive: true, force: true });
+          }
           const output = await youtubedl(text, {
-            format: 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-            mergeOutputFormat: 'mp4',
+            format: 'best[ext=mp4]/best',
             output: './lib/temp_video.mp4',
             noCheckCertificates: true,
             noWarnings: true,
             preferFreeFormats: true,
             addHeader: ['referer:https://www.youtube.com']
           });
-          
-          const videoBuffer = fs.readFileSync('./database/temp');
           await hc.sendMessage(sender, { 
-            video: videoBuffer, 
+            video: { url: './lib/temp_video.mp4' }, 
             caption: `*By: Heart candy*\nNih videonya!` 
           }, { quoted: m });
-          
-          if (fs.existsSync('./database/temp')) {
-            fs.unlinkSync('./database/temp');
+          if (fs.existsSync('./lib/temp_video.mp4')) {
+            fs.rmSync('./lib/temp_video.mp4', { recursive: true, force: true });
           }
         } catch (err) {
           console.error(err);
-          await reply('Gagal mengunduh video dari YouTube! Pastikan link valid dan video tidak dibatasi umur.');
+          if (fs.existsSync('./lib/temp_video.mp4')) {
+            fs.rmSync('./lib/temp_video.mp4', { recursive: true, force: true });
+          }
+          await reply('Gagal mengunduh video dari YouTube! Pastikan link valid dan coba jalankan `npm update youtube-dl-exec` di Termux.');
         }
       }
       break
