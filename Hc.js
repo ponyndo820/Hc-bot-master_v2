@@ -418,18 +418,25 @@ async function Hc(hc, m, db) {
           if (fs.existsSync('./lib/temp_video.mp4')) {
             fs.rmSync('./lib/temp_video.mp4', { recursive: true, force: true });
           }
-          const output = await youtubedl(text, {
-            format: 'best[ext=mp4]/best',
+          await youtubedl(text, {
             output: './lib/temp_video.mp4',
             noCheckCertificates: true,
             noWarnings: true,
             preferFreeFormats: true,
             addHeader: ['referer:https://www.youtube.com']
           });
+          
+          if (!fs.existsSync('./lib/temp_video.mp4')) {
+            return reply('Gagal mengunduh video: File output tidak ditemukan.');
+          }
+          
+          const videoBuffer = fs.readFileSync('./lib/temp_video.mp4');
+          
           await hc.sendMessage(sender, { 
-            video: { url: './lib/temp_video.mp4' }, 
+            video: videoBuffer, 
             caption: `*By: Heart candy*\nNih videonya!` 
           }, { quoted: m });
+          
           if (fs.existsSync('./lib/temp_video.mp4')) {
             fs.rmSync('./lib/temp_video.mp4', { recursive: true, force: true });
           }
@@ -438,7 +445,7 @@ async function Hc(hc, m, db) {
           if (fs.existsSync('./lib/temp_video.mp4')) {
             fs.rmSync('./lib/temp_video.mp4', { recursive: true, force: true });
           }
-          await reply('Gagal mengunduh video dari YouTube! Pastikan link valid dan coba jalankan `npm update youtube-dl-exec` di Termux.');
+          await reply('Gagal mengunduh video dari YouTube! Pastikan link valid dan pastikan ffmpeg sudah terinstal di Termux.');
         }
       }
       break
