@@ -38,17 +38,19 @@ async function Hc(hc, m, db) {
     (type === 'imageMessage') ? msg.imageMessage?.caption : 
     (type === 'videoMessage') ? msg.videoMessage?.caption : 
     (type === 'interactiveResponMessage' && m.quoted) ? (m.message.interactiveResponseMessage?.nativeFlowResponseMessage?.singleSelectReply.selectrdRowId || '') : '';
-               
     if (!body) return;
     
-    const prefixUsed = settings.prefix.find(p => body.startsWith(p));
-    if (!prefixUsed) return;
-    
     const sender = m.key.remoteJid;
-    const command = body.slice(prefixUsed.length).trim().split(/ +/).shift().toLowerCase();
-    const args = body.trim().split(/ +/).slice(1);
-    const text = args.join(' ');
-    const prefix = prefixUsed;
+    
+    global.activeAutoAI = global.activeAutoAI || new Set();
+    
+    const prefixUsed = settings.prefix.find(p => body.startsWith(p));
+    const isCmd = !!prefixUsed;
+    const prefix = isCmd ? prefixUsed : '';
+    if (!isCmd && !global.activeAutoAI.has(sender)) return;
+    const command = isCmd ? body.slice(prefix.length).trim().split(/ +/).shift().toLowerCase() : '';
+    const args = isCmd ? body.trim().split(/ +/).slice(1) : [];
+    const text = isCmd ? args.join(' ') : body;
     
     const reply = async (text) => {
       return await hc.sendMessage(sender, { text }, { quoted: m });
@@ -69,6 +71,23 @@ async function Hc(hc, m, db) {
     const packname = settings.packname || 'ponyndo';
     const botname = settings.botName?.[0] || 'Hc-bot';
     const setv = pickRandom(settings.listv)
+    if (!m.isGroup && global.activeAutoAI.has(sender) && !isCmd) {
+        if (text) {
+            await react('🤖');
+            try {
+                const { GoogleGenerativeAI } = await import('@google/generative-ai');
+                const apiKey = settings.APIKeys;
+                const genAI = new GoogleGenerativeAI(apiKey);
+                const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+                
+                const result = await model.generateContent(text);
+                return await reply(result.response.text());
+            } catch (err) {
+                console.error(err);
+                return await reply('❌ Error: Gagal merespons pesan AI.');
+            }
+        }
+    }
     
     switch (command) {
       case 'tes': {
@@ -238,46 +257,34 @@ async function Hc(hc, m, db) {
         }
       }
       break
-      case 'alyabrat': {
+      case 'alyabrat': { // Fitur ini masih dalam tahap pengembangan.
         if (!text) return reply(`Teksnya mana bang?\nContoh: *${prefix}alyabrat halo*`);
         await react('⏳');
         try {
           const Jimp = await import('jimp');
-          
           const imageUrl = 'https://files.catbox.moe/5zv26f.jpg';
           const image = await Jimp.default.read(imageUrl);
           image.resize(512, Jimp.default.AUTO);
-          
           const width = image.bitmap.width;
           const height = image.bitmap.height;
-          
-          // Ukuran area kertas pada gambar
           const paperW = Math.round(width * 0.58);
           const paperH = Math.round(height * 0.20);
-          
-          // 1. Buat canvas transparan khusus untuk menampung teks agar bisa di-wrap dan di-rotate
           const textCanvas = new Jimp.default(paperW, paperH, 0x00000000);
           const font = await Jimp.default.loadFont(Jimp.default.FONT_SANS_64_BLACK);
-          
-          // Cetak teks dengan auto-wrap ke dalam canvas teks
           textCanvas.print(font, 0, 0, {
             text: text,
             alignmentX: Jimp.default.HORIZONTAL_ALIGN_CENTER,
             alignmentY: Jimp.default.VERTICAL_ALIGN_MIDDLE
           }, paperW, paperH);
           
-          // 2. Putar teks sedikit ke kiri (-5 derajat) mengikuti sudut kemiringan kertas
           textCanvas.rotate(+5, false);
           
-          // 3. Tentukan posisi koordinat penempelan di atas gambar utama
           const posX = Math.round(width * 0.21);
           const posY = Math.round(height * 0.58);
           
-          // Tempelkan gambar teks yang sudah dimiringkan ke gambar utama
           image.composite(textCanvas, posX, posY);
           
           const buffer = await image.getBufferAsync(Jimp.default.MIME_JPEG);
-          
           const stickerFile = await writeExif(buffer, { packname: packname, author: author });
           await hc.sendMessage(sender, { sticker: { url: stickerFile } }, { quoted: m });
           
@@ -457,7 +464,23 @@ async function Hc(hc, m, db) {
         }
       }
       break
-
+      // Ai Menu
+      case 'autoai': {
+        if (m.isGroup) return reply(settings.mess.priv);
+        if (global.activeAutoAI.has(sender)) return reply('🤖 Mode Auto AI sudah aktif di chat ini.');
+        
+        global.activeAutoAI.add(sender);
+        reply('✅ Mode Auto AI diaktifkan!\nSilakan ketik pesan tanpa prefix.');
+      }
+      break
+      case 'delautoai': {
+        if (m.isGroup) return reply(settings.mess.priv);
+        if (!global.activeAutoAI.has(sender)) return reply('⚠️ Mode Auto AI belum aktif.');
+        
+        global.activeAutoAI.delete(sender);
+        reply('❌ Mode Auto AI dimatikan.');
+      }
+      break
       // Menu
       case 'menu': {
         await react('✨');
@@ -605,6 +628,7 @@ async function Hc(hc, m, db) {
 ╭┴─❍ *TOOLS*
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}brat
+|${setv} ${prefix}bratvid
 │${setv} ${prefix}tovn (reply pesan)
 │${setv} ${prefix}sticker (send/reply img/vid)
 │${setv} ${prefix}speedtest

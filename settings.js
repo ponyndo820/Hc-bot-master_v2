@@ -36,6 +36,15 @@ settings.mess = {
   fit: "Fitur Ini Belum Tersedia Ya Sayang ❗",
   qud: "Reply pesannya ya Sayang❗",
   don: "selesai✅",
+  priv: "kuhusus Privat Chat Ya Sayang❗"
+}
+
+settings.APIs = {
+  Gemini: 'https://aistudio.google.com/api-keys',
+}
+
+settings.APIKeys = {
+  'https://aistudio.google.com/api-keys': 'YOUR_API_KEY',
 }
 
 settings.limit = {
@@ -60,9 +69,8 @@ settings.jadwalSholat = {
 }
 
 settings.badWords = ['dongo','kontol'] // input kata-kata toxic di sini ya Sayang. ex: ['dongo','dongonya']
+
 settings.chatLength = 1000
-
-
 fs.watchFile(__filename, async () => {
   console.log(chalk.yellowBright(`[UPDATE] ${__filename}`))
 });
