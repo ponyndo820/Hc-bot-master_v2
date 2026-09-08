@@ -48,18 +48,20 @@ async function Hc(hc, m, db) {
     const prefixUsed = settings.prefix.find(p => body.startsWith(p));
     const isCmd = !!prefixUsed;
     const prefix = isCmd ? prefixUsed : '';
+    if (!isCmd && !m.isGroup && global.activeAutoAI.has(sender)) {
+    } else if (!isCmd && !global.activeAutoAI.has(sender)) {
+        return;
+    }
     if (!isCmd && !global.activeAutoAI.has(sender)) return;
     const command = isCmd ? body.slice(prefix.length).trim().split(/ +/).shift().toLowerCase() : '';
     const args = isCmd ? body.trim().split(/ +/).slice(1) : [];
     const text = isCmd ? args.join(' ') : body;
-    
     const reply = async (text) => {
       return await hc.sendMessage(sender, { text }, { quoted: m });
     };
     const react = async (emoji) => {
       return await hc.sendMessage(sender, { react: { text: emoji, key: m.key } });
     };
-    
     const participant = m.key.participant || sender; 
     const isCreator = m.key.fromMe || settings.ownerNumber.some(owner => participant.includes(owner));
     const contextInfo = m.message.extendedTextMessage?.contextInfo || m.message.imageMessage?.contextInfo || m.message.videoMessage?.contextInfo;
@@ -95,6 +97,7 @@ async function Hc(hc, m, db) {
             }
         }
     }
+
     
     switch (command) {
       case 'tes': {
@@ -477,7 +480,7 @@ async function Hc(hc, m, db) {
         if (global.activeAutoAI.has(sender)) return reply('🤖 Mode Auto AI sudah aktif di chat ini.');
         
         global.activeAutoAI.add(sender);
-        reply('✅ Mode Auto AI diaktifkan!\nSilakan ketik pesan tanpa prefix.');
+        reply(`✅ Mode Auto AI diaktifkan!\nKetik ${prefix}delautoai untuk mematikan.`);
       }
       break
       case 'delautoai': {
@@ -498,8 +501,6 @@ async function Hc(hc, m, db) {
         
         try {
           let settingsContent = fs.readFileSync('./settings.js', 'utf-8');
-          
-          // Mengganti struktur settings.APIKeys di settings.js secara fisik
           settingsContent = settingsContent.replace(
             /settings\.APIKeys\s*=\s*\{[\s\S]*?\}/,
             `settings.APIKeys = '${key}'`
@@ -509,12 +510,10 @@ async function Hc(hc, m, db) {
           reply('✅ API Key Gemini berhasil disimpan secara permanen ke *settings.js*!');
         } catch (err) {
           console.error(err);
-          reply('❌ Gagal menulis API Key ke settings.js');
+          reply('❌ Gagal menulis API Key ke settings.js\ncoba isi secara manual');
         }
       }
       break
-
-
       // Menu
       case 'menu': {
         await react('✨');
