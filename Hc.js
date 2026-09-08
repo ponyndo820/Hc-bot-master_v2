@@ -76,7 +76,6 @@ async function Hc(hc, m, db) {
     if (!isGroup && global.activeAutoAI.has(sender) && !isCmd) {
         if (m.key.id?.startsWith('3EB0') || m.key.id?.startsWith('BAE5') || text.startsWith('❌') || text.startsWith('✅')) return;
         if (text) {
-            await react('🤖');
             try {
                 const { GoogleGenerativeAI } = await import('@google/generative-ai');
                 const apiKey = settings.APIKeys;
@@ -515,7 +514,7 @@ async function Hc(hc, m, db) {
       break
       case 'ai': case 'gemini': case 'google': case 'bard': case 'ia': {
         if (!text) return reply(`Mau tanya apa?\nContoh: *${prefix + command} Bagaimana cuaca hari ini?*`);
-        await react('🤖');
+        await react('⏳');
         try {
           const { GoogleGenerativeAI } = await import('@google/generative-ai');
           const apiKey = settings.APIKeys;
@@ -688,7 +687,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}randomimage
 ╰┬──❍
 ╭┴─❍ *AI*
-│${setv} ${prefix}ai
+│${setv} ${prefix}ai (query)
 │${setv} ${prefix}autoai
 ╰┬──❍
 ╭┴─❍ *ANIME*
