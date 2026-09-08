@@ -688,6 +688,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}randomimage
 ╰┬──❍
 ╭┴─❍ *AI*
+│${setv} ${prefix}ai
 │${setv} ${prefix}autoai
 ╰┬──❍
 ╭┴─❍ *ANIME*
