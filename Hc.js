@@ -412,23 +412,27 @@ async function Hc(hc, m, db) {
         }
       }
       break
-        case 'ytmp4': case 'video': {
-        if (!text) return reply(`Example: ${prefix + command} url_youtube`)
-        if (!text.includes('youtu')) return reply('Url Tidak Mengandung Result Dari YouTube ❗')
-        await react('⏳')
+      case 'ytmp4': case 'video': {
+        if (!text) return reply(`Example: ${prefix + command} url_youtube`);
+        if (!text.includes('youtu')) return reply('Url Tidak Mengandung Result Dari YouTube ❗');
+        await react('⏳');
         let videoPath = null;
         try {
           const hasil = await ytMp4(text);
           videoPath = hasil.result;
-         await hc.sendMessage(sender, { video: { url: videoPath }, caption: `*📌 Title:* ${hasil.title}\n*✏ Description:* ${hasil.desc ? hasil.desc : '-'}\n*🔴 Channel:* ${hasil.channel}\n*🗓️ Upload at:* ${hasil.uploadDate}`  }, { quoted: m });
+          await hc.sendMessage(sender, { 
+            video: { url: videoPath }, 
+            caption: `*📌 Title:* ${hasil.title}\n*✏ Description:* ${hasil.desc ? hasil.desc : '-'}\n*🔴 Channel:* ${hasil.channel}\n*🗓️ Upload at:* ${hasil.uploadDate}` 
+          }, { quoted: m });
         } catch (e) {
-          reply(settings.mess.fail);
+          console.error("Error ytmp4:", e);
+          await reply('❌ Gagal memproses video YouTube. Pastikan link valid dan FFmpeg terinstal!');
         } finally {
           if (videoPath && fs.existsSync(videoPath)) {
             try {
               fs.unlinkSync(videoPath);
             } catch (e) {
-              console.error(e)
+              console.error("Error hapus file temp:", e);
             }
           }
         }
