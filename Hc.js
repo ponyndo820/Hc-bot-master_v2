@@ -420,7 +420,7 @@ async function Hc(hc, m, db) {
         try {
           const hasil = await ytMp4(text);
           videoPath = hasil.result;
-          await reply({ video: { url: videoPath }, caption: `*📌 Title:*${hasil.title}\n*✏Description:*${hasil.desc ? hasil.desc:''}\n*🔴Channel:*${hasil.cahannel}\n*🗓️ Upload at:* ${hasil.uploadDate}`});
+         await hc.sendMessage(sender, { video: { url: videoPath }, caption: `*📌 Title:* ${hasil.title}\n*✏ Description:* ${hasil.desc ? hasil.desc : '-'}\n*🔴 Channel:* ${hasil.channel}\n*🗓️ Upload at:* ${hasil.uploadDate}`  }, { quoted: m });
         } catch (e) {
           reply(settings.mess.fail);
         } finally {
