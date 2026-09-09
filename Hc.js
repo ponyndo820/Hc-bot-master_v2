@@ -386,24 +386,41 @@ async function Hc(hc, m, db) {
       break
       // Downloader Menu
       case 'ytmp3': {
-        let ytUrl = text ? text.trim() : '';
-        
+        let ytUrl = '';
+        if (text) {
+          const match = text.match(/https?:\/\/[^\s]+/g);
+          if (match) ytUrl = match.find(u => u.includes('youtu')) || '';
+        }
         if (!ytUrl && m.quoted) {
-          const quotedContent = typeof m.quoted === 'object' ? JSON.stringify(m.quoted) : String(m.quoted);
-          const match = quotedContent.match(/(https?:\/\/[^\s"']+)/g);
-          if (match) {
-            ytUrl = match.find(u => u.includes('youtu')) || '';
+          const q = m.quoted;
+          const possibleTexts = [
+            q.text,
+            q.body,
+            q.caption,
+            q.conversation,
+            q.message?.conversation,
+            q.message?.extendedTextMessage?.text,
+            q.message?.imageMessage?.caption,
+            q.message?.videoMessage?.caption
+          ];
+          for (const t of possibleTexts) {
+            if (t && typeof t === 'string') {
+              const match = t.match(/https?:\/\/[^\s]+/g);
+              if (match) {
+                const found = match.find(u => u.includes('youtu'));
+                if (found) {
+                  ytUrl = found;
+                  break;
+                }
+              }
+            }
           }
         }
-
         if (!ytUrl) return reply(`Example: ${prefix + command} url_youtube\nAtau reply pesan yang memiliki link YouTube!`);
-        if (!ytUrl.includes('youtu')) return reply('Url Tidak Mengandung Result Dari YouTube ❗');
-        
         await react('⏳');
         let audioPath = null;
         try {
           audioPath = path.join('./database/temp', `audio_${Date.now()}.mp3`);
-          
           await youtubedl(ytUrl, {
             extractAudio: true,
             audioFormat: 'mp3',
@@ -414,7 +431,6 @@ async function Hc(hc, m, db) {
             extractorArgs: 'youtube:player_client=android,web',
             addHeader: ['referer:https://www.youtube.com']
           });
-          
           await hc.sendMessage(sender, { 
             audio: { url: audioPath }, 
             mimetype: 'audio/mpeg', 
@@ -434,14 +450,42 @@ async function Hc(hc, m, db) {
         }
       }
       break
-
-      case 'ytmp4':{
-        if (!text) return reply(`Example: ${prefix + command} url_youtube`);
-        if (!text.includes('youtu')) return reply('Url Tidak Mengandung Result Dari YouTube ❗');
+      case 'ytmp4': case 'video': {
+        let ytUrl = '';
+        if (text) {
+          const match = text.match(/https?:\/\/[^\s]+/g);
+          if (match) ytUrl = match.find(u => u.includes('youtu')) || '';
+        }
+        if (!ytUrl && m.quoted) {
+          const q = m.quoted;
+          const possibleTexts = [
+            q.text,
+            q.body,
+            q.caption,
+            q.conversation,
+            q.message?.conversation,
+            q.message?.extendedTextMessage?.text,
+            q.message?.imageMessage?.caption,
+            q.message?.videoMessage?.caption
+          ];
+          for (const t of possibleTexts) {
+            if (t && typeof t === 'string') {
+              const match = t.match(/https?:\/\/[^\s]+/g);
+              if (match) {
+                const found = match.find(u => u.includes('youtu'));
+                if (found) {
+                  ytUrl = found;
+                  break;
+                }
+              }
+            }
+          }
+        }
+        if (!ytUrl) return reply(`Example: ${prefix + command} url_youtube\nAtau reply pesan yang memiliki link YouTube!`);
         await react('⏳');
         let videoPath = null;
         try {
-          const hasil = await ytMp4(text);
+          const hasil = await ytMp4(ytUrl);
           videoPath = hasil.result;
           await hc.sendMessage(sender, { 
             video: { url: videoPath }, 
@@ -449,7 +493,7 @@ async function Hc(hc, m, db) {
           }, { quoted: m });
         } catch (e) {
           console.error("Error ytmp4:", e);
-          await reply('❌ Gagal memproses video YouTube. Pastikan link valid dan FFmpeg terinstal!');
+          await reply('❌ Gagal memproses video YouTube. Pastikan link valid!');
         } finally {
           if (videoPath && fs.existsSync(videoPath)) {
             try {
