@@ -386,29 +386,48 @@ async function Hc(hc, m, db) {
       break
       // Downloader Menu
       case 'ytmp3': {
-        if (!text) return reply(`Masukkan link YouTube atau judul lagu yang ingin dicari!\nContoh: *${prefix}ytmp3 https://youtu.com/xxxxx*`);
+        let ytUrl = text ? text.trim() : '';
+        
+        if (!ytUrl && m.quoted) {
+          const quotedText = m.quoted.text || m.quoted.caption || '';
+          const match = quotedText.match(/(https?:\/\/[^\s]+)/g);
+          if (match) {
+            ytUrl = match.find(u => u.includes('youtu')) || '';
+          }
+        }
+        
+        if (!ytUrl) return reply(`Example: ${prefix + command} url_youtube\nAtau reply pesan yang memiliki link YouTube!`);
+        if (!ytUrl.includes('youtu')) return reply('Url Tidak Mengandung Result Dari YouTube ❗');
         await react('⏳');
+        let audioPath = null;
         try {
-          const output = await youtubedl(text, {
+          audioPath = path.join('./database/temp', `audio_${Date.now()}.mp3`);
+          await youtubedl(ytUrl, {
             extractAudio: true,
             audioFormat: 'mp3',
-            output: './lib/temp_audio.mp3',
+            output: audioPath,
             noCheckCertificates: true,
             noWarnings: true,
             preferFreeFormats: true,
+            extractorArgs: 'youtube:player_client=android,web',
             addHeader: ['referer:https://www.youtube.com']
           });
           await hc.sendMessage(sender, { 
-            audio: { url: './lib/temp_audio.mp3' }, 
+            audio: { url: audioPath }, 
             mimetype: 'audio/mpeg', 
             ptt: false 
           }, { quoted: m });
-          if (fs.existsSync('./lib/temp_audio.mp3')) {
-            fs.unlinkSync('./lib/temp_audio.mp3');
-          }
         } catch (err) {
-          console.error(err);
-          await reply('Gagal mengunduh audio dari YouTube. Pastikan link-nya benar!');
+          console.error("Error ytmp3:", err);
+          await reply('❌ Gagal mengunduh audio dari YouTube. Pastikan link-nya benar!');
+        } finally {
+          if (audioPath && fs.existsSync(audioPath)) {
+            try {
+              fs.unlinkSync(audioPath);
+            } catch (e) {
+              console.error("Error hapus file audio temp:", e);
+            }
+          }
         }
       }
       break
