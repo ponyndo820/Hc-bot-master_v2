@@ -17,7 +17,7 @@ import { exec, spawn, execSync } from 'child_process';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getContentType, downloadMediaMessage, generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
 
-import { ytMp4 } from './lib/yt.js';
+import { ytMp4 } from './lib/ytmp4.js';
 import settings from './settings.js';
 import { GroupUpdate } from './src/message.js';
 import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
@@ -445,7 +445,7 @@ async function Hc(hc, m, db) {
         
         try {
           const searchResults = await yts(text);
-          const videos = searchResults.videos.slice(0, 5);
+          const videos = searchResults.videos.slice(0, 1); // Atur berapa jumlah video yang akan di download.
           
           if (videos.length === 0) return reply('Maaf, video yang kamu cari tidak ditemukan.');
           let resultText = `*━━━━━━━━━━━━━━━━━━━━*\n`;
@@ -676,6 +676,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}tagme
 │${setv} ${prefix}donasi
 │${setv} ${prefix}request (text)
+│${setv} ${prefix}tovn (reply pesan)
 ╰┬───❍
 ╭┴─❍ *OWMER*
 │${setv} ${prefix}shutdown
@@ -707,7 +708,6 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}brat
 │${setv} ${prefix}bratvid
-│${setv} ${prefix}tovn (reply pesan)
 │${setv} ${prefix}sticker (send/reply img/vid)
 │${setv} ${prefix}speedtest
 ╰────❍
