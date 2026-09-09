@@ -17,7 +17,7 @@ import { exec, spawn, execSync } from 'child_process';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getContentType, downloadMediaMessage, generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
 
-import { ytMp4 } from '.lib/yt.js',
+import { ytMp4 } from '.lib/yt.js';
 import settings from './settings.js';
 import { GroupUpdate } from './src/message.js';
 import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
@@ -412,41 +412,25 @@ async function Hc(hc, m, db) {
         }
       }
       break
-      case 'ytmp4': case 'video': {
-        if (!text) return reply(`Masukkan link YouTube!\nContoh: *${prefix}ytmp4 https://youtu.com/xxxxx*`);
-        await react('⏳');
+        case 'ytmp4': case 'video': {
+        if (!text) return reply(`Example: ${prefix + command} url_youtube`)
+        if (!text.includes('youtu')) return reply('Url Tidak Mengandung Result Dari YouTube ❗')
+        await react('⏳')
+        let videoPath = null;
         try {
-          if (fs.existsSync('./lib/temp_video.mp4')) {
-            fs.rmSync('./lib/temp_video.mp4', { recursive: true, force: true });
+          const hasil = await ytMp4(text);
+          videoPath = hasil.result;
+          await reply({ video: { url: videoPath }, caption: `*📌 Title:*${hasil.title}\n*✏Description:*${hasil.desc ? hasil.desc:''}\n*🔴Channel:*${hasil.cahannel}\n*🗓️ Upload at:* ${hasil.uploadDate}`});
+        } catch (e) {
+          reply(settings.mess.fail);
+        } finally {
+          if (videoPath && fs.existsSync(videoPath)) {
+            try {
+              fs.unlinkSync(videoPath);
+            } catch (e) {
+              console.error(e)
+            }
           }
-          await youtubedl(text, {
-            output: './lib/temp_video.mp4',
-            noCheckCertificates: true,
-            noWarnings: true,
-            preferFreeFormats: true,
-            addHeader: ['referer:https://www.youtube.com']
-          });
-          
-          if (!fs.existsSync('./lib/temp_video.mp4')) {
-            return reply('Gagal mengunduh video: File output tidak ditemukan.');
-          }
-          
-          const videoBuffer = fs.readFileSync('./lib/temp_video.mp4');
-          
-          await hc.sendMessage(sender, { 
-            video: videoBuffer, 
-            caption: `*By: Heart candy*\nNih videonya!` 
-          }, { quoted: m });
-          
-          if (fs.existsSync('./lib/temp_video.mp4')) {
-            fs.rmSync('./lib/temp_video.mp4', { recursive: true, force: true });
-          }
-        } catch (err) {
-          console.error(err);
-          if (fs.existsSync('./lib/temp_video.mp4')) {
-            fs.rmSync('./lib/temp_video.mp4', { recursive: true, force: true });
-          }
-          await reply('Gagal mengunduh video dari YouTube! Pastikan link valid dan pastikan ffmpeg sudah terinstal di Termux.');
         }
       }
       break
