@@ -385,7 +385,7 @@ async function Hc(hc, m, db) {
       }
       break
       // Downloader Menu
-      case 'ytmp3': case 'play': {
+      case 'ytmp3': {
         if (!text) return reply(`Masukkan link YouTube atau judul lagu yang ingin dicari!\nContoh: *${prefix}ytmp3 https://youtu.com/xxxxx*`);
         await react('⏳');
         try {
@@ -412,7 +412,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
-      case 'ytmp4': case 'video': {
+      case 'ytmp4':{
         if (!text) return reply(`Example: ${prefix + command} url_youtube`);
         if (!text.includes('youtu')) return reply('Url Tidak Mengandung Result Dari YouTube ❗');
         await react('⏳');
