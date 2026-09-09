@@ -49,6 +49,7 @@
     "moment-timezone": "^0.5.43",
     "awesome-phonenumber": "^6.8.0",
     "@google/generative-ai": "^0.24.1",
-    "@whiskeysockets/baileys": "^7.0.0-rc13"
+    "@whiskeysockets/baileys": "^7.0.0-rc13",
+    "ytdl-core": "npm:@distube/ytdl-core@latest"
   }
 }

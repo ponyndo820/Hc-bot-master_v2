@@ -17,6 +17,7 @@ import { exec, spawn, execSync } from 'child_process';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getContentType, downloadMediaMessage, generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
 
+import { ytMp4 } from '.lib/yt.js',
 import settings from './settings.js';
 import { GroupUpdate } from './src/message.js';
 import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
@@ -690,6 +691,7 @@ async function Hc(hc, m, db) {
 ╰┬───❍
 ╭┴─❍ *OWMER*
 │${setv} ${prefix}shutdown
+│${setv} ${prefix}setapikeygemini
 ╰┬──❍
 ╭┴─❍ *QUOTES*
 │${setv} ${prefix}quotes
