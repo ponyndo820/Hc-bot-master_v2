@@ -391,17 +391,13 @@ async function Hc(hc, m, db) {
           const match = text.match(/https?:\/\/[^\s]+/g);
           if (match) ytUrl = match.find(u => u.includes('youtu')) || '';
         }
-        if (!ytUrl && m.quoted) {
-          const q = m.quoted;
+        if (!ytUrl && isQuoted) {
+          const q = contextInfo.quotedMessage;
           const possibleTexts = [
-            q.text,
-            q.body,
-            q.caption,
             q.conversation,
-            q.message?.conversation,
-            q.message?.extendedTextMessage?.text,
-            q.message?.imageMessage?.caption,
-            q.message?.videoMessage?.caption
+            q.extendedTextMessage?.text,
+            q.imageMessage?.caption,
+            q.videoMessage?.caption
           ];
           for (const t of possibleTexts) {
             if (t && typeof t === 'string') {
@@ -450,23 +446,19 @@ async function Hc(hc, m, db) {
         }
       }
       break
-      case 'ytmp4': case 'video': {
+      case 'ytmp4': {
         let ytUrl = '';
         if (text) {
           const match = text.match(/https?:\/\/[^\s]+/g);
           if (match) ytUrl = match.find(u => u.includes('youtu')) || '';
         }
-        if (!ytUrl && m.quoted) {
-          const q = m.quoted;
+        if (!ytUrl && isQuoted) {
+          const q = contextInfo.quotedMessage;
           const possibleTexts = [
-            q.text,
-            q.body,
-            q.caption,
             q.conversation,
-            q.message?.conversation,
-            q.message?.extendedTextMessage?.text,
-            q.message?.imageMessage?.caption,
-            q.message?.videoMessage?.caption
+            q.extendedTextMessage?.text,
+            q.imageMessage?.caption,
+            q.videoMessage?.caption
           ];
           for (const t of possibleTexts) {
             if (t && typeof t === 'string') {
@@ -505,6 +497,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
+
       // Search Menu
       case 'search': case 'yts': case 'ytsearch': case 'play': {
         if (!text) return reply(`Masukkan kata kunci pencarian!\nContoh: *${prefix}search mlp*`);
