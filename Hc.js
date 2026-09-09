@@ -389,19 +389,21 @@ async function Hc(hc, m, db) {
         let ytUrl = text ? text.trim() : '';
         
         if (!ytUrl && m.quoted) {
-          const quotedText = m.quoted.text || m.quoted.caption || '';
-          const match = quotedText.match(/(https?:\/\/[^\s]+)/g);
+          const quotedContent = typeof m.quoted === 'object' ? JSON.stringify(m.quoted) : String(m.quoted);
+          const match = quotedContent.match(/(https?:\/\/[^\s"']+)/g);
           if (match) {
             ytUrl = match.find(u => u.includes('youtu')) || '';
           }
         }
-        
+
         if (!ytUrl) return reply(`Example: ${prefix + command} url_youtube\nAtau reply pesan yang memiliki link YouTube!`);
         if (!ytUrl.includes('youtu')) return reply('Url Tidak Mengandung Result Dari YouTube ❗');
+        
         await react('⏳');
         let audioPath = null;
         try {
           audioPath = path.join('./database/temp', `audio_${Date.now()}.mp3`);
+          
           await youtubedl(ytUrl, {
             extractAudio: true,
             audioFormat: 'mp3',
@@ -412,6 +414,7 @@ async function Hc(hc, m, db) {
             extractorArgs: 'youtube:player_client=android,web',
             addHeader: ['referer:https://www.youtube.com']
           });
+          
           await hc.sendMessage(sender, { 
             audio: { url: audioPath }, 
             mimetype: 'audio/mpeg', 
@@ -431,6 +434,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
+
       case 'ytmp4':{
         if (!text) return reply(`Example: ${prefix + command} url_youtube`);
         if (!text.includes('youtu')) return reply('Url Tidak Mengandung Result Dari YouTube ❗');
