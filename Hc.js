@@ -526,7 +526,7 @@ async function Hc(hc, m, db) {
         await react('⏳');
         try {
           process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-          const res = await fetch(`https://api.tiklydown.eu.org/api/download?url=${ttUrl}`);
+          const res = await fetch(`https://www.tikwm.com/api/?url=${ttUrl}`);
           const json = await res.json();
 
           if (!json || (!json.video && !json.music)) return reply('❌ Gagal mengambil data TikTok!');
