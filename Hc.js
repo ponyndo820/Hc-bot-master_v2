@@ -560,6 +560,56 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      case 'ig': case 'igdl': case 'instagram': {
+        let igUrl = '';
+        if (text) {
+          const match = text.match(/https?:\/\/[^\s]+/g);
+          if (match) igUrl = match.find(u => u.includes('instagram.com')) || '';
+        }
+
+        if (!igUrl && isQuoted) {
+          const q = contextInfo.quotedMessage;
+          const possibleTexts = [
+            q.conversation, q.extendedTextMessage?.text, 
+            q.imageMessage?.caption, q.videoMessage?.caption
+          ];
+          for (const t of possibleTexts) {
+            if (t && typeof t === 'string') {
+              const match = t.match(/https?:\/\/[^\s]+/g);
+              if (match) {
+                const found = match.find(u => u.includes('instagram.com'));
+                if (found) { igUrl = found; break; }
+              }
+            }
+          }
+        }
+
+        if (!igUrl) return reply(`Example: ${prefix + command} url_instagram\nAtau reply pesan yang memiliki link Instagram!`);
+        
+        await react('⏳');
+        try {
+          // Menggunakan API Siputzx (sama seperti fitur Brat)
+          const res = await fetch(`https://api.siputzx.my.id/api/d/igdl?url=${igUrl}`);
+          const json = await res.json();
+
+          if (!json || !json.status || !json.data || json.data.length === 0) {
+            return reply('❌ Gagal mengambil data! Pastikan link valid dan akun tidak di-private.');
+          }
+
+          for (let media of json.data) {
+            let urlMedia = media.url || media;
+            if (urlMedia.includes('.mp4') || urlMedia.includes('video')) {
+              await hc.sendMessage(sender, { video: { url: urlMedia }, caption: '*By: Heart candy*' }, { quoted: m });
+            } else {
+              await hc.sendMessage(sender, { image: { url: urlMedia }, caption: '*By: Heart candy*' }, { quoted: m });
+            }
+          }
+        } catch (err) {
+          console.error("Error Instagram:", err);
+          reply('❌ Terjadi kesalahan saat mendownload media Instagram.');
+        }
+      }
+      break
 
       // Search Menu
       case 'search': case 'yts': case 'ytsearch': case 'play': {
