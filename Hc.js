@@ -525,39 +525,42 @@ async function Hc(hc, m, db) {
         
         await react('⏳');
         try {
-          process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
           const res = await fetch(`https://www.tikwm.com/api/?url=${ttUrl}`);
           const json = await res.json();
 
-          if (!json || (!json.video && !json.music)) return reply('❌ Gagal mengambil data TikTok!');
+          if (json.code !== 0 || !json.data) return reply('❌ Gagal mengambil data TikTok! Pastikan link valid dan tidak diprivate.');
 
-          // Jika user mengetik .ttaudio
+          const data = json.data;
+
           if (command === 'ttaudio') {
+             if (!data.music) return reply('❌ Audio tidak ditemukan pada postingan ini!');
              await hc.sendMessage(sender, {
-               audio: { url: json.music.play_url },
+               audio: { url: data.music },
                mimetype: 'audio/mpeg',
                ptt: false
              }, { quoted: m });
           } else {
-             // Jika postingan berupa Slide Foto
-             if (json.images && json.images.length > 0) {
-               for (let img of json.images) {
-                 await hc.sendMessage(sender, { image: { url: img.url } }, { quoted: m });
+             if (data.images && data.images.length > 0) {
+               for (let img of data.images) {
+                 await hc.sendMessage(sender, { image: { url: img } }, { quoted: m });
+               }
+               if (data.music) {
+                 await hc.sendMessage(sender, { audio: { url: data.music }, mimetype: 'audio/mpeg', ptt: false }, { quoted: m });
                }
              } else {
-               // Jika postingan berupa Video
                await hc.sendMessage(sender, {
-                 video: { url: json.video.noWatermark || json.video.watermark },
-                 caption: `*📌 Title:* ${json.title || '-'}\n*👤 Author:* ${json.author?.name || '-'}`
+                 video: { url: data.play || data.wmplay },
+                 caption: `*📌 Title:* ${data.title || '-'}\n*👤 Author:* ${data.author?.nickname || '-'}`
                }, { quoted: m });
              }
           }
         } catch (err) {
           console.error("Error TikTok:", err);
-          reply('❌ Terjadi kesalahan. API TikTok mungkin sedang mengalami gangguan.');
+          reply('❌ Terjadi kesalahan saat memproses data dari API TikTok.');
         }
       }
       break
+
       // Search Menu
       case 'search': case 'yts': case 'ytsearch': case 'play': {
         if (!text) return reply(`Masukkan kata kunci pencarian!\nContoh: *${prefix}search mlp*`);
