@@ -588,21 +588,29 @@ async function Hc(hc, m, db) {
         
         await react('⏳');
         try {
-          // Menggunakan API Siputzx (sama seperti fitur Brat)
           const res = await fetch(`https://api.siputzx.my.id/api/d/igdl?url=${igUrl}`);
           const json = await res.json();
+          
+          // Cetak respons asli ke terminal untuk pengecekan
+          console.log("Respon API IG:", json);
 
-          if (!json || !json.status || !json.data || json.data.length === 0) {
-            return reply('❌ Gagal mengambil data! Pastikan link valid dan akun tidak di-private.');
-          }
+          // Fleksibel menangani berbagai struktur data API
+          let mediaList = json.data || json.result;
+          if (!mediaList) return reply('❌ Gagal mengambil data! API mengembalikan respons kosong.');
 
-          for (let media of json.data) {
-            let urlMedia = media.url || media;
-            if (urlMedia.includes('.mp4') || urlMedia.includes('video')) {
-              await hc.sendMessage(sender, { video: { url: urlMedia }, caption: '*By: Heart candy*' }, { quoted: m });
-            } else {
-              await hc.sendMessage(sender, { image: { url: urlMedia }, caption: '*By: Heart candy*' }, { quoted: m });
+          if (Array.isArray(mediaList)) {
+            for (let media of mediaList) {
+              let urlMedia = media.url || media;
+              if (typeof urlMedia === 'string' && (urlMedia.includes('.mp4') || urlMedia.includes('video'))) {
+                await hc.sendMessage(sender, { video: { url: urlMedia }, caption: '*By: Heart candy*' }, { quoted: m });
+              } else {
+                await hc.sendMessage(sender, { image: { url: urlMedia }, caption: '*By: Heart candy*' }, { quoted: m });
+              }
             }
+          } else if (typeof mediaList === 'string') {
+            await hc.sendMessage(sender, { video: { url: mediaList }, caption: '*By: Heart candy*' }, { quoted: m });
+          } else {
+            return reply('❌ Format media Instagram tidak dikenali.');
           }
         } catch (err) {
           console.error("Error Instagram:", err);
@@ -610,6 +618,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
+
 
       // Search Menu
       case 'search': case 'yts': case 'ytsearch': case 'play': {
