@@ -2,6 +2,7 @@
    * index.js
    * By Heart candy
    * Sc ini open source
+   * ❗Peringatan Script ini tidak boleh di perjual belikan. Jika melanggar akan berurusan dengan hukum.
 */
 import fs from 'fs';
 import os from 'os';

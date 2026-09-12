@@ -2,6 +2,7 @@
    * Hc.js
    * By Heart candy
    * Sc ini open source
+   * ❗Peringatan Script ini tidak boleh di perjual belikan. Jika melanggar akan berurusan dengan hukum.
 */
 import fs from 'fs';
 import util from 'util';
@@ -97,6 +98,7 @@ async function Hc(hc, m, db) {
         }
     }
     
+    // Add case command di sini
     switch (command) {
       case 'tes': {
         await reply('Ya sayang');
@@ -111,6 +113,29 @@ async function Hc(hc, m, db) {
         });
       }
       break
+      case 'setapikeygemini': case 'setgemini': {
+        if (!isCreator) return reply(settings.mess.owr);
+        if (!text) return reply(`Masukkan API Key Gemini-nya!\nContoh: *${prefix}setapikeygemini AIzaSy...*`);
+        
+        const key = text.trim();
+        settings.APIKeys = key;
+        
+        try {
+          let settingsContent = fs.readFileSync('./settings.js', 'utf-8');
+          settingsContent = settingsContent.replace(
+            /settings\.APIKeys\s*=\s*\{[\s\S]*?\}/,
+            `settings.APIKeys = '${key}'`
+          );
+          
+          fs.writeFileSync('./settings.js', settingsContent, 'utf-8');
+          reply('✅ API Key Gemini berhasil disimpan secara permanen ke *settings.js*!');
+        } catch (err) {
+          console.error(err);
+          reply('❌ Gagal menulis API Key ke settings.js\ncoba isi secara manual');
+        }
+      }
+      break
+      
       // Quotes Menu
       case 'quotes': {
         try {
@@ -147,6 +172,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      
       // Tools Menu
       case 'sticker': case 'stiker': case 's': case 'stickergif': case 'stikergif': case 'sgif': case 'stickerwm': case 'swm': case 'curi': case 'colong': case 'take': case 'stickergifwm': case 'sgifwm': case 'wm': {
         if (!/image|video|sticker/.test(quotedType)) return reply(`Kirim/reply gambar/video/gif dengan caption ${prefix + command}\nDurasi Image/Video/Gif 1-9 Detik`);
@@ -203,30 +229,6 @@ async function Hc(hc, m, db) {
         } catch (e) {
           console.error(e);
           await reply('Media Tidak Valid atau gagal diproses❗');
-        }
-      }
-      break
-      case 'tovn': case 'toptt': case 'tovoice': {
-        if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin Dijadikan Audio Dengan Caption ${prefix + command}`);
-        await react('⏳');
-        const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
-        let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
-        try {
-          let audioRes = await toPTT(mediaBuffer, 'mp4');
-          let audioData = typeof audioRes === 'string' ? { url: audioRes } : audioRes;
-          const waveform = new Uint8Array(Array.from({ length: 64 }, () => Math.floor(Math.random() * 100)));
-          await hc.sendMessage(sender, { 
-            audio: audioData, 
-            mimetype: 'audio/ogg; codecs=opus', 
-            ptt: true,
-            waveform: waveform
-          }, { quoted: m });
-          if (typeof audioRes === 'string' && fs.existsSync(audioRes)) {
-            fs.unlinkSync(audioRes);
-          }
-        } catch (e) {
-          console.error(e);
-          await reply('Gagal mengonversi media ke Voice Note!');
         }
       }
       break
@@ -303,7 +305,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
-
+      
       //Bot Menu
       case 'sc': case 'script': {
         reply('Donasi dulu')
@@ -330,6 +332,30 @@ async function Hc(hc, m, db) {
           text: `Pesan Dari : @${sender.split('@')[0]}\nUntuk Owner\n\nRequest: ${text}`, mentions: [sender] });
       }
       break
+      case 'tovn': case 'toptt': case 'tovoice': {
+        if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin Dijadikan Audio Dengan Caption ${prefix + command}`);
+        await react('⏳');
+        const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
+        let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+        try {
+          let audioRes = await toPTT(mediaBuffer, 'mp4');
+          let audioData = typeof audioRes === 'string' ? { url: audioRes } : audioRes;
+          const waveform = new Uint8Array(Array.from({ length: 64 }, () => Math.floor(Math.random() * 100)));
+          await hc.sendMessage(sender, { 
+            audio: audioData, 
+            mimetype: 'audio/ogg; codecs=opus', 
+            ptt: true,
+            waveform: waveform
+          }, { quoted: m });
+          if (typeof audioRes === 'string' && fs.existsSync(audioRes)) {
+            fs.unlinkSync(audioRes);
+          }
+        } catch (e) {
+          console.error(e);
+          await reply('Gagal mengonversi media ke Voice Note!');
+        }
+      }
+      break
       
       // Random Images Menu
       case 'randomimage': case 'randomimg': case 'randomimages': {
@@ -349,6 +375,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      
       // Waifu Menu
       case 'randomwaifu': case 'waifu': {
         await react('⏳');
@@ -384,6 +411,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      
       // Downloader Menu
       case 'ytmp3': {
         let ytUrl = '';
@@ -503,7 +531,7 @@ async function Hc(hc, m, db) {
           const match = text.match(/https?:\/\/[^\s]+/g);
           if (match) ttUrl = match.find(u => u.includes('tiktok.com') || u.includes('vt.tiktok.com')) || '';
         }
-
+        
         if (!ttUrl && isQuoted) {
           const q = contextInfo.quotedMessage;
           const possibleTexts = [
@@ -520,18 +548,18 @@ async function Hc(hc, m, db) {
             }
           }
         }
-
+        
         if (!ttUrl) return reply(`Example: ${prefix + command} url_tiktok\nAtau reply pesan yang memiliki link TikTok!`);
         
         await react('⏳');
         try {
           const res = await fetch(`https://www.tikwm.com/api/?url=${ttUrl}`);
           const json = await res.json();
-
+          
           if (json.code !== 0 || !json.data) return reply('❌ Gagal mengambil data TikTok! Pastikan link valid dan tidak diprivate.');
-
+          
           const data = json.data;
-
+          
           if (command === 'ttaudio') {
              if (!data.music) return reply('❌ Audio tidak ditemukan pada postingan ini!');
              await hc.sendMessage(sender, {
@@ -566,7 +594,7 @@ async function Hc(hc, m, db) {
           const match = text.match(/https?:\/\/[^\s]+/g);
           if (match) igUrl = match.find(u => u.includes('instagram.com')) || '';
         }
-
+        
         if (!igUrl && isQuoted) {
           const q = contextInfo.quotedMessage;
           const possibleTexts = [
@@ -583,27 +611,24 @@ async function Hc(hc, m, db) {
             }
           }
         }
-
+        
         if (!igUrl) return reply(`Example: ${prefix + command} url_instagram\nAtau reply pesan yang memiliki link Instagram!`);
         
         await react('⏳');
         try {
-          // Menggunakan API BK9
-          const res = await fetch(`https://bk9.fun/scraper/igdl?url=${igUrl}`);
+          const res = await fetch(`https://api.yanzbotz.live/api/downloader/instagram?url=${igUrl}`);
           
-          // Mencegah crash jika server API down dan mengirim HTML (Unexpected token '<')
           const contentType = res.headers.get("content-type");
           if (!contentType || !contentType.includes("application/json")) {
-            return reply('❌ Server API sedang mengalami gangguan (tidak merespons JSON). Silakan coba beberapa saat lagi.');
+            return reply('❌ Server API Instagram sedang gangguan. Coba beberapa saat lagi.');
           }
-
+          
           const json = await res.json();
-          console.log("Respon API IG BK9:", json);
-
-          // Menyesuaikan dengan struktur data dari BK9 (json.BK9)
-          let mediaList = json.BK9 || json.data || json.result; 
+          console.log("Respon API IG Yanzhost:", json);
+          
+          let mediaList = json.result || json.data; 
           if (!mediaList || mediaList.length === 0) return reply('❌ Gagal mengambil data! Pastikan link valid dan akun tidak di-private.');
-
+          
           if (Array.isArray(mediaList)) {
             for (let media of mediaList) {
               let urlMedia = media.url || media; 
@@ -613,8 +638,10 @@ async function Hc(hc, m, db) {
                 await hc.sendMessage(sender, { image: { url: urlMedia }, caption: '*By: Heart candy*' }, { quoted: m });
               }
             }
+          } else if (typeof mediaList === 'string') {
+            await hc.sendMessage(sender, { video: { url: mediaList }, caption: '*By: Heart candy*' }, { quoted: m });
           } else {
-            return reply('❌ Format media Instagram tidak dikenali dari server API.');
+            return reply('❌ Format media Instagram tidak dikenali.');
           }
         } catch (err) {
           console.error("Error Instagram:", err);
@@ -622,6 +649,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
+
 
       // Search Menu
       case 'search': case 'yts': case 'ytsearch': case 'play': {
@@ -658,6 +686,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      
       // Ai Menu
       case 'cai': case 'autoai': case 'roomai': case 'chatai': {
         if (isGroup) return reply(settings.mess.priv);
@@ -673,29 +702,6 @@ async function Hc(hc, m, db) {
         
         global.activeAutoAI.delete(sender);
         reply('❌ Mode Auto AI dimatikan.');
-      }
-      break
-      // Set API_KEY
-      case 'setapikeygemini': case 'setgemini': {
-        if (!isCreator) return reply(settings.mess.owr);
-        if (!text) return reply(`Masukkan API Key Gemini-nya!\nContoh: *${prefix}setapikeygemini AIzaSy...*`);
-        
-        const key = text.trim();
-        settings.APIKeys = key;
-        
-        try {
-          let settingsContent = fs.readFileSync('./settings.js', 'utf-8');
-          settingsContent = settingsContent.replace(
-            /settings\.APIKeys\s*=\s*\{[\s\S]*?\}/,
-            `settings.APIKeys = '${key}'`
-          );
-          
-          fs.writeFileSync('./settings.js', settingsContent, 'utf-8');
-          reply('✅ API Key Gemini berhasil disimpan secara permanen ke *settings.js*!');
-        } catch (err) {
-          console.error(err);
-          reply('❌ Gagal menulis API Key ke settings.js\ncoba isi secara manual');
-        }
       }
       break
       case 'ai': case 'gemini': case 'google': case 'bard': case 'ia': {
@@ -727,6 +733,7 @@ async function Hc(hc, m, db) {
         
       }
       break
+      
       // Menu
       case 'menu': {
         await react('✨');
@@ -825,6 +832,8 @@ async function Hc(hc, m, db) {
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *DOWNLOADER*
+│${setv} ${prefix}ig (url)
+│${setv} ${prefix}tt (url)
 │${setv} ${prefix}ytmp4 (url)
 │${setv} ${prefix}ytmp3 (url)
 ╰────❍`)
@@ -886,6 +895,8 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}ytsearch (query)
 ╰┬───❍
 ╭┴─❍ *DOWNLOADER*
+│${setv} ${prefix}ig (url)
+│${setv} ${prefix}tt (url)
 │${setv} ${prefix}ytmp4 (url)
 │${setv} ${prefix}ytmp3 (url)
 ╰┬───❍

@@ -1,3 +1,9 @@
+/*
+   * main.js
+   * By Heart candy
+   * Sc ini open source
+   * ❗Peringatan Script ini tidak boleh di perjual belikan. Jika melanggar akan berurusan dengan hukum.
+*/
 import path from 'path';
 import chalk from 'chalk';
 import { spawn } from 'child_process';
