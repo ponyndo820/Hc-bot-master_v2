@@ -497,7 +497,66 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      case 'tiktok': case 'tt': case 'ttaudio': {
+        let ttUrl = '';
+        if (text) {
+          const match = text.match(/https?:\/\/[^\s]+/g);
+          if (match) ttUrl = match.find(u => u.includes('tiktok.com') || u.includes('vt.tiktok.com')) || '';
+        }
 
+        if (!ttUrl && isQuoted) {
+          const q = contextInfo.quotedMessage;
+          const possibleTexts = [
+            q.conversation, q.extendedTextMessage?.text, 
+            q.imageMessage?.caption, q.videoMessage?.caption
+          ];
+          for (const t of possibleTexts) {
+            if (t && typeof t === 'string') {
+              const match = t.match(/https?:\/\/[^\s]+/g);
+              if (match) {
+                const found = match.find(u => u.includes('tiktok.com') || u.includes('vt.tiktok.com'));
+                if (found) { ttUrl = found; break; }
+              }
+            }
+          }
+        }
+
+        if (!ttUrl) return reply(`Example: ${prefix + command} url_tiktok\nAtau reply pesan yang memiliki link TikTok!`);
+        
+        await react('⏳');
+        try {
+          const res = await fetch(`https://api.tiklydown.eu.org/api/download?url=${ttUrl}`);
+          const json = await res.json();
+
+          if (!json || (!json.video && !json.music)) return reply('❌ Gagal mengambil data TikTok!');
+
+          // Jika user mengetik .ttaudio
+          if (command === 'ttaudio') {
+             await hc.sendMessage(sender, {
+               audio: { url: json.music.play_url },
+               mimetype: 'audio/mpeg',
+               ptt: false
+             }, { quoted: m });
+          } else {
+             // Jika postingan berupa Slide Foto
+             if (json.images && json.images.length > 0) {
+               for (let img of json.images) {
+                 await hc.sendMessage(sender, { image: { url: img.url } }, { quoted: m });
+               }
+             } else {
+               // Jika postingan berupa Video
+               await hc.sendMessage(sender, {
+                 video: { url: json.video.noWatermark || json.video.watermark },
+                 caption: `*📌 Title:* ${json.title || '-'}\n*👤 Author:* ${json.author?.name || '-'}`
+               }, { quoted: m });
+             }
+          }
+        } catch (err) {
+          console.error("Error TikTok:", err);
+          reply('❌ Terjadi kesalahan. API TikTok mungkin sedang mengalami gangguan.');
+        }
+      }
+      break
       // Search Menu
       case 'search': case 'yts': case 'ytsearch': case 'play': {
         if (!text) return reply(`Masukkan kata kunci pencarian!\nContoh: *${prefix}search mlp*`);
