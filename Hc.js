@@ -525,6 +525,7 @@ async function Hc(hc, m, db) {
         
         await react('⏳');
         try {
+          process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
           const res = await fetch(`https://api.tiklydown.eu.org/api/download?url=${ttUrl}`);
           const json = await res.json();
 
