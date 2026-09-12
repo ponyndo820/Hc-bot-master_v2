@@ -588,37 +588,40 @@ async function Hc(hc, m, db) {
         
         await react('⏳');
         try {
-          const res = await fetch(`https://api.ryzendesu.vip/api/downloader/igdl?url=${igUrl}`);
-          const json = await res.json();
+          // Menggunakan API BK9
+          const res = await fetch(`https://bk9.fun/scraper/igdl?url=${igUrl}`);
           
-          // Cetak respons asli ke terminal untuk pengecekan
-          console.log("Respon API IG:", json);
+          // Mencegah crash jika server API down dan mengirim HTML (Unexpected token '<')
+          const contentType = res.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            return reply('❌ Server API sedang mengalami gangguan (tidak merespons JSON). Silakan coba beberapa saat lagi.');
+          }
 
-          // Fleksibel menangani berbagai struktur data API
-          let mediaList = json.data || json.result;
-          if (!mediaList) return reply('❌ Gagal mengambil data! API mengembalikan respons kosong.');
+          const json = await res.json();
+          console.log("Respon API IG BK9:", json);
+
+          // Menyesuaikan dengan struktur data dari BK9 (json.BK9)
+          let mediaList = json.BK9 || json.data || json.result; 
+          if (!mediaList || mediaList.length === 0) return reply('❌ Gagal mengambil data! Pastikan link valid dan akun tidak di-private.');
 
           if (Array.isArray(mediaList)) {
             for (let media of mediaList) {
-              let urlMedia = media.url || media;
+              let urlMedia = media.url || media; 
               if (typeof urlMedia === 'string' && (urlMedia.includes('.mp4') || urlMedia.includes('video'))) {
                 await hc.sendMessage(sender, { video: { url: urlMedia }, caption: '*By: Heart candy*' }, { quoted: m });
               } else {
                 await hc.sendMessage(sender, { image: { url: urlMedia }, caption: '*By: Heart candy*' }, { quoted: m });
               }
             }
-          } else if (typeof mediaList === 'string') {
-            await hc.sendMessage(sender, { video: { url: mediaList }, caption: '*By: Heart candy*' }, { quoted: m });
           } else {
-            return reply('❌ Format media Instagram tidak dikenali.');
+            return reply('❌ Format media Instagram tidak dikenali dari server API.');
           }
         } catch (err) {
           console.error("Error Instagram:", err);
-          reply('❌ Terjadi kesalahan saat mendownload media Instagram.');
+          reply('❌ Terjadi kesalahan sistem saat mendownload media Instagram.');
         }
       }
       break
-
 
       // Search Menu
       case 'search': case 'yts': case 'ytsearch': case 'play': {
