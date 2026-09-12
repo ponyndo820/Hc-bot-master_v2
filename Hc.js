@@ -588,7 +588,7 @@ async function Hc(hc, m, db) {
         
         await react('⏳');
         try {
-          const res = await fetch(`https://api.siputzx.my.id/api/d/igdl?url=${igUrl}`);
+          const res = await fetch(`https://api.ryzendesu.vip/api/downloader/igdl?url=${igUrl}`);
           const json = await res.json();
           
           // Cetak respons asli ke terminal untuk pengecekan
