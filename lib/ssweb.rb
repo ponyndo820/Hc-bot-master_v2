@@ -2,7 +2,7 @@
 # * By Heart candy
 # * Sc ini open source
 # * ❗Peringatan Script ini tidak boleh di perjual belikan. Jika melanggar akan berurusan dengan hukum.
-   
+
 require 'open-uri'
 
 url = ARGV[0]
@@ -14,18 +14,23 @@ if url.nil? || url.empty?
   exit
 end
 
-  if mode == "mobile"
-    api_url = "https://s0.wp.com/mshots/v1/#{url}?w=400"
-  else
-    api_url = "https://s0.wp.com/mshots/v1/#{url}?w=1280&h=800"
-  end
-  
+if mode == "mobile"
+  api_url = "https://image.thum.io/get/iphone/#{url}"
+else
+  api_url = "https://image.thum.io/get/width/1280/crop/800/#{url}"
+end
+
 begin
+  URI.open(api_url, "User-Agent" => "Mozilla/5.0") { |f| f.read }
+  
+  sleep(8)
+  
   URI.open(api_url, "User-Agent" => "Mozilla/5.0") do |gambar|
     File.open(nama_file, "wb") do |file|
       file.write(gambar.read)
     end
   end
+  
   puts "[✓] Screenshot berhasil disimpan ke #{nama_file}"
 rescue => e
   puts "[X] Gagal mengambil screenshot: #{e.message}"
