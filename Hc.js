@@ -309,15 +309,18 @@ async function Hc(hc, m, db) {
         if (!text) return reply(`Contoh: ${prefix + command} kucing lucu memakai kacamata`);
         await react('⏳');
         try {
-          const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(text)}?nologo=true`;
+          const randomSeed = Math.floor(Math.random() * 1000000);
+          const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(text)}?nologo=true&seed=${randomSeed}`;
+          
           await hc.sendMessage(sender, { image: { url: imgUrl }, caption: '*By: Heart candy*' }, { quoted: m });
-          await react('✅')
+          await react('✅');
         } catch (err) {
-          await react('❌')
+          await react('❌');
           reply('❌ Gagal membuat gambar.');
-          }
+        }
       }
       break
+
       //Bot Menu
       case 'sc': case 'script': {
         reply('Donasi dulu')
