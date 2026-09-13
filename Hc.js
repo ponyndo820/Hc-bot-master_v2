@@ -813,8 +813,8 @@ async function Hc(hc, m, db) {
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *OWNER*
-|${setv} ${prefix}shutdown
-|${setv} ${prefix}setapikeygemini
+│${setv} ${prefix}shutdown
+│${setv} ${prefix}setapikeygemini
 ╰────❍`)
       }
       break
@@ -895,7 +895,7 @@ async function Hc(hc, m, db) {
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *AI*
-|${setv} ${prefix}autoai
+│${setv} ${prefix}autoai
 │${setv} ${prefix}ai (query)
 ╰────❍`)
       }
