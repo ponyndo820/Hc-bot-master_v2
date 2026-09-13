@@ -310,9 +310,16 @@ async function Hc(hc, m, db) {
         await react('⏳');
         try {
           const randomSeed = Math.floor(Math.random() * 1000000);
-          const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(text)}?nologo=true&seed=${randomSeed}&model=flux`;
           
-          await hc.sendMessage(sender, { image: { url: imgUrl }, caption: '*By: Heart candy*' }, { quoted: m });
+          const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(text)}?nologo=true&seed=${randomSeed}&width=1024&height=1024&model=flux`;
+          
+          await hc.sendMessage(sender, { 
+            document: { url: imgUrl }, 
+            mimetype: 'image/jpeg', 
+            fileName: `HD_Image_${randomSeed}.jpg`,
+            caption: '*By: Heart candy*' 
+          }, { quoted: m });
+          
           await react('✅');
         } catch (err) {
           await react('❌');
@@ -320,7 +327,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
-
+      
       //Bot Menu
       case 'sc': case 'script': {
         reply('Donasi dulu')
@@ -916,6 +923,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}ytmp3 (url)
 ╰┬───❍
 ╭┴─❍ *TOOLS*
+│${setv} ${prefix}draw (prompt)
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}brat
 │${setv} ${prefix}bratvid
