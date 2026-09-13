@@ -309,7 +309,54 @@ async function Hc(hc, m, db) {
         }
       }
       break
-      
+      case 'ssweb': case 'screenshot': {
+        if (!text) return reply(`Contoh: ${prefix + command} https://google.com`);
+        await react('⏳');
+        
+        let targetUrl = text.trim();
+        // Memastikan URL diawali dengan http:// atau https://
+        if (!/^https?:\/\//i.test(targetUrl)) {
+          targetUrl = 'https://' + targetUrl;
+        }
+
+        // Membuat nama file unik berdasarkan nomor pengirim dan waktu eksekusi
+        const uniqueId = sender.replace(/[^0-9]/g, '') + Date.now();
+        const outputFileName = `./temp_${uniqueId}.png`;
+
+        // Menjalankan script Ruby dengan parameter dinamis
+        exec(`ruby rb3.rb "${targetUrl}" "${outputFileName}" desktop`, async (error, stdout, stderr) => {
+          if (error) {
+            console.error("Gagal mengeksekusi script Ruby:", error);
+            await react('❌');
+            return reply('❌ Gagal memproses screenshot dari website tersebut.');
+          }
+
+          try {
+            // Kirim gambar ke WhatsApp
+            await hc.sendMessage(sender, { 
+              image: { url: outputFileName }, 
+              caption: `*Screenshot Web Berhasil!*\n*URL:* ${targetUrl}\n*By: Heart candy*` 
+            }, { quoted: m });
+
+            await react('✅');
+
+            // Hapus file gambar dari penyimpanan lokal Termux setelah 5 detik
+            setTimeout(() => {
+              if (fs.existsSync(outputFileName)) {
+                fs.unlinkSync(outputFileName);
+              }
+            }, 5000);
+
+          } catch (sendErr) {
+            console.error("Gagal mengirim gambar ke WA:", sendErr);
+            await react('❌');
+            reply('❌ Terjadi kesalahan saat mengirim hasil screenshot.');
+          }
+        });
+      }
+      break
+
+
       //Bot Menu
       case 'sc': case 'script': {
         reply('Donasi dulu')
