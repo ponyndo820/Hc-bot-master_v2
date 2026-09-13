@@ -324,7 +324,7 @@ async function Hc(hc, m, db) {
         const outputFileName = `./temp_${uniqueId}.png`;
 
         // Menjalankan script Ruby dengan parameter dinamis
-        exec(`ruby rb3.rb "${targetUrl}" "${outputFileName}" desktop`, async (error, stdout, stderr) => {
+        exec(`ruby ./lib/ssweb.rb "${targetUrl}" "${outputFileName}" desktop`, async (error, stdout, stderr) => {
           if (error) {
             console.error("Gagal mengeksekusi script Ruby:", error);
             await react('❌');
