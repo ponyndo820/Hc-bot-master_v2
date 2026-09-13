@@ -83,7 +83,7 @@ async function Hc(hc, m, db) {
                 const apiKey = settings.APIKeys;
                 
                 if (!apiKey || apiKey === 'YOUR_API_KEY') {
-                    return reply(`⚠️ API Key Gemini belum diatur!\nSilakan atur menggunakan perintah:\n*${prefix}setgemini <API_KEY>*`);
+                    return reply(`⚠️ API Key Gemini belum diatur!\nSilakan atur menggunakan perintah:\n*${prefix}setgemini <YOUR_API_KEY>*`);
                 }
                 
                 const genAI = new GoogleGenerativeAI(apiKey);
@@ -129,9 +129,11 @@ async function Hc(hc, m, db) {
           
           fs.writeFileSync('./settings.js', settingsContent, 'utf-8');
           reply('✅ API Key Gemini berhasil disimpan secara permanen ke *settings.js*!');
+          await react('✅')
         } catch (err) {
           console.error(err);
           reply('❌ Gagal menulis API Key ke settings.js\ncoba isi secara manual');
+          await react('❌')
         }
       }
       break
@@ -184,21 +186,6 @@ async function Hc(hc, m, db) {
         let stickerFile = await writeExif(mediaBuffer, { packname: teks1, author: teks2 });
         await hc.sendMessage(sender, { sticker: { url: stickerFile } }, { quoted: m });
         if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
-      }
-      break
-      case 'speedtest': case 'speed': {
-        reply('Testing Speed...');
-        let o;
-        try {
-          const execPromise = promisify(exec);
-          o = await execPromise('python3 speed.py --share');
-        } catch (e) {
-          o = e;
-        } finally {
-          let { stdout, stderr } = o || {};
-          if (stdout && stdout.trim()) reply(stdout);
-          if (stderr && stderr.trim()) reply(stderr);
-        }
       }
       break
       case 'readviewonce': case 'readviewone': case 'rvo': {
@@ -370,6 +357,21 @@ async function Hc(hc, m, db) {
         } catch (e) {
           console.error(e);
           await reply('Gagal mengonversi media ke Voice Note!');
+        }
+      }
+      break
+      case 'speedtest': case 'speed': {
+        reply('Testing Speed...');
+        let o;
+        try {
+          const execPromise = promisify(exec);
+          o = await execPromise('python3 speed.py --share');
+        } catch (e) {
+          o = e;
+        } finally {
+          let { stdout, stderr } = o || {};
+          if (stdout && stdout.trim()) reply(stdout);
+          if (stderr && stderr.trim()) reply(stderr);
         }
       }
       break
@@ -574,6 +576,7 @@ async function Hc(hc, m, db) {
           const json = await res.json();
           
           if (json.code !== 0 || !json.data) return reply('❌ Gagal mengambil data TikTok! Pastikan link valid dan tidak diprivate.');
+          await react('❌')
           
           const data = json.data;
           
@@ -597,6 +600,7 @@ async function Hc(hc, m, db) {
                  video: { url: data.play || data.wmplay },
                  caption: `*📌 Title:* ${data.title || '-'}\n*👤 Author:* ${data.author?.nickname || '-'}`
                }, { quoted: m });
+               await react('✅')
              }
           }
         } catch (err) {
@@ -638,6 +642,7 @@ async function Hc(hc, m, db) {
           const contentType = res.headers.get("content-type");
           if (!contentType || !contentType.includes("application/json")) {
             return reply('❌ Server API Instagram sedang gangguan. Coba beberapa saat lagi.');
+            await react('❌')
           }
           
           const json = await res.json();
@@ -657,6 +662,7 @@ async function Hc(hc, m, db) {
             }
           } else if (typeof mediaList === 'string') {
             await hc.sendMessage(sender, { video: { url: mediaList }, caption: '*By: Heart candy*' }, { quoted: m });
+            await react('✅')
           } else {
             return reply('❌ Format media Instagram tidak dikenali.');
           }
@@ -783,6 +789,8 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      
+      // Bot menu
       case 'botmenu': {
         await reply(`*━━━━━━━━━━━━━━━━━━━━*
               🌈 *Hc-bot* 🌈
@@ -792,10 +800,13 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}sc
 │${setv} ${prefix}tagme
 │${setv} ${prefix}donasi
+│${setv} ${prefix}speedtest
 │${setv} ${prefix}request (text)
 ╰────❍`)
       }
       break
+      
+      // Owner menu
       case 'ownermenu': {
         await reply(`*━━━━━━━━━━━━━━━━━━━━*
               🌈 *Hc-bot* 🌈
@@ -807,6 +818,8 @@ async function Hc(hc, m, db) {
 ╰────❍`)
       }
       break
+      
+      // Quotes menu
       case 'quotesmenu': {
        await reply(` *━━━━━━━━━━━━━━━━━━━━*
               🌈 *Hc-bot* 🌈
@@ -818,31 +831,37 @@ async function Hc(hc, m, db) {
 ╰────❍`)
       }
       break
+      
+      // Tool menu
       case 'toolsmenu': {
         await reply(`*━━━━━━━━━━━━━━━━━━━━*
               🌈 *Hc-bot* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *TOOLS*
-│${setv} ${prefix}tovn (reply pesan)
-│${setv} ${prefix}sticker (send/reply img/vid)
-│${setv} ${prefix}speedtest
+│${setv} ${prefix}brat
+│${setv} ${prefix}bratvid
+│${setv} ${prefix}draw (prompt)
 │${setv} ${prefix}rvo (reply pesan viewone)
+│${setv} ${prefix}sticker (send/reply img/vid)
 ╰────❍`)
       }
       break
-      break
+      
+      // Anime menu
       case 'animemenu': {
         await reply(`*━━━━━━━━━━━━━━━━━━━━*
               🌈 *Hc-bot* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *ANIME*
-│${setv} ${prefix}cariwaifu (query)
 │${setv} ${prefix}randomwaifu
+│${setv} ${prefix}cariwaifu (query)
 ╰────❍`)
       }
       break
+      
+      // Downloader menu
       case 'downloadermenu': {
         await reply(`*━━━━━━━━━━━━━━━━━━━━*
               🌈 *Hc-bot* 🌈
@@ -856,6 +875,8 @@ async function Hc(hc, m, db) {
 ╰────❍`)
       }
       break
+      
+      // Search menu
       case 'Searchmenu': {
         await reply(`*━━━━━━━━━━━━━━━━━━━━*
               🌈 *Hc-bot* 🌈
@@ -866,6 +887,8 @@ async function Hc(hc, m, db) {
 ╰────❍`)
       }
       break
+      
+      // Ai menu
       case 'aimenu': {
         await reply(`*━━━━━━━━━━━━━━━━━━━━*
               🌈 *Hc-bot* 🌈
@@ -873,9 +896,12 @@ async function Hc(hc, m, db) {
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *AI*
 |${setv} ${prefix}autoai
+│${setv} ${prefix}ai (query)
 ╰────❍`)
       }
       break
+      
+      // All menu
       case 'allmenu': {
         await react('✨');
         const menuText =`*━━━━━━━━━━━━━━━━━━━━*
@@ -886,6 +912,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}sc
 │${setv} ${prefix}tagme
 │${setv} ${prefix}donasi
+│${setv} ${prefix}speedtest
 │${setv} ${prefix}request (text)
 │${setv} ${prefix}tovn (reply pesan)
 ╰┬───❍
@@ -901,12 +928,12 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}randomimage
 ╰┬──❍
 ╭┴─❍ *AI*
-│${setv} ${prefix}ai (query)
 │${setv} ${prefix}autoai
+│${setv} ${prefix}ai (query)
 ╰┬──❍
 ╭┴─❍ *ANIME*
-│${setv} ${prefix}cariwaifu (query)
 │${setv} ${prefix}randomwaifu
+│${setv} ${prefix}cariwaifu (query)
 ╰┬───❍
 ╭┴─❍ *Search*
 │${setv} ${prefix}ytsearch (query)
@@ -918,12 +945,11 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}ytmp3 (url)
 ╰┬───❍
 ╭┴─❍ *TOOLS*
-│${setv} ${prefix}draw (prompt)
-│${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}brat
 │${setv} ${prefix}bratvid
+│${setv} ${prefix}draw (prompt)
+│${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}sticker (send/reply img/vid)
-│${setv} ${prefix}speedtest
 ╰────❍
 Bot ini masih di kembangkan.\nTerima kasih telah menggunakan bot whatsapp kami.`;
        try {

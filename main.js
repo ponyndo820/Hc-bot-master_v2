@@ -21,7 +21,7 @@ function main() {
       console.log(chalk.yellow.bold('[BOT]Memulaiulang...'))
       p.kill()
       setTimeout(() => {
-        start()
+        main()
       }, 1000);
       
     } else if (data === 'uptime') {
