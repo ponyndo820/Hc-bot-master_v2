@@ -305,12 +305,11 @@ async function Hc(hc, m, db) {
         }
       }
       break
-      case 'draw': case 'imagine': {
+      case 'aidraw': case 'draw': case 'menggambar': {
         if (!text) return reply(`Contoh: ${prefix + command} kucing lucu memakai kacamata`);
         await react('⏳');
         try {
-          // Menggunakan API khusus pembuat gambar
-          const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(text)}`;
+          const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(text)}?nologo=true`;
           await hc.sendMessage(sender, { image: { url: imgUrl }, caption: '*By: Heart candy*' }, { quoted: m });
           await react('✅')
         } catch (err) {
