@@ -14,12 +14,12 @@ if url.nil? || url.empty?
   exit
 end
 
-if mode == "mobile"
-  api_url = "https://image.thum.io/get/iphone/#{url}"
-else
-  api_url = "https://image.thum.io/get/width/1280/crop/800/#{url}"
-end
-
+  if mode == "mobile"
+    api_url = "https://s0.wp.com/mshots/v1/#{url}?w=400"
+  else
+    api_url = "https://s0.wp.com/mshots/v1/#{url}?w=1280&h=800"
+  end
+  
 begin
   URI.open(api_url, "User-Agent" => "Mozilla/5.0") do |gambar|
     File.open(nama_file, "wb") do |file|
