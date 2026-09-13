@@ -310,7 +310,7 @@ async function Hc(hc, m, db) {
         await react('⏳');
         try {
           const randomSeed = Math.floor(Math.random() * 1000000);
-          const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(text)}?nologo=true&seed=${randomSeed}`;
+          const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(text)}?nologo=true&seed=${randomSeed}&model=flux`;
           
           await hc.sendMessage(sender, { image: { url: imgUrl }, caption: '*By: Heart candy*' }, { quoted: m });
           await react('✅');
