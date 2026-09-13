@@ -311,10 +311,8 @@ async function Hc(hc, m, db) {
         try {
           const randomSeed = Math.floor(Math.random() * 1000000);
           
-          // Tetap meminta resolusi tinggi dari Pollinations AI
-          const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(text)}?nologo=true&seed=${randomSeed}&width=1024&height=1024&model=flux`;
+          const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(text)}?nologo=true&seed=${randomSeed}&width=1024&height=1024&model=deliberate`;
           
-          // Kirim sebagai 'image' biasa agar langsung tampil di chat
           await hc.sendMessage(sender, { image: { url: imgUrl }, caption: '*By: Heart candy*' }, { quoted: m });
           
           await react('✅');
