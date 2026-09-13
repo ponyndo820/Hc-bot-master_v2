@@ -305,7 +305,20 @@ async function Hc(hc, m, db) {
         }
       }
       break
-      
+      case 'draw': case 'imagine': {
+        if (!text) return reply(`Contoh: ${prefix + command} kucing lucu memakai kacamata`);
+        await react('⏳');
+        try {
+          // Menggunakan API khusus pembuat gambar
+          const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(text)}`;
+          await hc.sendMessage(sender, { image: { url: imgUrl }, caption: '*By: Heart candy*' }, { quoted: m });
+          await react('✅')
+        } catch (err) {
+          await react('❌')
+          reply('❌ Gagal membuat gambar.');
+          }
+      }
+      break
       //Bot Menu
       case 'sc': case 'script': {
         reply('Donasi dulu')
