@@ -436,6 +436,32 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      case 'pony': case 'randompony': {
+        await react('🐴');
+        try {
+          const execPromise = promisify(exec);
+          const { stdout } = await execPromise('ruby ./lib/randompony.rb');
+          
+          if (stdout.trim() === 'SUCCESS' && fs.existsSync('./lib/temp_pony.jpg')) {
+            await hc.sendMessage(sender, {
+              image: { url: './lib/temp_pony.jpg' },
+              caption: '🐴 *Poooony! Yaaaay~ <3*\n\n*By: Heart candy*'
+            }, { quoted: m });
+            
+            fs.unlinkSync('./database/temp/pony.jpg');
+            await react('✅');
+          } else {
+            await react('❌');
+            reply('❌ Gagal mengambil gambar pony dari skrip Ruby.');
+          }
+        } catch (err) {
+          console.error("Error Ruby Pony:", err);
+          await react('❌');
+          reply('❌ Terjadi kesalahan saat menjalankan skrip Ruby.');
+        }
+      }
+      break
+
       
       // Waifu Menu
       case 'randomwaifu': case 'waifu': {
