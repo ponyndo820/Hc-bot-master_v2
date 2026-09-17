@@ -784,8 +784,9 @@ async function Hc(hc, m, db) {
         if (!text) return reply(`Masukkan judul lagu!\nContoh: *${prefix}spotify Koa Background pt.2*`);
         await react('⏳');
         
+        let audioPath = null;
         try {
-          // 1. Membersihkan link jika user memasukkan link Spotify
+          // 1. Membersihkan link dan konversi pencarian
           let query = text;
           if (text.includes('spotify.com')) {
              reply('🔄 Mengonversi link Spotify menjadi pencarian audio...');
@@ -794,7 +795,7 @@ async function Hc(hc, m, db) {
              query = text + " official audio";
           }
 
-          // 2. Mencari lagu di YouTube menggunakan yts (yang sudah di-import di atas)
+          // 2. Mencari metadata lagu
           const searchResult = await yts(query);
           if (!searchResult || !searchResult.videos.length) {
             return reply('❌ Lagu tidak ditemukan.');
@@ -808,25 +809,46 @@ async function Hc(hc, m, db) {
           caption += `🎵 *Judul:* ${video.title}\n`;
           caption += `⏱️ *Durasi:* ${video.timestamp}\n`;
           caption += `📺 *Channel:* ${video.author.name}\n\n`;
-          caption += `*By: Heart candy* 🐴`;
+          caption += `*By: Heart candy*`;
 
           await hc.sendMessage(sender, { image: { url: video.thumbnail }, caption: caption }, { quoted: m });
 
-          // 4. Unduh Audio secara langsung menggunakan ytdl-core
-          const stream = ytdl(ytUrl, { filter: 'audioonly', quality: 'highestaudio' });
+          // 4. Unduh Audio menggunakan youtube-dl-exec (sama seperti ytmp3)
+          audioPath = path.join('./database/temp', `spotify_${Date.now()}.mp3`);
+          
+          await youtubedl(ytUrl, {
+            extractAudio: true,
+            audioFormat: 'mp3',
+            output: audioPath,
+            noCheckCertificates: true,
+            noWarnings: true,
+            preferFreeFormats: true,
+            extractorArgs: 'youtube:player_client=android,web',
+            addHeader: ['referer:https://www.youtube.com']
+          });
 
           await hc.sendMessage(sender, { 
-            audio: { stream: stream }, 
+            audio: { url: audioPath }, 
             mimetype: 'audio/mpeg', 
             ptt: false 
           }, { quoted: m });
 
         } catch (err) {
           console.error("Error Local Downloader:", err);
-          await reply('❌ Terjadi kesalahan saat memproses audio. Pastikan dependensi ytdl-core kamu versi terbaru.');
+          await reply('❌ Terjadi kesalahan saat memproses audio. YouTube memblokir akses atau server sibuk.');
+        } finally {
+          // 5. Hapus file sementara dari penyimpanan
+          if (audioPath && fs.existsSync(audioPath)) {
+            try {
+              fs.unlinkSync(audioPath);
+            } catch (e) {
+              console.error("Error hapus file audio temp:", e);
+            }
+          }
         }
       }
       break
+
 
       
       // Ai Menu
