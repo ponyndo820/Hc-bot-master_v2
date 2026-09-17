@@ -9,10 +9,10 @@ import util from 'util';
 import path from 'path';
 import chalk from 'chalk'; 
 import yts from 'yt-search';
-import ytdl from 'ytdl-core';
 import { promisify } from 'util';
 import speed from 'performance-now';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'url',
+import ytdl from '@distube/ytdl-core';
 import { createRequire } from 'module';
 import youtubedl from 'youtube-dl-exec';
 import { exec, spawn, execSync } from 'child_process';
