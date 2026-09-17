@@ -783,60 +783,57 @@ async function Hc(hc, m, db) {
         if (!text) return reply(`Masukkan judul lagu!\nContoh: *${prefix}spotify Koa Background pt.2*`);
         await react('⏳');
         
+        const prosesMsg = await reply('⏳ *Sedang mengunduh audio, mohon tunggu sebentar...*');
+        
         let audioPath = null;
         try {
-          // 1. Membersihkan link dan konversi pencarian
           let query = text;
           if (text.includes('spotify.com')) {
-             reply('🔄 Mengonversi link Spotify menjadi pencarian audio...');
              query = text.split('/').pop().split('?')[0] + " official audio";
           } else {
              query = text + " official audio";
           }
-
-          // 2. Mencari metadata lagu
+          
           const searchResult = await yts(query);
           if (!searchResult || !searchResult.videos.length) {
             return reply('❌ Lagu tidak ditemukan.');
           }
-
+          
           const video = searchResult.videos[0];
           const ytUrl = video.url;
-
-          // 3. Kirim Thumbnail & Detail Lagu
-          let caption = `🎧 *LOCAL MUSIC DOWNLOADER*\n\n`;
-          caption += `🎵 *Judul:* ${video.title}\n`;
-          caption += `⏱️ *Durasi:* ${video.timestamp}\n`;
-          caption += `📺 *Channel:* ${video.author.name}\n\n`;
-          caption += `*By: Heart candy*`;
-
-          await hc.sendMessage(sender, { image: { url: video.thumbnail }, caption: caption }, { quoted: m });
-
-          // 4. Unduh Audio menggunakan youtube-dl-exec (sama seperti ytmp3)
+          
           audioPath = path.join('./database/temp', `spotify_${Date.now()}.mp3`);
           
-          await youtubedl(ytUrl, {
-            extractAudio: true,
-            audioFormat: 'mp3',
-            output: audioPath,
-            noCheckCertificates: true,
-            noWarnings: true,
-            preferFreeFormats: true,
-            extractorArgs: 'youtube:player_client=android,web',
-            addHeader: ['referer:https://www.youtube.com']
-          });
-
-          await hc.sendMessage(sender, { 
-            audio: { url: audioPath }, 
-            mimetype: 'audio/mpeg', 
-            ptt: false 
-          }, { quoted: m });
-
+          const execPromise = promisify(exec);
+          await execPromise(`yt-dlp -x --audio-format mp3 -o "${audioPath}" "${ytUrl}"`);
+          
+          if (fs.existsSync(audioPath)) {
+            let caption = `🎧 *LOCAL MUSIC DOWNLOADER*\n\n`;
+            caption += `🎵 *Judul:* ${video.title}\n`;
+            caption += `⏱️ *Durasi:* ${video.timestamp}\n`;
+            caption += `📺 *Channel:* ${video.author.name}\n\n`;
+            caption += `*By: Heart candy*`;
+            
+            await hc.sendMessage(sender, { 
+              image: { url: video.thumbnail }, 
+              caption: caption 
+            }, { quoted: m });
+            
+            await hc.sendMessage(sender, { 
+              audio: { url: audioPath }, 
+              mimetype: 'audio/mpeg', 
+              ptt: false 
+            }, { quoted: m });
+            
+            await react('✅');
+          } else {
+            return reply('❌ Gagal menghasilkan file audio.');
+          }
+          
         } catch (err) {
           console.error("Error Local Downloader:", err);
-          await reply('❌ Terjadi kesalahan saat memproses audio. YouTube memblokir akses atau server sibuk.');
+          await reply('❌ Terjadi kesalahan saat memproses audio. Pastikan paket yt-dlp terinstal di Termux.');
         } finally {
-          // 5. Hapus file sementara dari penyimpanan
           if (audioPath && fs.existsSync(audioPath)) {
             try {
               fs.unlinkSync(audioPath);
@@ -847,8 +844,6 @@ async function Hc(hc, m, db) {
         }
       }
       break
-
-
       
       // Ai Menu
       case 'cai': case 'autoai': case 'roomai': case 'chatai': {
