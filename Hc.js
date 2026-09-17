@@ -442,13 +442,15 @@ async function Hc(hc, m, db) {
           const execPromise = promisify(exec);
           const { stdout } = await execPromise('ruby ./lib/randompony.rb');
           
-          if (stdout.trim() === 'SUCCESS' && fs.existsSync('./lib/temp_pony.jpg')) {
+          const tempPath = './database/temp/pony.jpg';
+          
+          if (stdout.trim() === 'SUCCESS' && fs.existsSync(tempPath)) {
             await hc.sendMessage(sender, {
-              image: { url: './lib/temp/pony.jpg' },
+              image: { url: tempPath },
               caption: '🐴 *Poooony! Yaaaay~ <3*\n\n*By: Heart candy*'
             }, { quoted: m });
             
-            fs.unlinkSync('./database/temp/pony.jpg');
+            fs.unlinkSync(tempPath);
             await react('✅');
           } else {
             await react('❌');
