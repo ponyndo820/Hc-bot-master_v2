@@ -779,6 +779,53 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      case 'spotify': case 'carilagu': case 'spotisearch': {
+        if (!text) return reply(`Masukkan judul lagu!\nContoh: *${prefix + command} Malu Malu Tapi Mau*`);
+        await react('🎵');
+        try {
+          const res = await fetch(`https://api.siputzx.my.id/api/s/spotify?query=${encodeURIComponent(text)}`);
+          const json = await res.json();
+          
+          if (!json.status || !json.data || json.data.length === 0) {
+            await react('❌');
+            return reply('❌ Lagu tidak ditemukan di Spotify.');
+          }
+          
+          const songs = json.data.slice(0, 1); // Ambil 5 hasil teratas
+          let resultText = `*━━━━━━━━━━━━━━━━━━━━*\n`;
+          resultText += ` 🎵 *SPOTIFY SEARCH* 🎵\n`;
+          resultText += `*━━━━━━━━━━━━━━━━━━━━*\n\n`;
+          resultText += `Hasil pencarian untuk: *${text}*\n\n`;
+          
+          for (let i = 0; i < songs.length; i++) {
+            let song = songs[i];
+            resultText += `*${i + 1}. ${song.title || song.name}*\n`;
+            resultText += `👤 *Artis:* ${song.artist || song.artists}\n`;
+            resultText += `⏱️ *Durasi:* ${song.duration || '-'}\n`;
+            resultText += `🔗 *Link:* ${song.url || song.link}\n`;
+            resultText += `──────────────────\n\n`;
+          }
+          
+          resultText += `*By: Heart candy*`;
+          
+          const thumbnail = songs[0].image || songs[0].thumbnail;
+          if (thumbnail) {
+            await hc.sendMessage(sender, {
+              image: { url: thumbnail },
+              caption: resultText.trim()
+            }, { quoted: m });
+          } else {
+            await reply(resultText.trim());
+          }
+          
+          await react('✅');
+        } catch (err) {
+          console.error("Error Spotify Search:", err);
+          await react('❌');
+          await reply('❌ Terjadi kesalahan saat mencari lagu di Spotify.');
+        }
+      }
+      break
       
       // Ai Menu
       case 'cai': case 'autoai': case 'roomai': case 'chatai': {
@@ -995,6 +1042,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}quotesislami
 ╰┬───❍
 ╭┴─❍ *RANDOM IMAGE*
+│${setv} ${prefix}randompony
 │${setv} ${prefix}randomimage
 ╰┬──❍
 ╭┴─❍ *AI*
