@@ -11,6 +11,7 @@
 
 	pkg update && pkg upgrade
 	pkg install git
+	pkg install ruby
 	pkg install yarn
 	pkg install nodejs
 	pkg install ffmpeg
@@ -26,21 +27,28 @@
 ## 🗂 Structure Project
 ```
 ├── database
-│       └── database.json
+│       └── temp
 ├── lib
-│   ├── converter.js
+│   ├── ytmp4
+│   ├── ssweb.rb
+│   ├── quotes.js
 │   ├── function.js
-│   └── quotes.js
+│   ├── converter.js
+│   ├── randompony.rb
+│   └── quotesislami.json
 ├── src
 │   └── database.js
 ├── Hc.js
-├── LICENSE
-├── README.md
-├── index.js
 ├── main.js
-├── package.json
-├── settings.js
+├── LICENSE
 ├── speed.py
+├── app.json
+├── index.js
+├── Procfile
+├── README.md
+├── Dockerfile
+├── settings.js
+├── package.json
 ```
 
 
@@ -75,3 +83,9 @@ Masuk ke direktori folder bot, lalu jalankan perintah berikut untuk mulai menyal
 - Menghentikan bot sementara
 
       pm2 stop Hc-bot-master_v2
+      
+      
+# Bahasa program
+ - Ruby
+ - NodeJs
+ - Python

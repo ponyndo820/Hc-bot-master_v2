@@ -444,7 +444,7 @@ async function Hc(hc, m, db) {
           
           if (stdout.trim() === 'SUCCESS' && fs.existsSync('./lib/temp_pony.jpg')) {
             await hc.sendMessage(sender, {
-              image: { url: './lib/temp_pony.jpg' },
+              image: { url: './lib/temp/pony.jpg' },
               caption: '🐴 *Poooony! Yaaaay~ <3*\n\n*By: Heart candy*'
             }, { quoted: m });
             
