@@ -786,60 +786,84 @@ async function Hc(hc, m, db) {
         try {
           let spotifyUrl = text;
           
-          // 1. Jika yang diketik adalah judul lagu (bukan link), bot akan mencari lagunya dulu
           if (!text.includes('spotify.com')) {
-            const searchApi = await fetch(`https://api.ryzendesu.vip/api/search/spotify?query=${encodeURIComponent(text)}`);
-            const searchData = await searchApi.json();
+            const searchRes = await fetch(`https://api.vreden.web.id/api/spotifysearch?query=${encodeURIComponent(text)}`);
+            const searchType = searchRes.headers.get('content-type') || '';
             
-            // Menyesuaikan struktur data pencarian Ryzendesu
-            let results = searchData.data || searchData;
-            if (!results || results.length === 0) {
-              return reply('❌ Lagu tidak ditemukan di server API. Coba gunakan link Spotify langsung.');
+            if (!searchRes.ok || !searchType.includes('application/json')) {
+              return reply('❌ Server pencarian Spotify sedang gangguan. Coba tempelkan link Spotify secara langsung.');
             }
-            // Ambil URL lagu dari hasil pencarian teratas
-            spotifyUrl = results[0].url || results[0].link; 
+            
+            const searchData = await searchRes.json();
+            const results = searchData?.result || searchData?.data || [];
+            
+            if (!results.length) {
+              return reply('❌ Lagu tidak ditemukan di Spotify.');
+            }
+            spotifyUrl = results[0].link || results[0].url;
           }
-
-          // 2. Proses mengunduh lagu menggunakan URL
-          const dlApi = await fetch(`https://api.ryzendesu.vip/api/downloader/spotify?url=${spotifyUrl}`);
-          const dlData = await dlApi.json();
           
-          // Menyesuaikan struktur data unduhan API
-          const audioData = dlData.data || dlData;
-          const audioUrl = audioData.url || audioData.link;
+          let audioUrl = '';
+          let title = '';
+          let artist = '';
+          let cover = '';
           
-          if (!audioUrl) return reply('❌ Gagal mengambil file audio dari server API.');
-
-          const title = audioData.title || text;
-          const artist = audioData.artist || audioData.author || 'Unknown';
-          const cover = audioData.cover || audioData.thumbnail || audioData.image || '';
-
-          // 3. Kirim Thumbnail & Detail
+          try {
+            const dlRes = await fetch(`https://api.vreden.web.id/api/spotify?url=${encodeURIComponent(spotifyUrl)}`);
+            const contentType = dlRes.headers.get('content-type') || '';
+            
+            if (dlRes.ok && contentType.includes('application/json')) {
+              const dlData = await dlRes.json();
+              const resData = dlData?.result?.data || dlData?.result || dlData;
+              audioUrl = resData?.music || resData?.download || resData?.url;
+              title = resData?.title || resData?.name;
+              artist = resData?.artists || resData?.artist;
+              cover = resData?.cover || resData?.image || resData?.thumbnail;
+            }
+          } catch (e) {
+            console.log('API Utama bermasalah, mengalihkan ke API Cadangan...');
+          }
+          
+          if (!audioUrl) {
+            const fallbackRes = await fetch(`https://api.siputzx.my.id/api/d/spotify?url=${encodeURIComponent(spotifyUrl)}`);
+            const fbType = fallbackRes.headers.get('content-type') || '';
+            
+            if (fallbackRes.ok && fbType.includes('application/json')) {
+              const fbData = await fallbackRes.json();
+              audioUrl = fbData?.data?.download || fbData?.data?.url;
+              title = title || fbData?.data?.title;
+              artist = artist || fbData?.data?.artist;
+              cover = cover || fbData?.data?.cover;
+            }
+          }
+          
+          if (!audioUrl) {
+            return reply('❌ Gagal mengunduh audio. Semua server API Spotify sedang mengalami gangguan.');
+          }
+          
           let caption = `🎧 *SPOTIFY DOWNLOADER*\n\n`;
-          caption += `🎵 *Judul:* ${title}\n`;
-          caption += `🎤 *Artis:* ${artist}\n\n`;
+          caption += `🎵 *Judul:* ${title || 'Unknown'}\n`;
+          caption += `🎤 *Artis:* ${artist || 'Unknown'}\n\n`;
           caption += `*By: Heart candy* 🐴`;
-
+          
           if (cover) {
             await hc.sendMessage(sender, { image: { url: cover }, caption: caption }, { quoted: m });
           } else {
             await reply(caption);
           }
-
-          // 4. Kirim File MP3
+          
           await hc.sendMessage(sender, { 
             audio: { url: audioUrl }, 
             mimetype: 'audio/mpeg', 
             ptt: false 
           }, { quoted: m });
-
+          
         } catch (err) {
           console.error("Error Spotify:", err);
-          reply('❌ Terjadi kesalahan sistem atau API sedang gangguan. Coba lagi nanti.');
+          await reply('❌ Terjadi kesalahan pada server pengunduh.');
         }
       }
       break
-
       
       // Ai Menu
       case 'cai': case 'autoai': case 'roomai': case 'chatai': {
