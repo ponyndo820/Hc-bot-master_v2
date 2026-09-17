@@ -9,6 +9,7 @@ import util from 'util';
 import path from 'path';
 import chalk from 'chalk'; 
 import yts from 'yt-search';
+import ytdl from 'ytdl-core';
 import { promisify } from 'util';
 import speed from 'performance-now';
 import { fileURLToPath } from 'url';
@@ -784,47 +785,49 @@ async function Hc(hc, m, db) {
         await react('⏳');
         
         try {
-          const yts = require('yt-search');
-          const ytdl = require('ytdl-core');
+          // 1. Membersihkan link jika user memasukkan link Spotify
           let query = text;
           if (text.includes('spotify.com')) {
              reply('🔄 Mengonversi link Spotify menjadi pencarian audio...');
-             
              query = text.split('/').pop().split('?')[0] + " official audio";
           } else {
              query = text + " official audio";
           }
-          
+
+          // 2. Mencari lagu di YouTube menggunakan yts (yang sudah di-import di atas)
           const searchResult = await yts(query);
           if (!searchResult || !searchResult.videos.length) {
             return reply('❌ Lagu tidak ditemukan.');
           }
-          
+
           const video = searchResult.videos[0];
           const ytUrl = video.url;
-          
+
+          // 3. Kirim Thumbnail & Detail Lagu
           let caption = `🎧 *LOCAL MUSIC DOWNLOADER*\n\n`;
           caption += `🎵 *Judul:* ${video.title}\n`;
           caption += `⏱️ *Durasi:* ${video.timestamp}\n`;
           caption += `📺 *Channel:* ${video.author.name}\n\n`;
-          caption += `*By: Heart candy*`;
-          
+          caption += `*By: Heart candy* 🐴`;
+
           await hc.sendMessage(sender, { image: { url: video.thumbnail }, caption: caption }, { quoted: m });
-          
+
+          // 4. Unduh Audio secara langsung menggunakan ytdl-core
           const stream = ytdl(ytUrl, { filter: 'audioonly', quality: 'highestaudio' });
-          
+
           await hc.sendMessage(sender, { 
             audio: { stream: stream }, 
             mimetype: 'audio/mpeg', 
             ptt: false 
           }, { quoted: m });
-          
+
         } catch (err) {
           console.error("Error Local Downloader:", err);
           await reply('❌ Terjadi kesalahan saat memproses audio. Pastikan dependensi ytdl-core kamu versi terbaru.');
         }
       }
       break
+
       
       // Ai Menu
       case 'cai': case 'autoai': case 'roomai': case 'chatai': {
