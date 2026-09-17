@@ -23,7 +23,7 @@ end
 begin
   URI.open(api_url, "User-Agent" => "Mozilla/5.0") { |f| f.read }
   
-  sleep(8)
+  sleep(10)
   
   URI.open(api_url, "User-Agent" => "Mozilla/5.0") do |gambar|
     File.open(nama_file, "wb") do |file|

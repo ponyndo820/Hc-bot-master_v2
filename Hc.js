@@ -100,8 +100,8 @@ async function Hc(hc, m, db) {
     
     // Add case command di sini
     switch (command) {
-      case 'tes': {
-        await reply('Ya sayang');
+      case 'runtime': case 'tes': case 'bot': {
+        if (!args[0] && !args[1]) return reply(`*Bot Telah Aktif Selama*\n*${runtime(process.uptime())}*`);
       }
       break
       
@@ -309,7 +309,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
-      case 'ssweb': case 'screenshot': {
+      case 'ssweb': case 'screenshotweb': {
         if (!text) return reply(`Contoh: ${prefix + command} https://google.com`);
         await react('⏳');
         
@@ -987,6 +987,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}ytmp3 (url)
 ╰┬───❍
 ╭┴─❍ *TOOLS*
+│${setv} ${prefix}ssweb
 │${setv} ${prefix}brat
 │${setv} ${prefix}bratvid
 │${setv} ${prefix}draw (prompt)
