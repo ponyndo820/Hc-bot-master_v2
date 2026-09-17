@@ -779,53 +779,67 @@ async function Hc(hc, m, db) {
         }
       }
       break
-      case 'spotify': case 'carilagu': case 'spotisearch': {
-        if (!text) return reply(`Masukkan judul lagu!\nContoh: *${prefix + command} Malu Malu Tapi Mau*`);
-        await react('🎵');
+      case 'spotify': case 'spotifydl': {
+        if (!text) return reply(`Masukkan judul lagu atau link Spotify!\nContoh: *${prefix}spotify Koa Background pt.2*`);
+        await react('⏳');
+        
         try {
-          const res = await fetch(`https://api.siputzx.my.id/api/s/spotify?query=${encodeURIComponent(text)}`);
-          const json = await res.json();
+          let spotifyUrl = text;
           
-          if (!json.status || !json.data || json.data.length === 0) {
-            await react('❌');
-            return reply('❌ Lagu tidak ditemukan di Spotify.');
+          // 1. Jika yang diketik adalah judul lagu (bukan link), bot akan mencari lagunya dulu
+          if (!text.includes('spotify.com')) {
+            const searchApi = await fetch(`https://api.ryzendesu.vip/api/search/spotify?query=${encodeURIComponent(text)}`);
+            const searchData = await searchApi.json();
+            
+            // Menyesuaikan struktur data pencarian Ryzendesu
+            let results = searchData.data || searchData;
+            if (!results || results.length === 0) {
+              return reply('❌ Lagu tidak ditemukan di server API. Coba gunakan link Spotify langsung.');
+            }
+            // Ambil URL lagu dari hasil pencarian teratas
+            spotifyUrl = results[0].url || results[0].link; 
           }
+
+          // 2. Proses mengunduh lagu menggunakan URL
+          const dlApi = await fetch(`https://api.ryzendesu.vip/api/downloader/spotify?url=${spotifyUrl}`);
+          const dlData = await dlApi.json();
           
-          const songs = json.data.slice(0, 1); // Ambil 5 hasil teratas
-          let resultText = `*━━━━━━━━━━━━━━━━━━━━*\n`;
-          resultText += ` 🎵 *SPOTIFY SEARCH* 🎵\n`;
-          resultText += `*━━━━━━━━━━━━━━━━━━━━*\n\n`;
-          resultText += `Hasil pencarian untuk: *${text}*\n\n`;
+          // Menyesuaikan struktur data unduhan API
+          const audioData = dlData.data || dlData;
+          const audioUrl = audioData.url || audioData.link;
           
-          for (let i = 0; i < songs.length; i++) {
-            let song = songs[i];
-            resultText += `*${i + 1}. ${song.title || song.name}*\n`;
-            resultText += `👤 *Artis:* ${song.artist || song.artists}\n`;
-            resultText += `⏱️ *Durasi:* ${song.duration || '-'}\n`;
-            resultText += `🔗 *Link:* ${song.url || song.link}\n`;
-            resultText += `──────────────────\n\n`;
-          }
-          
-          resultText += `*By: Heart candy*`;
-          
-          const thumbnail = songs[0].image || songs[0].thumbnail;
-          if (thumbnail) {
-            await hc.sendMessage(sender, {
-              image: { url: thumbnail },
-              caption: resultText.trim()
-            }, { quoted: m });
+          if (!audioUrl) return reply('❌ Gagal mengambil file audio dari server API.');
+
+          const title = audioData.title || text;
+          const artist = audioData.artist || audioData.author || 'Unknown';
+          const cover = audioData.cover || audioData.thumbnail || audioData.image || '';
+
+          // 3. Kirim Thumbnail & Detail
+          let caption = `🎧 *SPOTIFY DOWNLOADER*\n\n`;
+          caption += `🎵 *Judul:* ${title}\n`;
+          caption += `🎤 *Artis:* ${artist}\n\n`;
+          caption += `*By: Heart candy* 🐴`;
+
+          if (cover) {
+            await hc.sendMessage(sender, { image: { url: cover }, caption: caption }, { quoted: m });
           } else {
-            await reply(resultText.trim());
+            await reply(caption);
           }
-          
-          await react('✅');
+
+          // 4. Kirim File MP3
+          await hc.sendMessage(sender, { 
+            audio: { url: audioUrl }, 
+            mimetype: 'audio/mpeg', 
+            ptt: false 
+          }, { quoted: m });
+
         } catch (err) {
-          console.error("Error Spotify Search:", err);
-          await react('❌');
-          await reply('❌ Terjadi kesalahan saat mencari lagu di Spotify.');
+          console.error("Error Spotify:", err);
+          reply('❌ Terjadi kesalahan sistem atau API sedang gangguan. Coba lagi nanti.');
         }
       }
       break
+
       
       // Ai Menu
       case 'cai': case 'autoai': case 'roomai': case 'chatai': {
