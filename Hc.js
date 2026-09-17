@@ -780,87 +780,48 @@ async function Hc(hc, m, db) {
       }
       break
       case 'spotify': case 'spotifydl': {
-        if (!text) return reply(`Masukkan judul lagu atau link Spotify!\nContoh: *${prefix}spotify Koa Background pt.2*`);
+        if (!text) return reply(`Masukkan judul lagu!\nContoh: *${prefix}spotify Koa Background pt.2*`);
         await react('⏳');
         
         try {
-          let spotifyUrl = text;
-          
-          if (!text.includes('spotify.com')) {
-            const searchRes = await fetch(`https://api.vreden.web.id/api/spotifysearch?query=${encodeURIComponent(text)}`);
-            const searchType = searchRes.headers.get('content-type') || '';
-            
-            if (!searchRes.ok || !searchType.includes('application/json')) {
-              return reply('❌ Server pencarian Spotify sedang gangguan. Coba tempelkan link Spotify secara langsung.');
-            }
-            
-            const searchData = await searchRes.json();
-            const results = searchData?.result || searchData?.data || [];
-            
-            if (!results.length) {
-              return reply('❌ Lagu tidak ditemukan di Spotify.');
-            }
-            spotifyUrl = results[0].link || results[0].url;
-          }
-          
-          let audioUrl = '';
-          let title = '';
-          let artist = '';
-          let cover = '';
-          
-          try {
-            const dlRes = await fetch(`https://api.vreden.web.id/api/spotify?url=${encodeURIComponent(spotifyUrl)}`);
-            const contentType = dlRes.headers.get('content-type') || '';
-            
-            if (dlRes.ok && contentType.includes('application/json')) {
-              const dlData = await dlRes.json();
-              const resData = dlData?.result?.data || dlData?.result || dlData;
-              audioUrl = resData?.music || resData?.download || resData?.url;
-              title = resData?.title || resData?.name;
-              artist = resData?.artists || resData?.artist;
-              cover = resData?.cover || resData?.image || resData?.thumbnail;
-            }
-          } catch (e) {
-            console.log('API Utama bermasalah, mengalihkan ke API Cadangan...');
-          }
-          
-          if (!audioUrl) {
-            const fallbackRes = await fetch(`https://api.siputzx.my.id/api/d/spotify?url=${encodeURIComponent(spotifyUrl)}`);
-            const fbType = fallbackRes.headers.get('content-type') || '';
-            
-            if (fallbackRes.ok && fbType.includes('application/json')) {
-              const fbData = await fallbackRes.json();
-              audioUrl = fbData?.data?.download || fbData?.data?.url;
-              title = title || fbData?.data?.title;
-              artist = artist || fbData?.data?.artist;
-              cover = cover || fbData?.data?.cover;
-            }
-          }
-          
-          if (!audioUrl) {
-            return reply('❌ Gagal mengunduh audio. Semua server API Spotify sedang mengalami gangguan.');
-          }
-          
-          let caption = `🎧 *SPOTIFY DOWNLOADER*\n\n`;
-          caption += `🎵 *Judul:* ${title || 'Unknown'}\n`;
-          caption += `🎤 *Artis:* ${artist || 'Unknown'}\n\n`;
-          caption += `*By: Heart candy* 🐴`;
-          
-          if (cover) {
-            await hc.sendMessage(sender, { image: { url: cover }, caption: caption }, { quoted: m });
+          const yts = require('yt-search');
+          const ytdl = require('ytdl-core');
+          let query = text;
+          if (text.includes('spotify.com')) {
+             reply('🔄 Mengonversi link Spotify menjadi pencarian audio...');
+             
+             query = text.split('/').pop().split('?')[0] + " official audio";
           } else {
-            await reply(caption);
+             query = text + " official audio";
           }
+          
+          const searchResult = await yts(query);
+          if (!searchResult || !searchResult.videos.length) {
+            return reply('❌ Lagu tidak ditemukan.');
+          }
+          
+          const video = searchResult.videos[0];
+          const ytUrl = video.url;
+          
+          let caption = `🎧 *LOCAL MUSIC DOWNLOADER*\n\n`;
+          caption += `🎵 *Judul:* ${video.title}\n`;
+          caption += `⏱️ *Durasi:* ${video.timestamp}\n`;
+          caption += `📺 *Channel:* ${video.author.name}\n\n`;
+          caption += `*By: Heart candy*`;
+          
+          await hc.sendMessage(sender, { image: { url: video.thumbnail }, caption: caption }, { quoted: m });
+          
+          const stream = ytdl(ytUrl, { filter: 'audioonly', quality: 'highestaudio' });
           
           await hc.sendMessage(sender, { 
-            audio: { url: audioUrl }, 
+            audio: { stream: stream }, 
             mimetype: 'audio/mpeg', 
             ptt: false 
           }, { quoted: m });
           
         } catch (err) {
-          console.error("Error Spotify:", err);
-          await reply('❌ Terjadi kesalahan pada server pengunduh.');
+          console.error("Error Local Downloader:", err);
+          await reply('❌ Terjadi kesalahan saat memproses audio. Pastikan dependensi ytdl-core kamu versi terbaru.');
         }
       }
       break
