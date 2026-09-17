@@ -22,7 +22,7 @@ import { ytMp4 } from './lib/ytmp4.js';
 import settings from './settings.js';
 import { GroupUpdate } from './src/message.js';
 import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
-import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom } from './lib/function.js';
+import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime } from './lib/function.js';
 
 async function Hc(hc, m, db) {
   try {
