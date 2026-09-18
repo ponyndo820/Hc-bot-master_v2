@@ -9,7 +9,7 @@ require 'json'
 require 'fileutils'
 
 def fetch_pony
-  url = 'https://derpibooru.org/api/v1/json/search/images?q=safe,pony&sf=random&per_page=1'
+  url = 'http://browse.deviantart.com/?q=pony&order=9&offset=' + str(offset)
   headers = { "User-Agent" => "Mozilla/5.0", read_timeout: 10 }
 
   response = URI.open(url, headers).read
