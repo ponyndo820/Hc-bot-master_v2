@@ -20,7 +20,7 @@ import { getContentType, downloadMediaMessage, generateWAMessageFromContent, pro
 
 import { ytMp4 } from './lib/ytmp4.js';
 import settings from './settings.js';
-import { GroupUpdate, LoadDataBase } from './src/message.js';
+import { GroupUpdate, /*LoadDataBase*/ } from './src/message.js';
 import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
 import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime } from './lib/function.js';
 
@@ -28,7 +28,7 @@ async function Hc(hc, m, db) {
   try {
     if (!m.message) return;
     
-    await LoadDataBase(hc, m);
+    // await LoadDataBase(hc, m);
     
     let msg = m.message;
     if (msg.ephemeralMessage) msg = msg.ephemeralMessage.message;

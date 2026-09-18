@@ -110,10 +110,10 @@ async function GroupUpdate(hc, m, store) {
   }
 }
 
-/* async function GroupParticipantsUpdate(hc,update store) {
+/*async function GroupParticipantsUpdate(hc,update store) {
   try {
     const { id, participants, author, action } = update;
-    function updateAdmminStatus(participants,metadataParticipants, status) {
+    function updateAdminStatus(participants,metadataParticipants, status) {
       for (const participants of metadataParticipants)
       if (participants.include(jidNormalizedUser(participant.id)) || participants.includes(jidNormalizedUser(participant.phoneNumber))) {
         participant.admin = status;
@@ -142,66 +142,31 @@ async function GroupUpdate(hc, m, store) {
         }
       } else if (action === 'remove') {
         if (global.db.groups[id]?.leave) messageText = global.db.groups[id]?.text?.setleave || `@\nLeaving From ${metadata.subject}`;
-        if ((jidNormalizedUser(hc.user.lid) == jidNormalizedUser(jid)) || (jidNormalizedUser(hc.userid) == jidNormalizedUser(jid))) {
-          
+        if ((jidNormalizedUser(hc.user.lid) == jidNormalizedUser(jid)) || (jidNormalizedUser(hc.user.id) == jidNormalizedUser(jid))) {
+          delete store.messages[id];
+          delete store.presences[id];
+          delete store.groupMetadata[id];
         }
+        if(metadata) metadata.participants = metadata.participants.filter(p => !participants.includes(metadata.addressingMode === 'lid' ? jidNormalizedUser(p.id) : jidNormalizedUser(p.phoneNumber)));
+      } else if (action === 'promote') {
+        if (global.db.groups[id]?.promote) messageText = global.db.groups[id]?.text?.setpromote || `@\nPromote From ${metadata.subject}\nBy @admin`;
+        updateAdminStatus(participants, metadata.participants, 'admin');
+      } else if (action === 'demote') {
+        if (global.db.groups[id]?.demote) messageText = global.db.groups[id]?.text?.setdemote || `@\nDemote Form${metadata.subject}\nBy `
       }
     }
   }
-}
-*/
+}*/
 
-async function LoadDataBase(hc, m) {
-  try {
-    const botNumber = hc.user.id.split(':')[0] + '@s.whatsapp.net';
-    
-    global.db = global.db || {};
-    global.db.users = global.db.users || {};
-    global.db.groups = global.db.groups || {};
-    global.db.game = global.db.game || {};
-    global.db.set = global.db.set || {};
 
-    let user = global.db.users[m.sender] || {};
-    global.db.users[m.sender] = user;
-
-const limitUser = user.vip ? settings.limit.vip : checkStatus(m.sender, premium) ? settings.limit.premium : settings.limit.free;
-		const moneyUser = user.vip ? settings.money.vip : checkStatus(m.sender, premium) ? settings.money.premium : settings.money.free;
-    // Default Data User
-    const defaultUser = {
-      vip: false,
-      ban: false,
-      limit: 20,
-      money: 1000,
-      lastclaim: Date.now(),
-    };
-    for (let key in defaultUser) {
-      if (!(key in user)) user[key] = defaultUser[key];
-    }
-
-    // Default Data Grup (Jika di dalam grup)
-    if (m.isGroup) {
-      let group = global.db.groups[m.chat] || {};
-      global.db.groups[m.chat] = group;
-
-      const defaultGroup = {
-        welcome: false,
-        antilink: false,
-        mute: false,
-      };
-      for (let key in defaultGroup) {
-        if (!(key in group)) group[key] = defaultGroup[key];
-      }
-    }
-
-  } catch (e) {
-    console.error("Error LoadDataBase:", e);
-  }
-}
+/*async function LoadDataBase(hc, m) {
+  
+}*/
 
 
 export {
   GroupUpdate,
-  LoadDataBase,
+  //LoadDataBase,
 };
 
 const watcher = chokidar.watch(hcPath, {
