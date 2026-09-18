@@ -9,7 +9,7 @@ import os from 'os';
 import pino from 'pino';
 import chalk from 'chalk';
 import readline from 'readline';
-import makeWaSocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
+import makeWaSocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers, makeInMemoryStore } from '@whiskeysockets/baileys';
 
 import { Hc } from './Hc.js'
 import settings from './settings.js';

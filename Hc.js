@@ -20,13 +20,15 @@ import { getContentType, downloadMediaMessage, generateWAMessageFromContent, pro
 
 import { ytMp4 } from './lib/ytmp4.js';
 import settings from './settings.js';
-import { GroupUpdate } from './src/message.js';
+import { GroupUpdate, LoadDataBase } from './src/message.js';
 import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
 import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime } from './lib/function.js';
 
 async function Hc(hc, m, db) {
   try {
     if (!m.message) return;
+    
+    await LoadDataBase(hc, m);
     
     let msg = m.message;
     if (msg.ephemeralMessage) msg = msg.ephemeralMessage.message;
@@ -943,6 +945,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}tagme
 │${setv} ${prefix}donasi
 │${setv} ${prefix}speedtest
+│${setv} ${prefix}randommenu
 │${setv} ${prefix}request (text)
 ╰────❍`)
       }
@@ -1019,7 +1022,7 @@ async function Hc(hc, m, db) {
       break
       
       // Search menu
-      case 'Searchmenu': {
+      case 'searchmenu': {
         await reply(`*━━━━━━━━━━━━━━━━━━━━*
               🌈 *Hc-bot* 🌈
                *By Heart candy*
@@ -1039,6 +1042,17 @@ async function Hc(hc, m, db) {
 ╭──❍ *AI*
 │${setv} ${prefix}autoai
 │${setv} ${prefix}ai (query)
+╰────❍`)
+      }
+      break
+      case 'randommenu': {
+        await reply(`*━━━━━━━━━━━━━━━━━━━━*
+              🌈 *Hc-bot* 🌈
+               *By Heart candy*
+*━━━━━━━━━━━━━━━━━━━━*
+╭──❍ *RANDOM IMAGE*
+│${setv} ${prefix}randompony
+│${setv} ${prefix}randomimage
 ╰────❍`)
       }
       break
