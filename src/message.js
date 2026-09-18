@@ -164,6 +164,8 @@ async function LoadDataBase(hc, m) {
     let user = global.db.users[m.sender] || {};
     global.db.users[m.sender] = user;
 
+const limitUser = user.vip ? settings.limit.vip : checkStatus(m.sender, premium) ? settings.limit.premium : settings.limit.free;
+		const moneyUser = user.vip ? settings.money.vip : checkStatus(m.sender, premium) ? settings.money.premium : settings.money.free;
     // Default Data User
     const defaultUser = {
       vip: false,

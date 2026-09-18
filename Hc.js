@@ -104,11 +104,11 @@ async function Hc(hc, m, db) {
         }
     }
     
-   const isVip = isCreator || (db.users[m.sender]?.vip || false);
+   /*const isVip = isCreator || (db.users[m.sender]?.vip || false);
    const isBan = db.users[m.sender]?.ban || false; 
    const isLimit = isCreator || (db.users[m.sender]?.limit > 0 || false);
    const isPremium = isCreator || checkStatus(m.sender, premium) || false;
-   const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;
+   const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;*/
 
     
     // Add case command di sini
