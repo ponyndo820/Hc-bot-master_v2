@@ -23,6 +23,7 @@ import settings from './settings.js';
 import { GroupUpdate, /*LoadDataBase*/ } from './src/message.js';
 import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
 import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime } from './lib/function.js';
+import { cmdAdd, cmdAddHit, addExpired, getPosition, getExpired, getStatus, getAllExpired, checkExpired } from './src/database.js';
 
 async function Hc(hc, m, db) {
   try {

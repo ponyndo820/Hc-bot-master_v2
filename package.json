@@ -19,7 +19,8 @@
   },
   
   "scripts": {
-    "start": "node index.js"
+    "start": "node main.js",
+    "debug": "DEBUG=* node main.js"
   },
   "engines": {
     "node": ">=20.0.0"
