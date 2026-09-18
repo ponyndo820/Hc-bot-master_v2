@@ -104,6 +104,13 @@ async function Hc(hc, m, db) {
         }
     }
     
+   const isVip = isCreator || (db.users[m.sender]?.vip || false);
+   const isBan = db.users[m.sender]?.ban || false; 
+   const isLimit = isCreator || (db.users[m.sender]?.limit > 0 || false);
+   const isPremium = isCreator || checkStatus(m.sender, premium) || false;
+   const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;
+
+    
     // Add case command di sini
     switch (command) {
       case 'runtime': case 'tes': case 'bot': {
@@ -944,6 +951,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}sc
 │${setv} ${prefix}tagme
 │${setv} ${prefix}donasi
+│${setv} ${prefix}runtime
 │${setv} ${prefix}speedtest
 │${setv} ${prefix}randommenu
 │${setv} ${prefix}request (text)
@@ -1068,6 +1076,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}sc
 │${setv} ${prefix}tagme
 │${setv} ${prefix}donasi
+│${setv} ${prefix}runtime
 │${setv} ${prefix}speedtest
 │${setv} ${prefix}request (text)
 │${setv} ${prefix}tovn (reply pesan)
