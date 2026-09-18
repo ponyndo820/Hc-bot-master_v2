@@ -53,6 +53,10 @@ async function Hc(hc, m, db) {
     const prefix = isCmd ? prefixUsed : '';
     
     if (!isCmd && !global.activeAutoAI.has(sender)) return;
+    if (isCmd) {
+      await hc.sendPresenceUpdate('composing', sender);
+      
+    }
     
     const command = isCmd ? body.slice(prefix.length).trim().split(/ +/).shift().toLowerCase() : '';
     const args = isCmd ? body.trim().split(/ +/).slice(1) : [];
@@ -380,6 +384,9 @@ async function Hc(hc, m, db) {
       break
       case 'tovn': case 'toptt': case 'tovoice': {
         if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin Dijadikan Audio Dengan Caption ${prefix + command}`);
+        
+        await hc.sendPresenceUpdate('recording', sender);
+        
         await react('⏳');
         const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
         let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
