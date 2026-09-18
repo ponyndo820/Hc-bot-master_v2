@@ -94,7 +94,7 @@ async function Hc(hc, m, db) {
                 }
                 
                 const genAI = new GoogleGenerativeAI(apiKey);
-                const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
+                const model = genAI.getGenerativeModel({ model: 'gemini-3.8-flash' });
                 const result = await model.generateContent(text);
                 return await reply(result.response.text());
             } catch (err) {
@@ -892,7 +892,7 @@ async function Hc(hc, m, db) {
           }
           
           const genAI = new GoogleGenerativeAI(apiKey);
-          const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
+          const model = genAI.getGenerativeModel({ model: 'gemini-3.8-flash' });
           const result = await model.generateContent(text);
           await reply(result.response.text());
           
