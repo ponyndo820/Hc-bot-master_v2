@@ -9,13 +9,17 @@ import os from 'os';
 import pino from 'pino';
 import chalk from 'chalk';
 import readline from 'readline';
-import makeWaSocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers, makeInMemoryStore } from '@whiskeysockets/baileys';
+import makeWaSocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
 
-import { Hc } from './Hc.js'
+import { Hc } from './Hc.js';
 import settings from './settings.js';
+import { createRequire } from 'module';
 import { printMessageLog } from './lib/function.js';
 import { dataBase, cmdDel, checkStatus} from './src/database.js';
 
+
+const require = createRequire(import.meta.url);
+const { makeInMemoryStore } = require('@whiskeysockets/baileys');
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 const question = (text) => new Promise((resolve) => rl.question(text, resolve));
 
@@ -90,7 +94,7 @@ async function startHcbot() {
   const hc = makeWaSocket.default ? makeWaSocket.default(hcOptions) : makeWaSocket(hcOptions);
   if (!hc.authState.creds.registered) {
     if (settings.pairing_code) {
-      const phoneNumber = await question(chalk.magenta('Masukin nomor bot Kamu disini ya sayang (contoh: 628xxx):'));
+      const phoneNumber = await question(chalk.magenta('Masukin nomor bot Kamu disini ya sayang (contoh: 628xxx): '));
       const code = await hc.requestPairingCode(phoneNumber.replace(/[^0-9]/g, ''));
       console.log(chalk.green.bold(`\n============================\n[INI CODE PAIRING KAMU SAYANG]: ${code}\n============================\n`));
     } else {
