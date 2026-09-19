@@ -116,8 +116,7 @@ async function Hc(hc, m, db) {
    const isPremium = isCreator || checkStatus(sender, premium) || false;
    const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;*/
    
-    const freeCmd = ['limit', 'balance', 'money', 'buylimit', 'menu', 'allmenu', 'botmenu', 'donasi'];
-    
+    const freeCmd = settings.bypasslimit || [];
     
     // Sistem Limit
     if (isCmd && !isCreator && !freeCmd.includes(command)) {

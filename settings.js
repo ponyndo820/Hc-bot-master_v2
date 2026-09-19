@@ -21,7 +21,15 @@ const settings = {
   selfMode: false,
   tempatDB: 'database.json',
   tempatStore: 'baileys_store.json',
-  listv: ['•','●','■','✿','▲','➩','➢','➣','➤','✦','✧','△','❀','○','□','♤','♡','◇','♧','々','〆']
+  listv: ['•','●','■','✿','▲','➩','➢','➣','➤','✦','✧','△','❀','○','□','♤','♡','◇','♧','々','〆'],
+  
+  // Daftar command yang bebas limit (tidak mengurangi limit)
+  bypasslimit: [
+    'limit', 'balance', 'money', 'buylimit', 
+    'menu', 'allmenu', 'botmenu', 'toolsmenu', 
+    'ownermenu', 'randommenu', 'quotesmenu', 
+    'downloadermenu', 'donasi'
+  ]
 }
 
 settings.my = {
