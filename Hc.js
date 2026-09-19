@@ -1057,9 +1057,10 @@ async function Hc(hc, m, db) {
 *━━━━━━━━━━━━━━━━━━━━*
 
 ╭──❍ *MENU*
+│${setv} ${prefix}aimenu
 │${setv} ${prefix}botmenu
 │${setv} ${prefix}allmenu
-│${setv} ${prefix}aimenu
+│${setv} ${prefix}gamemenu
 │${setv} ${prefix}animemenu
 │${setv} ${prefix}toolsmenu
 │${setv} ${prefix}ownermenu
@@ -1090,9 +1091,11 @@ async function Hc(hc, m, db) {
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *BOT*
 │${setv} ${prefix}sc
+│${setv} ${prefix}limit
 │${setv} ${prefix}tagme
 │${setv} ${prefix}donasi
 │${setv} ${prefix}runtime
+│${setv} ${prefix}buylimit
 │${setv} ${prefix}speedtest
 │${setv} ${prefix}request (text)
 ╰────❍`)
@@ -1204,6 +1207,17 @@ async function Hc(hc, m, db) {
 ╰────❍`)
       }
       break
+      case 'gamemenu': {
+        await reply(`*━━━━━━━━━━━━━━━━━━━━*
+              🌈 *Hc-bot* 🌈
+               *By Heart candy*
+*━━━━━━━━━━━━━━━━━━━━*
+╭──❍ *GAME*
+│${setv} ${prefix}tebakbom
+╰────❍`)
+      }
+      break
+
       
       // All menu
       case 'allmenu': {
@@ -1214,9 +1228,11 @@ async function Hc(hc, m, db) {
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *BOT*
 │${setv} ${prefix}sc
+│${setv} ${prefix}limit
 │${setv} ${prefix}tagme
 │${setv} ${prefix}donasi
 │${setv} ${prefix}runtime
+│${setv} ${prefix}buylimit
 │${setv} ${prefix}speedtest
 │${setv} ${prefix}request (text)
 │${setv} ${prefix}tovn (reply pesan)
@@ -1241,7 +1257,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}randomwaifu
 │${setv} ${prefix}cariwaifu (query)
 ╰┬───❍
-╭┴─❍ *Search*
+╭┴─❍ *SEARCH*
 │${setv} ${prefix}ytsearch (query)
 ╰┬───❍
 ╭┴─❍ *DOWNLOADER*
@@ -1249,6 +1265,9 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}tt (url)
 │${setv} ${prefix}ytmp4 (url)
 │${setv} ${prefix}ytmp3 (url)
+╰┬───❍
+╭┴─❍ *GAME*
+│${setv} ${prefix}tebakbom
 ╰┬───❍
 ╭┴─❍ *TOOLS*
 │${setv} ${prefix}ssweb

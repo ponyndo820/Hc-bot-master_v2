@@ -9,6 +9,7 @@ Fitur publik
    draw
    ytmp4
    ytmp3
+   limit
    tagme
    ssweb
    autoai
@@ -17,6 +18,8 @@ Fitur publik
    sticker
    request
    sticker
+   buylimit
+   tebakbom
    speedtes
    shutdown
    ytsearch
@@ -37,8 +40,9 @@ Fitur tidak publik
    
 Version : 2.0.3
 Creator : Heart candy
-Total fitur publik : 32
-Total fitur tidak publik : 5
+Fitur baru : 3
+Total fitur publik : 35
+Total fitur tidak publik : 2
 Bot name : Hc-bot-master_v2
 
 Pesan Dari Creator
