@@ -1,4 +1,6 @@
 ![image alt](https://files.catbox.moe/9gxjhx.jpg)
+[![WhatsApp](https://img.shields.io/badge/WhatsApp-25D366?logo=whatsapp&logoColor=white)](https://wa.me/6281234567890)
+
 - Sc/Script ini masih dalam tahap pengembangan ❗
 - Terimakasih telah mengunjungi repositori ini.
 
