@@ -531,11 +531,11 @@ async function Hc(hc, m, db) {
         }
         let user = db.users[targetSender];
         const userTag = targetSender.includes('@s.whatsapp.net') ? targetSender : `${targetSender.split('@')[0]}@s.whatsapp.net`;
-        
+        let displayMoney = isCreator ? '∞' : `Rp ${user.money.toLocaleString()}`;
         await reply(`┌── 📇 *USER PROFILE*
 │ 👤 *ID:* @${userTag.split('@')[0]}
 │ 🎫 *Limit:* ${isCreator ? '∞' : user.limit}
-│ 💰 *Money:* Rp ${user.money.toLocaleString()}
+│ 💰 *Money:* ${displayMoney}
 └───────────────`, { mentions: [userTag] });
       }
       break
