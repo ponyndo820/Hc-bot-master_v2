@@ -500,15 +500,15 @@ async function Hc(hc, m, db) {
       }
       break
       case 'limit': case 'balance': case 'money': {
-        db.users[sender] = db.users[sender] || {};
-        let user = db.users[sender];
-        if (typeof user.limit !== 'number') user.limit = settings.limit?.free || 15;
-        if (typeof user.money !== 'number') user.money = settings.money?.free || 10000;
-
-        const userTag = m.key.participant || sender;
-
+        const targetSender = m.key.participant || m.sender || sender;
+        if (!db.users[targetSender]) {
+          db.users[targetSender] = { limit: 10, money: 0 }; // Default data jika belum terdaftar
+        }
+        let user = db.users[targetSender];
+        const userTag = targetSender.includes('@s.whatsapp.net') ? targetSender : `${targetSender.split('@')[0]}@s.whatsapp.net`;
+        
         await reply(`┌── 📇 *USER PROFILE*
-│ 👤 *Name:* @${userTag.split('@')[0]}
+│ 👤 *ID:* @${userTag.split('@')[0]}
 │ 🎫 *Limit:* ${isCreator ? '∞' : user.limit}
 │ 💰 *Money:* Rp ${user.money.toLocaleString()}
 └───────────────`, { mentions: [userTag] });
