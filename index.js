@@ -15,13 +15,13 @@ import { Hc } from './Hc.js';
 import settings from './settings.js';
 import { createRequire } from 'module';
 import { printMessageLog } from './lib/function.js';
-import { dataBase, cmdDel, checkStatus} from './src/database.js';
-
+import { dataBase, cmdDel, checkStatus } from './src/database.js';
 
 const require = createRequire(import.meta.url);
 const { makeInMemoryStore } = require('@whiskeysockets/baileys');
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 const question = (text) => new Promise((resolve) => rl.question(text, resolve));
+const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) });
 
 function displaySystemInfo() {
     console.log(chalk.red.bold(`
@@ -39,7 +39,7 @@ function displaySystemInfo() {
 
 async function startHcbot() {
   const dbConnector = dataBase(settings.tempatDB || 'database.json');
-  const { state, saveCreds } = await useMultiFileAuthState('sessions');
+  const { state, saveCreds } = await useMultiFileAuthState('Hc');
   const { version } = await fetchLatestBaileysVersion();
 
   try {
@@ -92,6 +92,10 @@ async function startHcbot() {
   };
   
   const hc = makeWaSocket.default ? makeWaSocket.default(hcOptions) : makeWaSocket(hcOptions);
+  
+  // Bind store ke events socket
+  store.bind(hc.ev);
+
   if (!hc.authState.creds.registered) {
     if (settings.pairing_code) {
       const phoneNumber = await question(chalk.magenta('Masukin nomor bot Kamu disini ya sayang (contoh: 628xxx): '));
