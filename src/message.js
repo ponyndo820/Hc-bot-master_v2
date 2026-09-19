@@ -12,7 +12,7 @@ import PhoneNumber from 'awesome-phonenumber';
 import { jidNormalizedUser, proto, getBinaryNodeChildren, getBinaryNodeChildString, getBinaryNodeChild, generateMessageIDV2, jidEncode, encodeSignedDeviceIdentity, generateWAMessageContent, generateForwardMessageContent, prepareWAMessageMedia, delay, areJidsSameUser, extractMessageContent, generateMessageID, downloadContentFromMessage, generateWAMessageFromContent, jidDecode, generateWAMessage, toBuffer, getContentType, getDevice } from '@whiskeysockets/baileys';
 
 
-import '../settings.js';
+import settings from '../settings.js';
 import { checkStatus } from './database.js';
 import { imageToWebp, videoToWebp, writeExif, gifToWebp,} from '../lib/converter.js';
 import { getBuffer, getSizeMedia, fetchJson, sleep, axiosss, fixBytes } from '../lib/function.js'
