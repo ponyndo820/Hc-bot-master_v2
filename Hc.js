@@ -110,7 +110,49 @@ async function Hc(hc, m, db) {
    const isLimit = isCreator || (db.users[m.sender]?.limit > 0 || false);
    const isPremium = isCreator || checkStatus(m.sender, premium) || false;
    const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;*/
-
+   
+   let tebakbom = db.game.tebakbom
+    
+    
+    let pilih = '🌀', bomb = '💣';
+    if (m.sender in global.tebakbom) {
+    if (!/^[1-9]|10$/i.test(body) && !isCmd && !isCreator) return !0;
+    let index = parseInt(body) - 1;
+    if (global.tebakbom[m.sender].petak[index] === 1 || global.tebakbom[m.sender].petak[index] === 3) return !0;
+    if (global.tebakbom[m.sender].petak[index] === 2) {
+        global.tebakbom[m.sender].petak[index] = 3;
+        global.tebakbom[m.sender].board[index] = bomb;
+        global.tebakbom[m.sender].pick++;
+        m.react('❌');
+        global.tebakbom[m.sender].bomb--;
+        global.tebakbom[m.sender].nyawa.pop();
+        let brd = global.tebakbom[m.sender].board;
+        
+        if (global.tebakbom[m.sender].nyawa.length < 1) {
+            await m.reply(`*GAME TELAH BERAKHIR*\nKamu terkena bomb\n\n ${brd.join('')}\n\n*Terpilih :* ${global.tebakbom[m.sender].pick}\n_Pengurangan Limit : 1_`);
+            m.react('😂');
+            delete global.tebakbom[m.sender];
+        } else {
+            m.reply(`*PILIH ANGKA*\n\nKamu terkena bomb\n ${brd.join('')}\n\nTerpilih: ${global.tebakbom[m.sender].pick}\nSisa nyawa: ${global.tebakbom[m.sender].nyawa.join('')}`);
+        }
+        return !0;
+    }
+    if (global.tebakbom[m.sender].petak[index] === 0) {
+        global.tebakbom[m.sender].petak[index] = 1;
+        global.tebakbom[m.sender].board[index] = pilih;
+        global.tebakbom[m.sender].pick++;
+        global.tebakbom[m.sender].lolos--;
+        let brd = global.tebakbom[m.sender].board;
+        
+        if (global.tebakbom[m.sender].lolos < 1) {
+            db.users[m.sender].money += 6000;
+            await m.reply(`*KAMU HEBAT ಠ⁠ᴥ⁠ಠ*\n\n${brd.join('')}\n\n*Terpilih :* ${global.tebakbom[m.sender].pick}\n*Sisa nyawa :* ${global.tebakbom[m.sender].nyawa.join('')}\n*Bomb :* ${global.tebakbom[m.sender].bomb}\nBonus Money 💰 *+6000*`);
+            delete global.tebakbom[m.sender];
+        } else {
+            m.reply(`*PILIH ANGKA*\n\n${brd.join('')}\n\nTerpilih : ${global.tebakbom[m.sender].pick}\nSisa nyawa : ${global.tebakbom[m.sender].nyawa.join('')}\nBomb : ${global.tebakbom[m.sender].bomb}`);
+        }
+    }
+}
     
     // Add case command di sini
     switch (command) {
@@ -906,6 +948,25 @@ async function Hc(hc, m, db) {
           
         }
         
+      }
+      break
+      // Game menu
+      case 'tebakbom': {
+        if (tebakbom[m.sender]) return reply('Masih Ada Sesi Yang Belum Diselesaikan!')
+        tebakbom[m.sender] = {
+          petak: [0,0,0,2,0,2,0,0].sort(() => Math.random() -0.5),
+          board: ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'],
+					bomb: 3,
+					lolos: 7,
+					pick: 0,
+					nyawa: ['❤️', '❤️', '❤️'],
+        }
+        await reply(`*TEBAK BOM*\n\n${tebakbom[m.sender].board.join("")}\n\nPilih lah nomor tersebut! dan jangan sampai terkena Bom!\nBomb : ${tebakbom[m.sender].bomb}\nNyawa : ${tebakbom[m.sender].nyawa.join("")}`);
+        await sleep(120000)
+        if (tebakbom[m.sender]){
+          reply(`_Waktu ${command} habis_`)
+          delete tebakbom[m.sender];
+        }
       }
       break
       

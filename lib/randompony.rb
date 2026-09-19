@@ -3,7 +3,6 @@
 # * Sc ini open source
 # * ❗Peringatan Script ini tidak boleh di perjual belikan. Jika melanggar akan berurusan dengan hukum.
 
-
 require 'open-uri'
 require 'json'
 require 'fileutils'
