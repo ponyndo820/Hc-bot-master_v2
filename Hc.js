@@ -500,7 +500,11 @@ async function Hc(hc, m, db) {
       }
       break
       case 'limit': case 'balance': case 'money': {
+        db.users[sender] = db.users[sender] || {};
         let user = db.users[sender];
+        if (typeof user.limit !== 'number') user.limit = settings.limit?.free || 15;
+        if (typeof user.money !== 'number') user.money = settings.money?.free || 10000;
+        
         await reply(`┌── 📇 *USER PROFILE*
 │ 👤 *ID:* @${sender.split('@')[0]}
 │ 🎫 *Limit:* ${isCreator ? 'Infinite (Owner)' : user.limit}
