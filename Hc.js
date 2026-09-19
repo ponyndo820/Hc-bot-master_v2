@@ -22,7 +22,7 @@ import { ytMp4 } from './lib/ytmp4.js';
 import settings from './settings.js';
 import { GroupUpdate, /*LoadDataBase*/ } from './src/message.js';
 import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
-import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime } from './lib/function.js';
+import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime, sleep } from './lib/function.js';
 import { cmdAdd, cmdAddHit, addExpired, getPosition, getExpired, getStatus, getAllExpired, checkExpired } from './src/database.js';
 
 async function Hc(hc, m, db) {
@@ -105,51 +105,51 @@ async function Hc(hc, m, db) {
         }
     }
     
-   /*const isVip = isCreator || (db.users[m.sender]?.vip || false);
-   const isBan = db.users[m.sender]?.ban || false; 
-   const isLimit = isCreator || (db.users[m.sender]?.limit > 0 || false);
-   const isPremium = isCreator || checkStatus(m.sender, premium) || false;
+   /*const isVip = isCreator || (db.users[sender]?.vip || false);
+   const isBan = db.users[sender]?.ban || false; 
+   const isLimit = isCreator || (db.users[sender]?.limit > 0 || false);
+   const isPremium = isCreator || checkStatus(sender, premium) || false;
    const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;*/
    
    let tebakbom = db.game.tebakbom
     
     
     let pilih = '🌀', bomb = '💣';
-    if (m.sender in global.tebakbom) {
+    if (sender in global.tebakbom) {
     if (!/^[1-9]|10$/i.test(body) && !isCmd && !isCreator) return !0;
     let index = parseInt(body) - 1;
-    if (global.tebakbom[m.sender].petak[index] === 1 || global.tebakbom[m.sender].petak[index] === 3) return !0;
-    if (global.tebakbom[m.sender].petak[index] === 2) {
-        global.tebakbom[m.sender].petak[index] = 3;
-        global.tebakbom[m.sender].board[index] = bomb;
-        global.tebakbom[m.sender].pick++;
+    if (global.tebakbom[sender].petak[index] === 1 || global.tebakbom[sender].petak[index] === 3) return !0;
+    if (global.tebakbom[sender].petak[index] === 2) {
+        global.tebakbom[sender].petak[index] = 3;
+        global.tebakbom[sender].board[index] = bomb;
+        global.tebakbom[sender].pick++;
         m.react('❌');
-        global.tebakbom[m.sender].bomb--;
-        global.tebakbom[m.sender].nyawa.pop();
-        let brd = global.tebakbom[m.sender].board;
+        global.tebakbom[sender].bomb--;
+        global.tebakbom[sender].nyawa.pop();
+        let brd = global.tebakbom[sender].board;
         
-        if (global.tebakbom[m.sender].nyawa.length < 1) {
-            await m.reply(`*GAME TELAH BERAKHIR*\nKamu terkena bomb\n\n ${brd.join('')}\n\n*Terpilih :* ${global.tebakbom[m.sender].pick}\n_Pengurangan Limit : 1_`);
+        if (global.tebakbom[sender].nyawa.length < 1) {
+            await m.reply(`*GAME TELAH BERAKHIR*\nKamu terkena bomb\n\n ${brd.join('')}\n\n*Terpilih :* ${global.tebakbom[sender].pick}\n_Pengurangan Limit : 1_`);
             m.react('😂');
-            delete global.tebakbom[m.sender];
+            delete global.tebakbom[sender];
         } else {
-            m.reply(`*PILIH ANGKA*\n\nKamu terkena bomb\n ${brd.join('')}\n\nTerpilih: ${global.tebakbom[m.sender].pick}\nSisa nyawa: ${global.tebakbom[m.sender].nyawa.join('')}`);
+            m.reply(`*PILIH ANGKA*\n\nKamu terkena bomb\n ${brd.join('')}\n\nTerpilih: ${global.tebakbom[sender].pick}\nSisa nyawa: ${global.tebakbom[sender].nyawa.join('')}`);
         }
         return !0;
     }
-    if (global.tebakbom[m.sender].petak[index] === 0) {
-        global.tebakbom[m.sender].petak[index] = 1;
-        global.tebakbom[m.sender].board[index] = pilih;
-        global.tebakbom[m.sender].pick++;
-        global.tebakbom[m.sender].lolos--;
-        let brd = global.tebakbom[m.sender].board;
+    if (global.tebakbom[sender].petak[index] === 0) {
+        global.tebakbom[sender].petak[index] = 1;
+        global.tebakbom[sender].board[index] = pilih;
+        global.tebakbom[sender].pick++;
+        global.tebakbom[sender].lolos--;
+        let brd = global.tebakbom[sender].board;
         
-        if (global.tebakbom[m.sender].lolos < 1) {
-            db.users[m.sender].money += 6000;
-            await m.reply(`*KAMU HEBAT ಠ⁠ᴥ⁠ಠ*\n\n${brd.join('')}\n\n*Terpilih :* ${global.tebakbom[m.sender].pick}\n*Sisa nyawa :* ${global.tebakbom[m.sender].nyawa.join('')}\n*Bomb :* ${global.tebakbom[m.sender].bomb}\nBonus Money 💰 *+6000*`);
-            delete global.tebakbom[m.sender];
+        if (global.tebakbom[sender].lolos < 1) {
+            db.users[sender].money += 6000;
+            await m.reply(`*KAMU HEBAT ಠ⁠ᴥ⁠ಠ*\n\n${brd.join('')}\n\n*Terpilih :* ${global.tebakbom[sender].pick}\n*Sisa nyawa :* ${global.tebakbom[sender].nyawa.join('')}\n*Bomb :* ${global.tebakbom[sender].bomb}\nBonus Money 💰 *+6000*`);
+            delete global.tebakbom[sender];
         } else {
-            m.reply(`*PILIH ANGKA*\n\n${brd.join('')}\n\nTerpilih : ${global.tebakbom[m.sender].pick}\nSisa nyawa : ${global.tebakbom[m.sender].nyawa.join('')}\nBomb : ${global.tebakbom[m.sender].bomb}`);
+            m.reply(`*PILIH ANGKA*\n\n${brd.join('')}\n\nTerpilih : ${global.tebakbom[sender].pick}\nSisa nyawa : ${global.tebakbom[sender].nyawa.join('')}\nBomb : ${global.tebakbom[sender].bomb}`);
         }
     }
 }
@@ -418,7 +418,7 @@ async function Hc(hc, m, db) {
       }
       break
       case 'tagme': {
-        const userTag = m.key.participant || m.sender || sender;
+        const userTag = m.key.participant || sender || sender;
         const userNumber = typeof userTag === 'string' ? userTag.split('@')[0] : sender.split('@')[0];
         await hc.sendMessage(sender, { 
           text: `@${userNumber}`, 
@@ -952,8 +952,8 @@ async function Hc(hc, m, db) {
       break
       // Game menu
       case 'tebakbom': {
-        if (tebakbom[m.sender]) return reply('Masih Ada Sesi Yang Belum Diselesaikan!')
-        tebakbom[m.sender] = {
+        if (tebakbom[sender]) return reply('Masih Ada Sesi Yang Belum Diselesaikan!')
+        tebakbom[sender] = {
           petak: [0,0,0,2,0,2,0,0].sort(() => Math.random() -0.5),
           board: ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'],
 					bomb: 3,
@@ -961,11 +961,11 @@ async function Hc(hc, m, db) {
 					pick: 0,
 					nyawa: ['❤️', '❤️', '❤️'],
         }
-        await reply(`*TEBAK BOM*\n\n${tebakbom[m.sender].board.join("")}\n\nPilih lah nomor tersebut! dan jangan sampai terkena Bom!\nBomb : ${tebakbom[m.sender].bomb}\nNyawa : ${tebakbom[m.sender].nyawa.join("")}`);
+        await reply(`*TEBAK BOM*\n\n${tebakbom[sender].board.join("")}\n\nPilih lah nomor tersebut! dan jangan sampai terkena Bom!\nBomb : ${tebakbom[sender].bomb}\nNyawa : ${tebakbom[sender].nyawa.join("")}`);
         await sleep(120000)
-        if (tebakbom[m.sender]){
+        if (tebakbom[sender]){
           reply(`_Waktu ${command} habis_`)
-          delete tebakbom[m.sender];
+          delete tebakbom[sender];
         }
       }
       break
