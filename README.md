@@ -1,5 +1,14 @@
 ![image alt](https://files.catbox.moe/9gxjhx.jpg)
-[![WhatsApp](https://img.shields.io/badge/WhatsApp-25D366?logo=whatsapp&logoColor=white)](https://wa.me/6285823709413) [![YouTube](https://img.shields.io/badge/YouTube-EA7EA3?logo=youtube&logoColor=white)](https://youtube.com/@ponyndo?si=rMY2tSN5BbeNZWQ4)
+<p align="center">
+  <a href="https://wa.me/6285823709413">
+    <img src="https://img.shields.io/badge/WhatsApp-25D366?logo=whatsapp&logoColor=white" alt="WhatsApp">
+  </a>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="https://youtube.com/@ponyndo?si=rMY2tSN5BbeNZWQ4">
+    <img src="https://img.shields.io/badge/YouTube-EA7EA3?logo=youtube&logoColor=white" alt="YouTube">
+  </a>
+</p>
+
 
 - Sc/Script ini masih dalam tahap pengembangan ❗
 - Terimakasih telah mengunjungi repositori ini.
