@@ -458,7 +458,7 @@ async function Hc(hc, m, db) {
       
       //Bot Menu
       case 'sc': case 'script': {
-        reply('Donasi dulu')
+        reply(`Follow: https://github.com/ponyndo820\nDan jangan lupa beri bintang ya sayang`)
       }
       break
       case 'donasi': case 'donate': {
