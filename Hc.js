@@ -505,11 +505,13 @@ async function Hc(hc, m, db) {
         if (typeof user.limit !== 'number') user.limit = settings.limit?.free || 15;
         if (typeof user.money !== 'number') user.money = settings.money?.free || 10000;
 
+        const userTag = m.key.participant || sender;
+
         await reply(`┌── 📇 *USER PROFILE*
-│ 👤 *Name:* @${sender.split('@')[0]}
-│ 🎫 *Limit:* ${isCreator ? '∞ (Infinite)' : user.limit}
+│ 👤 *Name:* @${userTag.split('@')[0]}
+│ 🎫 *Limit:* ${isCreator ? '∞' : user.limit}
 │ 💰 *Money:* Rp ${user.money.toLocaleString()}
-└───────────────`, { mentions: [sender] });
+└───────────────`, { mentions: [userTag] });
       }
       break
 
