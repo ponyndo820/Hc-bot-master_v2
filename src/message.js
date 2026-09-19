@@ -198,7 +198,7 @@ async function LoadDataBase(hc, m) {
         user.money = 999999999;
       }
     } else {
-      if (typeof user.money !== 'number' || isNaN(user.money)) {
+      if (typeof user.money !== 'number' || isNaN(user.money) || user.money === 0) {
         user.money = settings.money?.free || 10000;
       }
       if (typeof user.limit !== 'number' || isNaN(user.limit)) {
