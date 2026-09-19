@@ -55,7 +55,9 @@ async function Hc(hc, m, db) {
     const isCmd = !!prefixUsed;
     const prefix = isCmd ? prefixUsed : '';
     
-    let tebakbom = db.game?.tebakbom || {};
+    global.tebakbom = global.tebakbom || {};
+    let tebakbom = global.tebakbom;
+
     
     if (!isCmd && !global.activeAutoAI.has(sender) && !(sender in tebakbom)) return;
     
@@ -114,7 +116,7 @@ async function Hc(hc, m, db) {
    const isPremium = isCreator || checkStatus(sender, premium) || false;
    const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;*/
     
-    let pilih = '🌀', bomb = '💣';
+        let pilih = '🌀', bomb = '💣';
     if (sender in tebakbom) {
         if (!/^[1-9]|10$/i.test(body) && !isCmd && !isCreator) return !0;
         let index = parseInt(body) - 1;
@@ -124,17 +126,17 @@ async function Hc(hc, m, db) {
             tebakbom[sender].petak[index] = 3;
             tebakbom[sender].board[index] = bomb;
             tebakbom[sender].pick++;
-            m.react('❌');
+            await react('❌'); // Telah diperbaiki
             tebakbom[sender].bomb--;
             tebakbom[sender].nyawa.pop();
             let brd = tebakbom[sender].board;
             
             if (tebakbom[sender].nyawa.length < 1) {
-                await m.reply(`*GAME TELAH BERAKHIR*\nKamu terkena bomb\n\n ${brd.join('')}\n\n*Terpilih :* ${tebakbom[sender].pick}\n_Pengurangan Limit : 1_`);
-                m.react('😂');
+                await reply(`*GAME TELAH BERAKHIR*\nKamu terkena bomb\n\n ${brd.join('')}\n\n*Terpilih :* ${tebakbom[sender].pick}\n_Pengurangan Limit : 1_`); // Telah diperbaiki
+                await react('😂'); // Telah diperbaiki
                 delete tebakbom[sender];
             } else {
-                m.reply(`*PILIH ANGKA*\n\nKamu terkena bomb\n ${brd.join('')}\n\nTerpilih: ${tebakbom[sender].pick}\nSisa nyawa: ${tebakbom[sender].nyawa.join('')}`);
+                await reply(`*PILIH ANGKA*\n\nKamu terkena bomb\n ${brd.join('')}\n\nTerpilih: ${tebakbom[sender].pick}\nSisa nyawa: ${tebakbom[sender].nyawa.join('')}`); // Telah diperbaiki
             }
             return !0;
         }
@@ -147,15 +149,16 @@ async function Hc(hc, m, db) {
             let brd = tebakbom[sender].board;
             
             if (tebakbom[sender].lolos < 1) {
-                db.users[sender].money += 6000;
-                await m.reply(`*KAMU HEBAT ಠ⁠ᴥ⁠ಠ*\n\n${brd.join('')}\n\n*Terpilih :* ${tebakbom[sender].pick}\n*Sisa nyawa :* ${tebakbom[sender].nyawa.join('')}\n*Bomb :* ${tebakbom[sender].bomb}\nBonus Money 💰 *+6000*`);
+                if (db && db.users && db.users[sender]) db.users[sender].money += 6000;
+                
+                await reply(`*KAMU HEBAT ಠ⁠ᴥ⁠ಠ*\n\n${brd.join('')}\n\n*Terpilih :* ${tebakbom[sender].pick}\n*Sisa nyawa :* ${tebakbom[sender].nyawa.join('')}\n*Bomb :* ${tebakbom[sender].bomb}\nBonus Money 💰 *+6000*`);
                 delete tebakbom[sender];
             } else {
-                m.reply(`*PILIH ANGKA*\n\n${brd.join('')}\n\nTerpilih : ${tebakbom[sender].pick}\nSisa nyawa : ${tebakbom[sender].nyawa.join('')}\nBomb : ${tebakbom[sender].bomb}`);
+                await reply(`*PILIH ANGKA*\n\n${brd.join('')}\n\nTerpilih : ${tebakbom[sender].pick}\nSisa nyawa : ${tebakbom[sender].nyawa.join('')}\nBomb : ${tebakbom[sender].bomb}`);
             }
         }
     }
-    
+
     
     // Add case command di sini
     switch (command) {
