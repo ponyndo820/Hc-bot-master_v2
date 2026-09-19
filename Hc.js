@@ -29,7 +29,7 @@ async function Hc(hc, m, db) {
   try {
     if (!m.message) return;
     
-    // await LoadDataBase(hc, m);
+    await LoadDataBase(hc, m);
     
     let msg = m.message;
     if (msg.ephemeralMessage) msg = msg.ephemeralMessage.message;
@@ -115,8 +115,18 @@ async function Hc(hc, m, db) {
    const isLimit = isCreator || (db.users[sender]?.limit > 0 || false);
    const isPremium = isCreator || checkStatus(sender, premium) || false;
    const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;*/
-    
-        let pilih = '🌀', bomb = '💣';
+   
+       // Sistem Limit Otomatis untuk Command (Kecuali Owner)
+    if (isCmd && !isCreator) {
+      let user = db.users[sender];
+      if (user.limit <= 0) {
+        return reply(`⚠️ Limit harian kamu sudah habis! Silahkan tunggu reset atau mainkan game seperti *${prefix}tebakbom* untuk mendapatkan bonus money/limit.`);
+      }
+      user.limit -= 1;
+    }
+   
+   // Tebak Bom
+   let pilih = '🌀', bomb = '💣';
     if (sender in tebakbom) {
         if (!/^([1-9]|10)$/i.test(body) && !isCmd && !isCreator) return !0;
         let index = parseInt(body) - 1;
@@ -126,17 +136,17 @@ async function Hc(hc, m, db) {
             tebakbom[sender].petak[index] = 3;
             tebakbom[sender].board[index] = bomb;
             tebakbom[sender].pick++;
-            await react('❌'); // Telah diperbaiki
+            await react('❌');
             tebakbom[sender].bomb--;
             tebakbom[sender].nyawa.pop();
             let brd = tebakbom[sender].board;
             
             if (tebakbom[sender].nyawa.length < 1) {
-                await reply(`*GAME TELAH BERAKHIR*\nKamu terkena bomb\n\n ${brd.join('')}\n\n*Terpilih :* ${tebakbom[sender].pick}\n_Pengurangan Limit : 1_`); // Telah diperbaiki
-                await react('😂'); // Telah diperbaiki
+                await reply(`*GAME TELAH BERAKHIR*\nKamu terkena bomb\n\n ${brd.join('')}\n\n*Terpilih :* ${tebakbom[sender].pick}\n_Pengurangan Limit : 1_`);
+                await react('😂');
                 delete tebakbom[sender];
             } else {
-                await reply(`*PILIH ANGKA*\n\nKamu terkena bomb\n ${brd.join('')}\n\nTerpilih: ${tebakbom[sender].pick}\nSisa nyawa: ${tebakbom[sender].nyawa.join('')}`); // Telah diperbaiki
+                await reply(`*PILIH ANGKA*\n\nKamu terkena bomb\n ${brd.join('')}\n\nTerpilih: ${tebakbom[sender].pick}\nSisa nyawa: ${tebakbom[sender].nyawa.join('')}`);
             }
             return !0;
         }
@@ -480,6 +490,15 @@ async function Hc(hc, m, db) {
           if (stdout && stdout.trim()) reply(stdout);
           if (stderr && stderr.trim()) reply(stderr);
         }
+      }
+      break
+      case 'limit': case 'balance': case 'money': {
+        let user = db.users[sender];
+        await reply(`┌── 📇 *USER PROFILE*
+│ 👤 *ID:* @${sender.split('@')[0]}
+│ 🎫 *Limit:* ${isCreator ? 'Infinite (Owner)' : user.limit}
+│ 💰 *Money:* Rp ${user.money.toLocaleString()}
+└───────────────`, { mentions: [sender] });
       }
       break
       

@@ -158,15 +158,48 @@ async function GroupUpdate(hc, m, store) {
   }
 }*/
 
-
-/*async function LoadDataBase(hc, m) {
-  
-}*/
+async function LoadDataBase(hc, m) {
+  try {
+    const botNumber = hc.user.id.split(':')[0] + '@s.whatsapp.net';
+    
+    global.db = global.db || {};
+    global.db.users = global.db.users || {};
+    global.db.groups = global.db.groups || {};
+    global.db.game = global.db.game || {};
+    global.db.set = global.db.set || {};
+    let user = global.db.users[m.sender] || {};
+    global.db.users[m.sender] = user;
+    const defaultUser = {
+      vip: false,
+      ban: false,
+      limit: settings.limit.free || 15,
+      money: settings.money.free || 10000,
+      lastclaim: Date.now(),
+    };
+    for (let key in defaultUser) {
+      if (!(key in user)) user[key] = defaultUser[key];
+    }
+    if (m.isGroup) {
+      let group = global.db.groups[m.chat] || {};
+      global.db.groups[m.chat] = group;
+      const defaultGroup = {
+        welcome: false,
+        antilink: false,
+        mute: false,
+      };
+      for (let key in defaultGroup) {
+        if (!(key in group)) group[key] = defaultGroup[key];
+      }
+    }
+  } catch (e) {
+    console.error("Error LoadDataBase:", e);
+  }
+}
 
 
 export {
   GroupUpdate,
-  //LoadDataBase,
+  LoadDataBase,
 };
 
 const watcher = chokidar.watch(hcPath, {
