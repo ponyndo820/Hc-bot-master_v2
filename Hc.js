@@ -1024,6 +1024,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}animemenu
 │${setv} ${prefix}toolsmenu
 │${setv} ${prefix}ownermenu
+│${setv} ${prefix}randommenu
 │${setv} ${prefix}quotesmenu
 │${setv} ${prefix}downloadermenu
 ╰────❍`;
@@ -1054,7 +1055,6 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}donasi
 │${setv} ${prefix}runtime
 │${setv} ${prefix}speedtest
-│${setv} ${prefix}randommenu
 │${setv} ${prefix}request (text)
 ╰────❍`)
       }
