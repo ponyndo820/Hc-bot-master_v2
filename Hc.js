@@ -116,9 +116,16 @@ async function Hc(hc, m, db) {
    const isPremium = isCreator || checkStatus(sender, premium) || false;
    const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;*/
    
-       // Sistem Limit Otomatis untuk Command (Kecuali Owner)
+    // Sistem Limit Otomatis untuk Command (Kecuali Owner)
     if (isCmd && !isCreator) {
+      db.users[sender] = db.users[sender] || {};
       let user = db.users[sender];
+      
+      // Berikan nilai default jika limit belum ada
+      if (typeof user.limit !== 'number') {
+        user.limit = settings.limit?.free || 15;
+      }
+      
       if (user.limit <= 0) {
         return reply(`⚠️ Limit harian kamu sudah habis! Silahkan tunggu reset atau mainkan game seperti *${prefix}tebakbom* untuk mendapatkan bonus money/limit.`);
       }
