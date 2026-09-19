@@ -20,7 +20,7 @@ import { getContentType, downloadMediaMessage, generateWAMessageFromContent, pro
 
 import { ytMp4 } from './lib/ytmp4.js';
 import settings from './settings.js';
-import { GroupUpdate, /*LoadDataBase*/ } from './src/message.js';
+import { GroupUpdate, LoadDataBase } from './src/message.js';
 import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
 import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime, sleep } from './lib/function.js';
 import { cmdAdd, cmdAddHit, addExpired, getPosition, getExpired, getStatus, getAllExpired, checkExpired } from './src/database.js';
