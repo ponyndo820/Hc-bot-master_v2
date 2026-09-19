@@ -1,5 +1,6 @@
 ![image alt](https://files.catbox.moe/9gxjhx.jpg)
-[![WhatsApp](https://img.shields.io/badge/WhatsApp-25D366?logo=whatsapp&logoColor=white)](https://wa.me/6285823709413)
+[![WhatsApp](https://img.shields.io/badge/WhatsApp-25D366?logo=whatsapp&logoColor=white)](https://wa.me/6285823709413) [![YouTube](https://img.shields.io/badge/YouTube-pink ?logo=youtube&logoColor=white)](https://youtube.com/@ponyndo?si=rMY2tSN5BbeNZWQ4)
+
 
 - Sc/Script ini masih dalam tahap pengembangan ❗
 - Terimakasih telah mengunjungi repositori ini.
