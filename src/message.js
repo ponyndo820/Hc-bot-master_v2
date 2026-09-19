@@ -24,6 +24,7 @@ const hcPath = fileURLToPath(new URL('../Hc.js', import.meta.url));
 
 let hcHandler = null;
 const botStartTime = Date.now();
+const groupMetadataTimers = {};
 const Timers = {};
 const reloadHandler = async () => {
   try {
@@ -88,7 +89,7 @@ async function GroupUpdate(hc, m, store) {
       if (!metadata.participants.some(a => (a.id === (normalizedTarget.id || normalizedTarget) || a.phoneNumber === (normalizedTarget.id || normalizedTarget)))) {
         clearTimeout(groupMetadataTimers[m.chat])
         groupMetadataTimers[m.chat] = setTimeout(async () => {
-          store.groupMetadata[m.chat] = await hc.groupMetadata(m.chat).catch(e => ({ ...store?.[m.chat] }));
+          store.groupMetadata[m.chat] = await hc.groupMetadata(m.chat).catch(e => ({ ...store.groupMetadata[m.chat] }));
         }, 5000);
       }
     } else if (type === 28 || type === 32) {

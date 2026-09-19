@@ -43,7 +43,7 @@ async function Hc(hc, m, db) {
     (type === 'extendedTextMessage') ? msg.extendedTextMessage?.text :
     (type === 'imageMessage') ? msg.imageMessage?.caption : 
     (type === 'videoMessage') ? msg.videoMessage?.caption : 
-    (type === 'interactiveResponMessage' && m.quoted) ? (m.message.interactiveResponseMessage?.nativeFlowResponseMessage?.singleSelectReply.selectrdRowId || '') : '';
+    (type === 'interactiveResponMessage' && m.quoted) ? (m.message.interactiveResponseMessage?.nativeFlowResponseMessage?.singleSelectReply.selectedRowId || "" ) : '';
     if (!body) return;
     
     const sender = m.key.remoteJid;
