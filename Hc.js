@@ -118,7 +118,7 @@ async function Hc(hc, m, db) {
     
         let pilih = '🌀', bomb = '💣';
     if (sender in tebakbom) {
-        if (!/^[1-9]|10$/i.test(body) && !isCmd && !isCreator) return !0;
+        if (!/^([1-9]|10)$/i.test(body) && !isCmd && !isCreator) return !0;
         let index = parseInt(body) - 1;
         if (tebakbom[sender].petak[index] === 1 || tebakbom[sender].petak[index] === 3) return !0;
         
@@ -960,12 +960,12 @@ async function Hc(hc, m, db) {
       case 'tebakbom': {
         if (tebakbom[sender]) return reply('Masih Ada Sesi Yang Belum Diselesaikan!')
         tebakbom[sender] = {
-          petak: [0,0,0,2,0,2,0,0].sort(() => Math.random() -0.5),
+          petak: [0,0,0,0,0,0,0,2,2,2].sort(() => Math.random() -0.5),
           board: ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'],
-					bomb: 3,
-					lolos: 7,
-					pick: 0,
-					nyawa: ['❤️', '❤️', '❤️'],
+          bomb: 3,
+          lolos: 7,
+          pick: 0,
+          nyawa: ['❤️', '❤️', '❤️'],
         }
         await reply(`*TEBAK BOM*\n\n${tebakbom[sender].board.join("")}\n\nPilih lah nomor tersebut! dan jangan sampai terkena Bom!\nBomb : ${tebakbom[sender].bomb}\nNyawa : ${tebakbom[sender].nyawa.join("")}`);
         await sleep(120000)
