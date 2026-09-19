@@ -504,14 +504,15 @@ async function Hc(hc, m, db) {
         let user = db.users[sender];
         if (typeof user.limit !== 'number') user.limit = settings.limit?.free || 15;
         if (typeof user.money !== 'number') user.money = settings.money?.free || 10000;
-        
+
         await reply(`┌── 📇 *USER PROFILE*
-│ 👤 *ID:* @${sender.split('@')[0]}
-│ 🎫 *Limit:* ${isCreator ? 'Infinite (Owner)' : user.limit}
+│ 👤 *Name:* @${sender.split('@')[0]}
+│ 🎫 *Limit:* ${isCreator ? '∞ (Infinite)' : user.limit}
 │ 💰 *Money:* Rp ${user.money.toLocaleString()}
 └───────────────`, { mentions: [sender] });
       }
       break
+
       
       // Random Images Menu
       case 'randomimage': case 'randomimg': case 'randomimages': {
