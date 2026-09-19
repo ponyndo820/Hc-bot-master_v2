@@ -13,15 +13,31 @@ import makeWaSocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCac
 
 import { Hc } from './Hc.js';
 import settings from './settings.js';
-import { createRequire } from 'module';
 import { printMessageLog } from './lib/function.js';
 import { dataBase, cmdDel, checkStatus } from './src/database.js';
 
-const require = createRequire(import.meta.url);
-const { makeInMemoryStore } = require('@whiskeysockets/baileys');
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 const question = (text) => new Promise((resolve) => rl.question(text, resolve));
-const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) });
+const simpleStore = {
+  messages: {},
+  bind(ev) {
+    ev.on('messages.upsert', ({ messages }) => {
+      for (const msg of messages) {
+        const jid = msg.key.remoteJid;
+        if (!this.messages[jid]) {
+          this.messages[jid] = { array: [] };
+        }
+        const chatStore = this.messages[jid];
+        if (!chatStore.array.some(m => m.key.id === msg.key.id)) {
+          chatStore.array.push(msg);
+          if (chatStore.array.length > 100) chatStore.array.shift();
+        }
+      }
+    });
+  }
+};
+
+const store = simpleStore;
 
 function displaySystemInfo() {
     console.log(chalk.red.bold(`
@@ -39,7 +55,7 @@ function displaySystemInfo() {
 
 async function startHcbot() {
   const dbConnector = dataBase(settings.tempatDB || 'database.json');
-  const { state, saveCreds } = await useMultiFileAuthState('Hc');
+  const { state, saveCreds } = await useMultiFileAuthState('sessions');
   const { version } = await fetchLatestBaileysVersion();
 
   try {
@@ -93,7 +109,6 @@ async function startHcbot() {
   
   const hc = makeWaSocket.default ? makeWaSocket.default(hcOptions) : makeWaSocket(hcOptions);
   
-  // Bind store ke events socket
   store.bind(hc.ev);
 
   if (!hc.authState.creds.registered) {
