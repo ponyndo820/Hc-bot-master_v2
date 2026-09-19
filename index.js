@@ -129,9 +129,38 @@ async function startHcbot() {
       startHcbot();
     } else if (connection === 'open') {
       console.log(chalk.yellowBright(`[SYSTEM] ${settings.botName} Berhasil Terhubung!`));
+      
+      // AUTO BACKUP DATABASE (Setiap 6 Jam)
+      setInterval(async () => {
+          let dbPath = path.join(process.cwd(), 'database', settings.tempatDB || 'database.json');
+          
+          if (fs.existsSync(dbPath)) {
+              let ownerJid = settings.ownerNumber[0] + '@s.whatsapp.net';
+              await hc.sendMessage(ownerJid, {
+                  document: fs.readFileSync(dbPath),
+                  mimetype: 'application/json',
+                  fileName: `Backup_DB_${new Date().toISOString().split('T')[0]}.json`,
+                  caption: '📂 *AUTO BACKUP DATABASE*\nBerikut adalah file cadangan database otomatis bot (Interval 6 Jam).'
+              });
+              console.log(chalk.green('[SYSTEM] Auto Backup Database berhasil dikirim ke Owner.'));
+          }
+      }, 6 * 60 * 60 * 1000);
+      
+      // AUTO RESET LIMIT (Tepat Pukul 00:00)
+      setInterval(() => {
+          let now = new Date();
+          if (now.getHours() === 0 && now.getMinutes() === 0 && now.getSeconds() === 0) {
+              if (global.db && global.db.users) {
+                  for (let user in global.db.users) {
+                      global.db.users[user].limit = settings.limit.free;
+                  }
+                  console.log(chalk.green('[SYSTEM] Limit harian semua user telah di-reset!'));
+                  dbConnector.write(global.db);
+              }
+          }
+      }, 1000);
     }
   });
-  
   hc.ev.on('messages.upsert', async (chatUpdate) => {
     try {
       const m = chatUpdate.messages[0];
