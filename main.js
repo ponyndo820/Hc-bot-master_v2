@@ -8,35 +8,25 @@ import path from 'path';
 import chalk from 'chalk';
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
-import { watchFile, unwatchFile } from 'fs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function main() {
-  let args = [path.join(__dirname, 'index.js'), ...process.argv.slice(2)]
+  let args = [path.join(__dirname, 'index.js'), ...process.argv.slice(2)];
   let p = spawn(process.argv[0], args, {
-    stdio: ['inherit', 'inherit', 'ipc']
-  }).on('message', data =>{
-    if (data === 'reset') {
-      console.log(chalk.yellow.bold('[BOT]Memulaiulang...'))
-      p.kill()
-      setTimeout(() => {
-        main()
-      }, 1000);
-      
-    } else if (data === 'uptime') {
-      p.send(process.uptime())
-    }
-  }).on('exit', code => {
+    stdio: ['inherit', 'inherit', 'inherit']
+  });
+  p.on('exit', code => {
     if (code !== 0) {
-      console.error(chalk.red.bold(`[BOT] Keluar dengan kode: ${code}`));
+      console.error(chalk.red.bold(`[BOT] Keluar dengan kode: ${code}, memuat ulang bot...`));
       setTimeout(() => {
-        main()
+        main();
       }, 2000);
     } else {
-      console.log(chalk.green.bold('[BOT] Proses berakhir dengan bersih. Sampai jumpa!'))
-      process.exit(0)
+      console.log(chalk.green.bold('[BOT] Proses berakhir dengan bersih. Sampai jumpa!'));
+      process.exit(0);
     }
-  })
+  });
 }
-main()
+
+main();
