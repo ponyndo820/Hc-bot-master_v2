@@ -527,7 +527,7 @@ async function Hc(hc, m, db) {
       case 'limit': case 'balance': case 'money': {
         const targetSender = m.key.participant || m.sender || sender;
         if (!db.users[targetSender]) {
-          db.users[targetSender] = { limit: 10, money: 0 }; // Default data jika belum terdaftar
+          db.users[targetSender] = { limit: 10, money: 10000 };
         }
         let user = db.users[targetSender];
         const userTag = targetSender.includes('@s.whatsapp.net') ? targetSender : `${targetSender.split('@')[0]}@s.whatsapp.net`;
@@ -539,7 +539,6 @@ async function Hc(hc, m, db) {
 └───────────────`, { mentions: [userTag] });
       }
       break
-
       
       // Random Images Menu
       case 'randomimage': case 'randomimg': case 'randomimages': {
