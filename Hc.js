@@ -55,7 +55,10 @@ async function Hc(hc, m, db) {
     const isCmd = !!prefixUsed;
     const prefix = isCmd ? prefixUsed : '';
     
-    if (!isCmd && !global.activeAutoAI.has(sender)) return;
+    let tebakbom = db.game?.tebakbom || {};
+    
+    if (!isCmd && !global.activeAutoAI.has(sender) && !(sender in tebakbom)) return;
+    
     if (isCmd) {
       await hc.sendPresenceUpdate('composing', sender);
       
@@ -110,9 +113,6 @@ async function Hc(hc, m, db) {
    const isLimit = isCreator || (db.users[sender]?.limit > 0 || false);
    const isPremium = isCreator || checkStatus(sender, premium) || false;
    const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;*/
-   
-   
-    let tebakbom = db.game?.tebakbom || {}; 
     
     let pilih = '🌀', bomb = '💣';
     if (sender in tebakbom) {
