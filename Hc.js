@@ -116,14 +116,17 @@ async function Hc(hc, m, db) {
    const isPremium = isCreator || checkStatus(sender, premium) || false;
    const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;*/
    
+   
     const freeCmd = settings.bypasslimit || [];
     
     // Sistem Limit
+    global.tebakbom = global.tebakbom || {};
     if (isCmd && !isCreator && !freeCmd.includes(command)) {
+      db.users = db.users || {};
       db.users[sender] = db.users[sender] || {};
       let user = db.users[sender];
       
-      if (typeof user.limit !== 'number') {
+      if (typeof user.limit !== 'number' || isNaN(user.limit)) {
         user.limit = settings.limit?.free || 15;
       }
       
@@ -132,52 +135,72 @@ async function Hc(hc, m, db) {
       }
       user.limit -= 1;
     }
-
-   
-   // Tebak Bom
-   let pilih = '🌀', bomb = '💣';
-    if (sender in tebakbom) {
-        if (!/^([1-9]|10)$/i.test(body) && !isCmd && !isCreator) return !0;
-        let index = parseInt(body) - 1;
-        if (tebakbom[sender].petak[index] === 1 || tebakbom[sender].petak[index] === 3) return !0;
-        
-        if (tebakbom[sender].petak[index] === 2) {
-            tebakbom[sender].petak[index] = 3;
-            tebakbom[sender].board[index] = bomb;
-            tebakbom[sender].pick++;
-            await react('❌');
-            tebakbom[sender].bomb--;
-            tebakbom[sender].nyawa.pop();
-            let brd = tebakbom[sender].board;
-            
-            if (tebakbom[sender].nyawa.length < 1) {
-                await reply(`*GAME TELAH BERAKHIR*\nKamu terkena bomb\n\n ${brd.join('')}\n\n*Terpilih :* ${tebakbom[sender].pick}\n_Pengurangan Limit : 1_`);
-                await react('😂');
-                delete tebakbom[sender];
-            } else {
-                await reply(`*PILIH ANGKA*\n\nKamu terkena bomb\n ${brd.join('')}\n\nTerpilih: ${tebakbom[sender].pick}\nSisa nyawa: ${tebakbom[sender].nyawa.join('')}`);
-            }
+    
+    // Tebak bom
+    let pilih = '🌀', bomb = '💣';
+    
+    if (sender in global.tebakbom) {
+        let textBody = (body || '').trim();
+        const isNumberInput = /^([1-9]|10)$/.test(textBody);
+        if (!isNumberInput) {
+            if (isCmd) return;
             return !0;
         }
-        
-        if (tebakbom[sender].petak[index] === 0) {
-            tebakbom[sender].petak[index] = 1;
-            tebakbom[sender].board[index] = pilih;
-            tebakbom[sender].pick++;
-            tebakbom[sender].lolos--;
-            let brd = tebakbom[sender].board;
+        let index = parseInt(textBody) - 1;
+        let game = global.tebakbom[sender];
+        if (index >= 0 && index < game.petak.length) {
             
-            if (tebakbom[sender].lolos < 1) {
-                if (db && db.users && db.users[sender]) db.users[sender].money += 6000;
+            if (game.petak[index] === 1 || game.petak[index] === 3) {
+                await reply('⚠️ Petak ini sudah pernah kamu buka! Pilih angka lain yang belum dibuka.');
+                return !0;
+            }
+            
+            if (game.petak[index] === 2) {
+                game.petak[index] = 3;
+                game.board[index] = bomb;
+                game.pick++;
+                game.bomb--;
+                game.nyawa.pop();
                 
-                await reply(`*KAMU HEBAT ಠ⁠ᴥ⁠ಠ*\n\n${brd.join('')}\n\n*Terpilih :* ${tebakbom[sender].pick}\n*Sisa nyawa :* ${tebakbom[sender].nyawa.join('')}\n*Bomb :* ${tebakbom[sender].bomb}\nBonus Money 💰 *+6000*`);
-                delete tebakbom[sender];
-            } else {
-                await reply(`*PILIH ANGKA*\n\n${brd.join('')}\n\nTerpilih : ${tebakbom[sender].pick}\nSisa nyawa : ${tebakbom[sender].nyawa.join('')}\nBomb : ${tebakbom[sender].bomb}`);
+                try { await react('❌'); } catch (e) {}
+                
+                let brd = game.board;
+                
+                if (game.nyawa.length < 1) {
+                    if (db && db.users && db.users[sender] && !isCreator) {
+                        db.users[sender].limit = Math.max(0, (db.users[sender].limit || 0) - 1);
+                    }
+                    await reply(`*GAME TELAH BERAKHIR*\nKamu terkena bomb\n\n ${brd.join('')}\n\n*Terpilih :* ${game.pick}\n_Pengurangan Limit : 1_`);
+                    try { await react('😂'); } catch (e) {}
+                    
+                    delete global.tebakbom[sender];
+                } else {
+                    await reply(`*PILIH ANGKA*\n\nKamu terkena bomb\n ${brd.join('')}\n\nTerpilih: ${game.pick}\nSisa nyawa: ${game.nyawa.join('')}`);
+                }
+                return !0;
+            }
+            if (game.petak[index] === 0) {
+                game.petak[index] = 1;
+                game.board[index] = pilih;
+                game.pick++;
+                game.lolos--;
+                let brd = game.board;
+                
+                if (game.lolos < 1) {
+                    if (db && db.users && db.users[sender]) {
+                        db.users[sender].money = (db.users[sender].money || 0) + 6000;
+                    }
+                    
+                    await reply(`*KAMU HEBAT ಠ⁠ᴥ⁠ಠ*\n\n${brd.join('')}\n\n*Terpilih :* ${game.pick}\n*Sisa nyawa :* ${game.nyawa.join('')}\n*Bomb :* ${game.bomb}\nBonus Money 💰 *+6000*`);
+                    
+                    delete global.tebakbom[sender];
+                } else {
+                    await reply(`*PILIH ANGKA*\n\n${brd.join('')}\n\nTerpilih : ${game.pick}\nSisa nyawa : ${game.nyawa.join('')}\nBomb : ${game.bomb}`);
+                }
+                return !0;
             }
         }
     }
-
     
     // Add case command di sini
     switch (command) {

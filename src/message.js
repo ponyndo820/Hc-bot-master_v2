@@ -160,35 +160,65 @@ async function GroupUpdate(hc, m, store) {
 
 async function LoadDataBase(hc, m) {
   try {
-    const botNumber = hc.user.id.split(':')[0] + '@s.whatsapp.net';
+    if (!m || !m.sender) return;
+    
+    const sender = m.sender;
+    const chat = m.chat || m.key?.remoteJid;
+    const isGroup = m.isGroup || chat?.endsWith('@g.us');
+    const isCreator = m.key?.fromMe || (Array.isArray(settings.ownerNumber) && settings.ownerNumber.some(owner => sender.includes(owner)));
     
     global.db = global.db || {};
     global.db.users = global.db.users || {};
     global.db.groups = global.db.groups || {};
     global.db.game = global.db.game || {};
     global.db.set = global.db.set || {};
-    let user = global.db.users[m.sender] || {};
-    global.db.users[m.sender] = user;
+    
+    let user = global.db.users[sender];
+    if (!user || typeof user !== 'object') {
+      user = {};
+      global.db.users[sender] = user;
+    }
     const defaultUser = {
-      vip: false,
+      vip: isCreator,
       ban: false,
-      limit: settings.limit.free || 15,
-      money: settings.money.free || 10000,
+      limit: isCreator ? 999999999 : (settings.limit?.free || 15),
+      money: isCreator ? 999999999 : (settings.money?.free || 10000),
       lastclaim: Date.now(),
     };
     for (let key in defaultUser) {
-      if (!(key in user)) user[key] = defaultUser[key];
+      if (!(key in user) || user[key] === undefined || user[key] === null) {
+        user[key] = defaultUser[key];
+      }
     }
-    if (m.isGroup) {
-      let group = global.db.groups[m.chat] || {};
-      global.db.groups[m.chat] = group;
+    if (isCreator) {
+      user.vip = true;
+      user.limit = 999999999;
+      if (typeof user.money !== 'number' || user.money < 1000000) {
+        user.money = 999999999;
+      }
+    } else {
+      if (typeof user.money !== 'number' || isNaN(user.money)) {
+        user.money = settings.money?.free || 10000;
+      }
+      if (typeof user.limit !== 'number' || isNaN(user.limit)) {
+        user.limit = settings.limit?.free || 15;
+      }
+    }
+    if (isGroup && chat) {
+      let group = global.db.groups[chat];
+      if (!group || typeof group !== 'object') {
+        group = {};
+        global.db.groups[chat] = group;
+      }
       const defaultGroup = {
         welcome: false,
         antilink: false,
         mute: false,
       };
       for (let key in defaultGroup) {
-        if (!(key in group)) group[key] = defaultGroup[key];
+        if (!(key in group) || group[key] === undefined || group[key] === null) {
+          group[key] = defaultGroup[key];
+        }
       }
     }
   } catch (e) {
