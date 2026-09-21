@@ -150,6 +150,8 @@ async function Hc(hc, m, db) {
         let game = global.tebakbom[sender];
         if (index >= 0 && index < game.petak.length) {
             
+            const userJid = participant || sender;
+            
             if (game.petak[index] === 1 || game.petak[index] === 3) {
                 await reply('⚠️ Petak ini sudah pernah kamu buka! Pilih angka lain yang belum dibuka.');
                 return !0;
@@ -167,9 +169,17 @@ async function Hc(hc, m, db) {
                 let brd = game.board;
                 
                 if (game.nyawa.length < 1) {
-                    if (db && db.users && db.users[sender] && !isCreator) {
-                        db.users[sender].limit = Math.max(0, (db.users[sender].limit || 0) - 1);
+                    if (db) {
+                        db.users = db.users || {};
+                        db.users[userJid] = db.users[userJid] || { 
+                            limit: settings.limit?.free || 15, 
+                            money: settings.money?.free || 10000 
+                        };
+                        if (!isCreator) {
+                            db.users[userJid].limit = Math.max(0, (db.users[userJid].limit || 0) - 1);
+                        }
                     }
+                    
                     await reply(`*GAME TELAH BERAKHIR*\nKamu terkena bomb\n\n ${brd.join('')}\n\n*Terpilih :* ${game.pick}\n_Pengurangan Limit : 1_`);
                     try { await react('😂'); } catch (e) {}
                     
@@ -187,8 +197,13 @@ async function Hc(hc, m, db) {
                 let brd = game.board;
                 
                 if (game.lolos < 1) {
-                    if (db && db.users && db.users[sender]) {
-                        db.users[sender].money = (db.users[sender].money || 0) + 6000;
+                    if (db) {
+                        db.users = db.users || {};
+                        db.users[userJid] = db.users[userJid] || { 
+                            limit: settings.limit?.free || 15, 
+                            money: settings.money?.free || 10000 
+                        };
+                        db.users[userJid].money = (db.users[userJid].money || 0) + 6000;
                     }
                     
                     await reply(`*KAMU HEBAT ಠ⁠ᴥ⁠ಠ*\n\n${brd.join('')}\n\n*Terpilih :* ${game.pick}\n*Sisa nyawa :* ${game.nyawa.join('')}\n*Bomb :* ${game.bomb}\nBonus Money 💰 *+6000*`);
@@ -586,19 +601,38 @@ async function Hc(hc, m, db) {
       }
       break
       case 'buylimit': {
-        db.users[sender] = db.users[sender] || {};
-        let user = db.users[sender];
-        let count = args[0] ? parseInt(args[0]) : 1;
-        let hargaPerLimit = 500; // Harga 1 limit = Rp 500
-        let totalHarga = hargaPerLimit * count;
+        const userJid = participant || sender;
         
-        if (isNaN(count) || count < 1) return reply(`Masukkan jumlah limit yang ingin dibeli.\nContoh: *${prefix}buylimit 5*`);
-        if (user.money < totalHarga) return reply(`⚠️ Uang kamu tidak cukup.\nKamu butuh *Rp ${totalHarga.toLocaleString('id-ID')}* untuk membeli ${count} limit.\nSisa uangmu: Rp ${user.money.toLocaleString('id-ID')}`);
+        global.db = global.db || {};
+        global.db.users = global.db.users || {};
         
-        user.money -= totalHarga;
+        if (!global.db.users[userJid]) {
+          global.db.users[userJid] = { 
+            limit: settings.limit?.free || 15, 
+            money: settings.money?.free || 10000 
+            
+          };
+        }
+        let user = global.db.users[userJid];
+        let count = args[0] ? Math.floor(parseInt(args[0])) : 1;
+        
+        if (isNaN(count) || count < 1) {
+          return reply('⚠️ Masukkan jumlah limit yang valid!\n\n*Contoh:* .buylimit 5');
+          
+        }
+        const hargaPerLimit = 500;
+        let harga = hargaPerLimit * count;
+        user.money = typeof user.money === 'number' ? user.money : 0;
+        user.limit = typeof user.limit === 'number' ? user.limit : 0;
+        
+        if (user.money < harga) {
+          return reply(`❌ Uang kamu tidak cukup!\nHarga *${count} limit* adalah *Rp ${harga.toLocaleString('id-ID')}*\nUang kamu saat ini: *Rp ${user.money.toLocaleString('id-ID')}*`);
+        }
+        user.money -= harga;
         user.limit += count;
         
-        reply(`✅ Berhasil membeli *${count} limit* seharga *Rp ${totalHarga.toLocaleString('id-ID')}*.\n\n🎫 Limit sekarang: ${user.limit}\n💰 Sisa uang: Rp ${user.money.toLocaleString('id-ID')}`);
+        await reply(`✅ Berhasil membeli *${count} limit* seharga *Rp ${harga.toLocaleString('id-ID')}*.\n\n📊 Limit sekarang: *${user.limit}*\n💰 Sisa uang: *Rp ${user.money.toLocaleString('id-ID')}*`);
+        
       }
       break
       
