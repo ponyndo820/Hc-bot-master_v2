@@ -24,12 +24,15 @@ const settings = {
   listv: ['•','●','■','✿','▲','➩','➢','➣','➤','✦','✧','△','❀','○','□','♤','♡','◇','♧','々','〆'],
   
   // Daftar command yang bebas limit (tidak mengurangi limit)
-  bypasslimit: [
-    'limit', 'balance', 'money', 'buylimit', 
-    'menu', 'allmenu', 'botmenu', 'toolsmenu', 
-    'ownermenu', 'randommenu', 'quotesmenu', 
-    'downloadermenu', 'donasi'
-  ]
+    bypasslimit: [
+    'menu', 'allmenu', 'botmenu', 'ownermenu', 'quotesmenu', 
+    'toolsmenu', 'animemenu', 'downloadermenu', 'searchmenu', 
+    'aimenu', 'randommenu', 'gamemenu', 'runtime', 'tes', 
+    'bot', 'sc', 'script', 'donasi', 'donate', 'tagme', 
+    'req', 'request', 'speedtest', 'speed', 'limit', 
+    'balance', 'money', 'buylimit', 'shutdown', 'off', 
+    'setgemini', 'setapikeygemini'
+  ],
 }
 
 settings.my = {
