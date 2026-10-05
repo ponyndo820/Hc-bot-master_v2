@@ -876,18 +876,23 @@ async function Hc(hc, m, db) {
         
         if (!igUrl) return reply(`Example: ${prefix + command} url_instagram\nAtau reply pesan yang memiliki link Instagram!`);
         
-        // --- PERBAIKAN PENTING ---
-        // Membersihkan link dari parameter pelacakan (?igsh=... atau ?stkn=...)
+        // Membersihkan link dari parameter pelacakan agar mudah dibaca API
         igUrl = igUrl.split('?')[0]; 
         
         await react('⏳');
         try {
-          // Menggunakan API Ryzendesu yang lebih stabil & tangguh untuk IG
-          const res = await fetch(`https://api.ryzendesu.vip/api/downloader/igdl?url=${encodeURIComponent(igUrl)}`);
-          const json = await res.json();
+          // Kembali menggunakan API Siputzx
+          const res = await fetch(`https://api.siputzx.my.id/api/d/igdl?url=${igUrl}`);
           
-          // Mengambil array media (mendukung multiple foto/video dalam 1 post)
-          let mediaList = json.data || json.url || json.result; 
+          // PENCEGAHAN CRASH: Cek apakah respons dari server adalah JSON atau HTML
+          const contentType = res.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+             await react('❌');
+             return reply('❌ Gagal terhubung ke API. Server penyedia data sedang offline atau bermasalah (menerima HTML, bukan JSON).');
+          }
+
+          const json = await res.json();
+          let mediaList = json.data || json.result; 
           
           if (!mediaList || mediaList.length === 0) {
              await react('❌');
@@ -907,13 +912,13 @@ async function Hc(hc, m, db) {
             await hc.sendMessage(sender, { video: { url: mediaList }, caption: '*By: Heart candy*' }, { quoted: m });
           } else {
              await react('❌');
-             return reply('❌ Format media Instagram tidak dikenali.');
+             return reply('❌ Format media Instagram tidak dikenali oleh sistem.');
           }
           await react('✅');
         } catch (err) {
           console.error("Error Instagram:", err);
           await react('❌');
-          reply('❌ Terjadi kesalahan sistem saat mendownload media Instagram.');
+          reply('❌ Terjadi kesalahan saat memproses permintaan download.');
         }
       }
       break
