@@ -472,26 +472,31 @@ async function Hc(hc, m, db) {
       }
       break
       case 'toptv': case 'ptv': {
-        const q = m.quoted ? m.quoted : m;
-        
-        let mime = (q.msg || q).mimetype || q.mediaType || '';
-        if (!mime && q.message) {
-          if (q.message.videoMessage) mime = 'video/mp4';
-        }
-        if (m.quoted && m.quoted.message && m.quoted.message.videoMessage) {
-          mime = 'video/mp4';
+        const checkQuoted = m.message.extendedTextMessage?.contextInfo?.quotedMessage;
+        if (!checkQuoted) {
+          return reply(`Silakan reply video dengan caption ${prefix + command} untuk mengubahnya menjadi PTV!`);
         }
         
-        if (!mime && m.quoted && m.quoted.mimetype) {
-          mime = m.quoted.mimetype;
-        }
-        if (!mime || !mime.includes('video')) {
-          return reply(`Kirim atau reply video dengan caption ${prefix + command} untuk mengubahnya menjadi PTV!`);
+        const citatedMessage = m.message.extendedTextMessage.contextInfo;
+        const targetMsg = {
+          key: {
+            remoteJid: sender,
+            fromMe: false,
+            id: citatedMessage.stanzaId,
+            participant: citatedMessage.participant || sender
+          },
+          message: citatedMessage.quotedMessage
+        };
+        const mediaType = getContentType(targetMsg.message);
+        if (!mediaType || !mediaType.includes('video')) {
+          return reply(`Pesan yang Anda reply bukan video! Kirim atau reply video dengan caption ${prefix + command}.`);
         }
         
         await react('⏳');
         try {
-          const mediaBuffer = typeof q.download === 'function' ? await q.download() : await m.quoted.download();
+          
+          const mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+          if (!mediaBuffer) throw new Error('Gagal mengunduh buffer media.');
           
           const ptvBuffer = await toPTV(mediaBuffer, 'mp4');
           
@@ -509,7 +514,7 @@ async function Hc(hc, m, db) {
           reply(`❌ Gagal mengonversi video menjadi PTV: ${err.message || 'Terjadi kesalahan sistem.'}`);
         }
       }
-      break
+      break;
 
       
       //Bot Menu
