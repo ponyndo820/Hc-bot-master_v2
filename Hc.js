@@ -473,15 +473,25 @@ async function Hc(hc, m, db) {
       break
       case 'toptv': case 'ptv': {
         const q = m.quoted ? m.quoted : m;
-        const mime = (q.msg || q).mimetype || '';
         
+        let mime = (q.msg || q).mimetype || q.mediaType || '';
+        if (!mime && q.message) {
+          if (q.message.videoMessage) mime = 'video/mp4';
+        }
+        if (m.quoted && m.quoted.message && m.quoted.message.videoMessage) {
+          mime = 'video/mp4';
+        }
+        
+        if (!mime && m.quoted && m.quoted.mimetype) {
+          mime = m.quoted.mimetype;
+        }
         if (!mime || !mime.includes('video')) {
           return reply(`Kirim atau reply video dengan caption ${prefix + command} untuk mengubahnya menjadi PTV!`);
         }
         
         await react('⏳');
         try {
-          const mediaBuffer = await q.download();
+          const mediaBuffer = typeof q.download === 'function' ? await q.download() : await m.quoted.download();
           
           const ptvBuffer = await toPTV(mediaBuffer, 'mp4');
           
@@ -500,6 +510,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
+
       
       //Bot Menu
       case 'sc': case 'script': {
