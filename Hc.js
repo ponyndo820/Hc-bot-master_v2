@@ -1350,8 +1350,8 @@ Bot ini masih di kembangkan.\nTerima kasih telah menggunakan bot whatsapp kami.`
           isForwarded: true,
           forwardedNewsletterMessageInfo: {
             newsletterJid: settings.my.ch,
-            newsletterName: 'Heart candy Official Channel',
-            serverMessageId: 100
+            newsletterName: 'Join For More Info',
+            serverMessageId: null
           }
         };
         try {
