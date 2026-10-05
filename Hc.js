@@ -502,9 +502,8 @@ async function Hc(hc, m, db) {
           
           await hc.sendMessage(sender, { 
             video: ptvBuffer, 
-            ptt: true,
-            seconds: 60,
-            pvs: true 
+            ptv: true,
+            seconds: 60
           }, { quoted: m });
           
           await react('✅');
@@ -514,8 +513,7 @@ async function Hc(hc, m, db) {
           reply(`❌ Gagal mengonversi video menjadi PTV: ${err.message || 'Terjadi kesalahan sistem.'}`);
         }
       }
-      break;
-
+      break
       
       //Bot Menu
       case 'sc': case 'script': {
