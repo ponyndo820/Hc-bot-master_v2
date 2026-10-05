@@ -878,19 +878,15 @@ async function Hc(hc, m, db) {
         
         await react('⏳');
         try {
-          const res = await fetch(`https://api.yanzbotz.live/api/downloader/instagram?url=${igUrl}`);
-          
-          const contentType = res.headers.get("content-type");
-          if (!contentType || !contentType.includes("application/json")) {
-            return reply('❌ Server API Instagram sedang gangguan. Coba beberapa saat lagi.');
-            await react('❌')
-          }
-          
+          // MENGGUNAKAN API SIPUTZX SEBAGAI PENGGANTI YANZBOTZ
+          const res = await fetch(`https://api.siputzx.my.id/api/d/igdl?url=${igUrl}`);
           const json = await res.json();
-          console.log("Respon API IG Yanzhost:", json);
           
-          let mediaList = json.result || json.data; 
-          if (!mediaList || mediaList.length === 0) return reply('❌ Gagal mengambil data! Pastikan link valid dan akun tidak di-private.');
+          let mediaList = json.data || json.result; 
+          if (!mediaList || mediaList.length === 0) {
+             await react('❌');
+             return reply('❌ Gagal mengambil data! Pastikan link valid dan akun tidak di-private.');
+          }
           
           if (Array.isArray(mediaList)) {
             for (let media of mediaList) {
@@ -903,7 +899,7 @@ async function Hc(hc, m, db) {
             }
           } else if (typeof mediaList === 'string') {
             await hc.sendMessage(sender, { video: { url: mediaList }, caption: '*By: Heart candy*' }, { quoted: m });
-            await react('✅')
+            await react('✅');
           } else {
             return reply('❌ Format media Instagram tidak dikenali.');
           }
@@ -913,8 +909,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
-
-
+      
       // Search Menu
       case 'search': case 'yts': case 'ytsearch': case 'play': {
         if (!text) return reply(`Masukkan kata kunci pencarian!\nContoh: *${prefix}search mlp*`);
@@ -1304,7 +1299,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}tebakbom
 ╰┬───❍
 ╭┴─❍ *TOOLS*
-│${setv} ${prefix}ssweb
+│${setv} ${prefix}ssweb (url)
 │${setv} ${prefix}brat
 │${setv} ${prefix}bratvid
 │${setv} ${prefix}draw (prompt)
