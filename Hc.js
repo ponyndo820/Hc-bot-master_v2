@@ -22,7 +22,7 @@ import { ytMp4 } from './lib/ytmp4.js';
 import settings from './settings.js';
 import { igdl } from './lib/igdl.js';
 import { GroupUpdate, LoadDataBase } from './src/message.js';
-import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
+import { writeExif, toAudio, toPTT, toPTV, toVideo } from './lib/converter.js';
 import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime, sleep } from './lib/function.js';
 import { cmdAdd, cmdAddHit, addExpired, getPosition, getExpired, getStatus, getAllExpired, checkExpired } from './src/database.js';
 
@@ -469,6 +469,35 @@ async function Hc(hc, m, db) {
             reply('❌ Terjadi kesalahan saat mengirim hasil screenshot.');
           }
         });
+      }
+      break
+      case 'toptv': case 'ptv': {
+        const q = m.quoted ? m.quoted : m;
+        const mime = (q.msg || q).mimetype || '';
+        
+        if (!mime || !mime.includes('video')) {
+          return reply(`Kirim atau reply video dengan caption ${prefix + command} untuk mengubahnya menjadi PTV!`);
+        }
+        
+        await react('⏳');
+        try {
+          const mediaBuffer = await q.download();
+          
+          const ptvBuffer = await toPTV(mediaBuffer, 'mp4');
+          
+          await hc.sendMessage(sender, { 
+            video: ptvBuffer, 
+            ptt: false,
+            seconds: 60,
+            pvs: true 
+          }, { quoted: m });
+          
+          await react('✅');
+        } catch (err) {
+          console.error("Error toPTV:", err);
+          await react('❌');
+          reply(`❌ Gagal mengonversi video menjadi PTV: ${err.message || 'Terjadi kesalahan sistem.'}`);
+        }
       }
       break
       
