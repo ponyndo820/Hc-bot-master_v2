@@ -1291,9 +1291,11 @@ async function Hc(hc, m, db) {
       case 'allmenu': {
         await react('✨');
         const menuText =`*━━━━━━━━━━━━━━━━━━━━*
-              🌈 *Hc-bot* 🌈
+              🌈 *HC-BOT* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
+📌 *Saluran Bot:* ${settings.my.ch}
+
 ╭──❍ *BOT*
 │${setv} ${prefix}sc
 │${setv} ${prefix}limit
@@ -1359,6 +1361,7 @@ Bot ini masih di kembangkan.\nTerima kasih telah menggunakan bot whatsapp kami.`
         }
       }
       break
+
       
     } // Penutup case command
   } catch (err) {

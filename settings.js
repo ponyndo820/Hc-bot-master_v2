@@ -36,10 +36,10 @@ const settings = {
 }
 
 settings.my = {
-  yt: '',
-  gh: '',
-  gc: '',
-  ch: '',
+	yt: 'https://youtube.com/@ponyndo?si=k9PQEkINzEREkE6p',
+	gh: 'https://github.com/ponyndo820/Hc-bot',
+	gc: 'https://chat.whatsapp.com/E50d9VEtLnc3acHPFeRdqY?mode=gi_t',
+	ch: '120363421709200388@newsletter',
 }
 
 settings.mess = {
