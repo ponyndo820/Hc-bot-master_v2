@@ -20,6 +20,7 @@ import { getContentType, downloadMediaMessage, generateWAMessageFromContent, pro
 
 import { ytMp4 } from './lib/ytmp4.js';
 import settings from './settings.js';
+import { igdl } from './lib/igdl.js';
 import { GroupUpdate, LoadDataBase } from './src/message.js';
 import { writeExif, toAudio, toPTT, toVideo } from './lib/converter.js';
 import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime, sleep } from './lib/function.js';
@@ -876,54 +877,35 @@ async function Hc(hc, m, db) {
         
         if (!igUrl) return reply(`Example: ${prefix + command} url_instagram\nAtau reply pesan yang memiliki link Instagram!`);
         
-        // Membersihkan link dari parameter pelacakan agar mudah dibaca API
         igUrl = igUrl.split('?')[0]; 
         
         await react('⏳');
         try {
-          // Kembali menggunakan API Siputzx
-          const res = await fetch(`https://api.siputzx.my.id/api/d/igdl?url=${igUrl}`);
+          const result = await igdl(igUrl);
           
-          // PENCEGAHAN CRASH: Cek apakah respons dari server adalah JSON atau HTML
-          const contentType = res.headers.get("content-type");
-          if (!contentType || !contentType.includes("application/json")) {
-             await react('❌');
-             return reply('❌ Gagal terhubung ke API. Server penyedia data sedang offline atau bermasalah (menerima HTML, bukan JSON).');
-          }
-
-          const json = await res.json();
-          let mediaList = json.data || json.result; 
-          
-          if (!mediaList || mediaList.length === 0) {
+          if (!result || !result.media || result.media.length === 0) {
              await react('❌');
              return reply('❌ Gagal mengambil data! Pastikan link valid dan akun tidak di-private.');
           }
           
-          if (Array.isArray(mediaList)) {
-            for (let media of mediaList) {
-              let urlMedia = media.url || media; 
-              if (typeof urlMedia === 'string' && (urlMedia.includes('.mp4') || urlMedia.includes('video'))) {
-                await hc.sendMessage(sender, { video: { url: urlMedia }, caption: '*By: Heart candy*' }, { quoted: m });
-              } else {
-                await hc.sendMessage(sender, { image: { url: urlMedia }, caption: '*By: Heart candy*' }, { quoted: m });
-              }
+          const authorName = result.author?.username && result.author.username !== '-' ? result.author.username : 'Instagram';
+          
+          for (let item of result.media) {
+            if (item.type === 'video') {
+              await hc.sendMessage(sender, { video: { url: item.download }, caption: `*👤 Author:* ${authorName}\n*By: Heart candy*` }, { quoted: m });
+            } else {
+              await hc.sendMessage(sender, { image: { url: item.download }, caption: `*👤 Author:* ${authorName}\n*By: Heart candy*` }, { quoted: m });
             }
-          } else if (typeof mediaList === 'string') {
-            await hc.sendMessage(sender, { video: { url: mediaList }, caption: '*By: Heart candy*' }, { quoted: m });
-          } else {
-             await react('❌');
-             return reply('❌ Format media Instagram tidak dikenali oleh sistem.');
           }
           await react('✅');
         } catch (err) {
-          console.error("Error Instagram:", err);
+          console.error("Error Instagram Lokal:", err);
           await react('❌');
-          reply('❌ Terjadi kesalahan saat memproses permintaan download.');
+          reply(`❌ Terjadi kesalahan: ${err.message || 'Gagal memproses permintaan download.'}`);
         }
       }
       break
 
-      
       // Search Menu
       case 'search': case 'yts': case 'ytsearch': case 'play': {
         if (!text) return reply(`Masukkan kata kunci pencarian!\nContoh: *${prefix}search mlp*`);
