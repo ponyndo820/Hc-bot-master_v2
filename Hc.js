@@ -502,7 +502,7 @@ async function Hc(hc, m, db) {
           
           await hc.sendMessage(sender, { 
             video: ptvBuffer, 
-            ptt: false,
+            ptt: true,
             seconds: 60,
             pvs: true 
           }, { quoted: m });
