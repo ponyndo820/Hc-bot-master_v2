@@ -876,13 +876,19 @@ async function Hc(hc, m, db) {
         
         if (!igUrl) return reply(`Example: ${prefix + command} url_instagram\nAtau reply pesan yang memiliki link Instagram!`);
         
+        // --- PERBAIKAN PENTING ---
+        // Membersihkan link dari parameter pelacakan (?igsh=... atau ?stkn=...)
+        igUrl = igUrl.split('?')[0]; 
+        
         await react('⏳');
         try {
-          // MENGGUNAKAN API SIPUTZX SEBAGAI PENGGANTI YANZBOTZ
-          const res = await fetch(`https://api.siputzx.my.id/api/d/igdl?url=${igUrl}`);
+          // Menggunakan API Ryzendesu yang lebih stabil & tangguh untuk IG
+          const res = await fetch(`https://api.ryzendesu.vip/api/downloader/igdl?url=${encodeURIComponent(igUrl)}`);
           const json = await res.json();
           
-          let mediaList = json.data || json.result; 
+          // Mengambil array media (mendukung multiple foto/video dalam 1 post)
+          let mediaList = json.data || json.url || json.result; 
+          
           if (!mediaList || mediaList.length === 0) {
              await react('❌');
              return reply('❌ Gagal mengambil data! Pastikan link valid dan akun tidak di-private.');
@@ -899,16 +905,19 @@ async function Hc(hc, m, db) {
             }
           } else if (typeof mediaList === 'string') {
             await hc.sendMessage(sender, { video: { url: mediaList }, caption: '*By: Heart candy*' }, { quoted: m });
-            await react('✅');
           } else {
-            return reply('❌ Format media Instagram tidak dikenali.');
+             await react('❌');
+             return reply('❌ Format media Instagram tidak dikenali.');
           }
+          await react('✅');
         } catch (err) {
           console.error("Error Instagram:", err);
+          await react('❌');
           reply('❌ Terjadi kesalahan sistem saat mendownload media Instagram.');
         }
       }
       break
+
       
       // Search Menu
       case 'search': case 'yts': case 'ytsearch': case 'play': {
