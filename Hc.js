@@ -1285,17 +1285,13 @@ async function Hc(hc, m, db) {
 ╰────❍`)
       }
       break
-
-      
       // All menu
       case 'allmenu': {
         await react('✨');
-        const menuText =`*━━━━━━━━━━━━━━━━━━━━*
+        const menuText = `*━━━━━━━━━━━━━━━━━━━━*
               🌈 *HC-BOT* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
-📌 *Saluran Bot:* ${settings.my.ch}
-
 ╭──❍ *BOT*
 │${setv} ${prefix}sc
 │${setv} ${prefix}limit
@@ -1348,20 +1344,33 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}sticker (send/reply img/vid)
 ╰────❍
 Bot ini masih di kembangkan.\nTerima kasih telah menggunakan bot whatsapp kami.`;
-       try {
+
+        const channelContext = {
+          forwardingScore: 9999,
+          isForwarded: true,
+          forwardedNewsletterMessageInfo: {
+            newsletterJid: settings.my.ch,
+            newsletterName: 'Heart candy Official Channel',
+            serverMessageId: 100
+          }
+        };
+        try {
           const animasiMenu = fs.readFileSync('./src/media/menu.mp4');
           await hc.sendMessage(sender, {
             video: animasiMenu,
             caption: menuText,
-            gifPlayback: true
+            gifPlayback: true,
+            contextInfo: channelContext
           }, { quoted: m });
         } catch (err) {
           console.error("Gagal memuat animasi menu:", err);
-          await reply(menuText);
+          await hc.sendMessage(sender, {
+            text: menuText,
+            contextInfo: channelContext
+          }, { quoted: m });
         }
       }
       break
-
       
     } // Penutup case command
   } catch (err) {
