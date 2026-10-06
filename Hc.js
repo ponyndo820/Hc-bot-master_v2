@@ -217,6 +217,11 @@ async function Hc(hc, m, db) {
             }
         }
     }
+    // Salam
+    if (/^a(s|ss)alamu('|)alaikum(| )(wr|)( |)(wb |)$/.test(budy?.toLowerCase()) {
+    	const jwb_salam = ['Wa\'alaikumusalam', 'Wa\'alaikumusalam wr wb','Wa\'alaikumusalam Warohmatullahi Wabarokatuh']
+    	reply(pickRandom(jwb_salam))
+    }
     
     // Add case command di sini
     switch (command) {
@@ -261,7 +266,7 @@ async function Hc(hc, m, db) {
       // Quotes Menu
       case 'quotes': {
         try {
-          const rawData = fs.readFileSync('./lib/quotes.json', 'utf-8');
+          const rawData = fs.readFileSync('./scrape/quotes.json', 'utf-8');
           const data = JSON.parse(rawData);
           const quotesList = data && data.quotes;
           if (!Array.isArray(quotesList) || quotesList.length === 0){
@@ -279,7 +284,7 @@ async function Hc(hc, m, db) {
       break
       case 'quotesislami': {
         try {
-          const rawData = fs.readFileSync('./lib/quotesislami.json', 'utf-8');
+          const rawData = fs.readFileSync('.//quotesislami.json', 'utf-8');
           const data = JSON.parse(rawData);
           if (!data || !Array.isArray(data) || data.length === 0){
             return reply('Maaf ada masalah teknis atau data kosong❗');
@@ -596,6 +601,11 @@ async function Hc(hc, m, db) {
 │ 🎫 *Limit:* ${isCreator ? '∞' : user.limit}
 │ 💰 *Money:* ${displayMoney}
 └───────────────`, { mentions: [userTag] });
+      }
+      break
+      case 'totalfitur': case 'fitur': {
+      	const total = ((fs.readFileSync(__filename).toString()).match(/case'/g) || []).length
+      	reply(`Total Fitur : ${total}`);
       }
       break
       
@@ -1342,9 +1352,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}draw (prompt)
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}sticker (send/reply img/vid)
-╰────❍
-Bot ini masih di kembangkan.\nTerima kasih telah menggunakan bot whatsapp kami.`;
-
+╰────❍`;
         const channelContext = {
           forwardingScore: 9999,
           isForwarded: true,

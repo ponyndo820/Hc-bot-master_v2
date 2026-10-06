@@ -1,3 +1,9 @@
+/*
+   * server.js
+   * By Heart candy
+   * Sc ini open source
+   * ❗Peringatan Script ini tidak boleh di perjual belikan. Jika melanggar akan berurusan dengan hukum.
+*/
 import express from 'express';
 import { createServer } from 'http';
 import { createRequire } from 'module';
