@@ -72,28 +72,25 @@ async function Hc(hc, m, db) {
     }
     
     // Afk
-    let mentionUser = [...new Set([...(m.mentionedJid || []), ...(m.quoted ? [m.quoted.sender] : [])])];
-    for (let jid of mentionUser) {
-        let user = global.db?.users?.[jid];
-        if (!user) continue;
-        let afkTime = user.afkTime;
-        if (!afkTime || afkTime < 0) continue;
-        let reason = user.afkReason || '';
-        reply(`Jangan tag @${jid.split('@')[0]}!\nDia sedang AFK ${reason ? 'dengan alasan: ' + reason : 'tanpa alasan'}\nSelama: ${clockString(new Date() - afkTime)}`, { mentions: [jid] });
-    }
-    
-    if (global.db?.users?.[sender]?.afkTime > -1) {
-        let user = global.db.users[sender];
-        reply(`@${sender.split('@')[0]} berhenti AFK${user.afkReason ? ' setelah: ' + user.afkReason : ''}\nSelama: ${clockString(new Date() - user.afkTime)}`, { mentions: [sender] });
-        user.afkTime = -1;
-        user.afkReason = '';
-    }
-    
-    if (global.db?.users?.[sender]?.afkTime > -1) {
-        let user = global.db.users[sender];
-        reply(`@${sender.split('@')[0]} berhenti AFK${user.afkReason ? ' setelah: ' + user.afkReason : ''}\nSelama: ${clockString(new Date() - user.afkTime)}`);
-        user.afkTime = -1;
-        user.afkReason = '';
+    if (!m.key.fromMe) {
+        let mentionUser = [...new Set([...(m.mentionedJid || []), ...(m.quoted ? [m.quoted.sender] : [])])];
+        for (let jid of mentionUser) {
+            let user = global.db?.users?.[jid];
+            if (!user) continue;
+            let afkTime = user.afkTime;
+            if (!afkTime || afkTime < 0) continue;
+            let reason = user.afkReason || '';
+            reply(`Jangan tag @${jid.split('@')[0]}!\nDia sedang AFK ${reason ? 'dengan alasan: ' + reason : 'tanpa alasan'}\nSelama: ${clockString(new Date() - afkTime)}`, { mentions: [jid] });
+        }
+        
+        const isAfkCommand = body?.toLowerCase().startsWith(prefix + 'afk') || body?.toLowerCase() === 'afk';
+        
+        if (global.db?.users?.[sender]?.afkTime > -1 && !isAfkCommand) {
+            let user = global.db.users[sender];
+            reply(`@${sender.split('@')[0]} berhenti AFK${user.afkReason ? ' setelah: ' + user.afkReason : ''}\nSelama: ${clockString(new Date() - user.afkTime)}`, { mentions: [sender] });
+            user.afkTime = -1;
+            user.afkReason = '';
+        }
     }
     
     
