@@ -55,10 +55,21 @@ async function Hc(hc, m, db) {
     const prefixUsed = settings.prefix.find(p => body.startsWith(p));
     const isCmd = !!prefixUsed;
     const prefix = isCmd ? prefixUsed : '';
+    const reply = async (text) => {
+      return await hc.sendMessage(sender, { text }, { quoted: m });
+    };
+    const react = async (emoji) => {
+      return await hc.sendMessage(sender, { react: { text: emoji, key: m.key } });
+    };
     
     global.tebakbom = global.tebakbom || {};
     let tebakbom = global.tebakbom;
-
+    
+    // Salam
+    if (/^a(s|ss)alamu('|)alaikum(| )(wr|)( |)(wb |)$/.test(body?.toLowerCase())) {
+    	const jwb_salam = ['Wa\'alaikumusalam', 'Wa\'alaikumusalam wr wb','Wa\'alaikumusalam Warohmatullahi Wabarokatuh'];
+    	return reply(pickRandom(jwb_salam));
+    }
     
     if (!isCmd && !global.activeAutoAI.has(sender) && !(sender in tebakbom)) return;
     
@@ -70,12 +81,6 @@ async function Hc(hc, m, db) {
     const command = isCmd ? body.slice(prefix.length).trim().split(/ +/).shift().toLowerCase() : '';
     const args = isCmd ? body.trim().split(/ +/).slice(1) : [];
     const text = isCmd ? args.join(' ') : body;
-    const reply = async (text) => {
-      return await hc.sendMessage(sender, { text }, { quoted: m });
-    };
-    const react = async (emoji) => {
-      return await hc.sendMessage(sender, { react: { text: emoji, key: m.key } });
-    };
     const participant = m.key.participant || sender; 
     const isCreator = m.key.fromMe || settings.ownerNumber.some(owner => participant.includes(owner));
     const contextInfo = m.message.extendedTextMessage?.contextInfo || m.message.imageMessage?.contextInfo || m.message.videoMessage?.contextInfo;
@@ -216,12 +221,6 @@ async function Hc(hc, m, db) {
                 return !0;
             }
         }
-    }
-    // Salam
-    // Salam
-    if (/^a(s|ss)alamu('|)alaikum(| )(wr|)( |)(wb |)$/.test(body?.toLowerCase())) {
-    	const jwb_salam = ['Wa\'alaikumusalam', 'Wa\'alaikumusalam wr wb','Wa\'alaikumusalam Warohmatullahi Wabarokatuh'];
-    	reply(pickRandom(jwb_salam));
     }
     
     // Add case command di sini
