@@ -609,7 +609,18 @@ async function Hc(hc, m, db) {
       	reply(`Total Fitur : ${total}`);
       }
       break
-
+      case 'anticall': {
+      	if (!isCreator) return reply(settings.mess.owr);
+      	global.anticall = true;
+      	reply('Fitur Anti-Call berhasil *diaktifkan*. Bot akan menolak panggilan secara otomatis.');
+      }
+      break
+      case 'delanticall': {
+      	if (!isCreator) return reply(settings.mess.owr);
+      	global.anticall = false;
+      	reply('Fitur Anti-Call berhasil *dimatikan*. Bot dapat menerima panggilan lagi.');
+      }
+      break
       
       // Random Images Menu
       case 'randomimage': case 'randomimg': case 'randomimages': {

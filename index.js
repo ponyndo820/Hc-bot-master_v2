@@ -161,6 +161,25 @@ async function startHcbot() {
       }, 1000);
     }
   });
+  
+  hc.ev.on('call', async (calls) => {
+      if (!global.anticall) return;
+      for (const call of calls) {
+          if (call.status === 'offer') {
+              const caller = call.from;
+              const ownerNumber = settings.ownerNumber[0]; 
+              const ownerJid = ownerNumber + "@s.whatsapp.net";
+              await hc.rejectCall(call.id, call.from).catch(() => {});
+              const teksPesan = `Saat tidak dapat menerima panggilan jika @${caller.split('@')[0]} membutuhkan bantuan hubungi owner @${ownerNumber}`;
+              
+              await hc.sendMessage(caller, {
+                  text: teksPesan,
+                  mentions: [caller, ownerJid] 
+              });
+          }
+      }
+  });
+
   hc.ev.on('messages.upsert', async (chatUpdate) => {
     try {
       const m = chatUpdate.messages[0];
