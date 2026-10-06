@@ -47,8 +47,11 @@ async function Hc(hc, m, db) {
     (type === 'interactiveResponMessage' && m.quoted) ? (m.message.interactiveResponseMessage?.nativeFlowResponseMessage?.singleSelectReply.selectedRowId || "" ) : '';
     if (!body) return;
     
-    const sender = m.key.remoteJid;
-    const isGroup = sender.endsWith('@g.us');
+    const sender = m.key.fromMe 
+        ? (hc.user.id.split(':')[0] + '@s.whatsapp.net') 
+        : (m.key.participant || m.key.remoteJid);
+    const senderClean = sender.split(':')[0];
+    const isGroup = m.key.remoteJid.endsWith('@g.us');
     
     global.activeAutoAI = global.activeAutoAI || new Set();
     
@@ -56,10 +59,11 @@ async function Hc(hc, m, db) {
     const isCmd = !!prefixUsed;
     const prefix = isCmd ? prefixUsed : '';
     const reply = async (text, options = {}) => {
-  return await hc.sendMessage(sender, { text, ...options }, { quoted: m });
-};
+        return await hc.sendMessage(m.key.remoteJid, { text, ...options }, { quoted: m });
+    };
     const react = async (emoji) => {
-      return await hc.sendMessage(sender, { react: { text: emoji, key: m.key } });
+    return await hc.sendMessage(m.key.remoteJid, { react: { text: emoji, key: m.key } });
+      
     };
     
     global.tebakbom = global.tebakbom || {};
@@ -73,6 +77,7 @@ async function Hc(hc, m, db) {
     
     // Afk
     if (!m.key.fromMe) {
+      
         let mentionUser = [...new Set([...(m.mentionedJid || []), ...(m.quoted ? [m.quoted.sender] : [])])];
         for (let jid of mentionUser) {
             let user = global.db?.users?.[jid];
@@ -84,10 +89,12 @@ async function Hc(hc, m, db) {
         }
         
         const isAfkCommand = body?.toLowerCase().startsWith(prefix + 'afk') || body?.toLowerCase() === 'afk';
-        
         if (global.db?.users?.[sender]?.afkTime > -1 && !isAfkCommand) {
             let user = global.db.users[sender];
-            reply(`@${sender.split('@')[0]} berhenti AFK${user.afkReason ? ' setelah: ' + user.afkReason : ''}\nSelama: ${clockString(new Date() - user.afkTime)}`, { mentions: [sender] });
+            let tagUser = sender.includes('@') ? sender : sender + '@s.whatsapp.net';
+            
+            reply(`@${sender.split('@')[0]} berhenti AFK${user.afkReason ? ' setelah: ' + user.afkReason : ''}\nSelama: ${clockString(new Date() - user.afkTime)}`, { mentions: [tagUser] });
+            
             user.afkTime = -1;
             user.afkReason = '';
         }
