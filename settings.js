@@ -31,7 +31,7 @@ const settings = {
     'bot', 'sc', 'script', 'donasi', 'donate', 'tagme', 
     'req', 'request', 'speedtest', 'speed', 'limit', 
     'balance', 'money', 'buylimit', 'shutdown', 'off', 
-    'setgemini', 'setapikeygemini'
+    'setgemini', 'setapikeygemini', 'tebakbom', 'totalfitur', 'fitur' 'afk'
   ],
 }
 
