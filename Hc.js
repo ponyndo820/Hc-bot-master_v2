@@ -23,7 +23,7 @@ import settings from './settings.js';
 import { igdl } from './lib/igdl.js';
 import { GroupUpdate, LoadDataBase } from './src/message.js';
 import { writeExif, toAudio, toPTT, toPTV, toVideo } from './lib/converter.js';
-import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime, sleep } from './lib/function.js';
+import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime, sleep, clockString } from './lib/function.js';
 import { cmdAdd, cmdAddHit, addExpired, getPosition, getExpired, getStatus, getAllExpired, checkExpired } from './src/database.js';
 
 async function Hc(hc, m, db) {
@@ -55,9 +55,9 @@ async function Hc(hc, m, db) {
     const prefixUsed = settings.prefix.find(p => body.startsWith(p));
     const isCmd = !!prefixUsed;
     const prefix = isCmd ? prefixUsed : '';
-    const reply = async (text) => {
-      return await hc.sendMessage(sender, { text }, { quoted: m });
-    };
+    const reply = async (text, options = {}) => {
+  return await hc.sendMessage(sender, { text, ...options }, { quoted: m });
+};
     const react = async (emoji) => {
       return await hc.sendMessage(sender, { react: { text: emoji, key: m.key } });
     };
@@ -79,16 +79,23 @@ async function Hc(hc, m, db) {
         let afkTime = user.afkTime;
         if (!afkTime || afkTime < 0) continue;
         let reason = user.afkReason || '';
-        reply(`Jangan tag dia!\nDia sedang AFK ${reason ? 'dengan alasan: ' + reason : 'tanpa alasan'}\nSelama: ${clockString(new Date() - afkTime)}`);
+        reply(`Jangan tag @${jid.split('@')[0]}!\nDia sedang AFK ${reason ? 'dengan alasan: ' + reason : 'tanpa alasan'}\nSelama: ${clockString(new Date() - afkTime)}`, { mentions: [jid] });
     }
-
+    
+    if (global.db?.users?.[sender]?.afkTime > -1) {
+        let user = global.db.users[sender];
+        reply(`@${sender.split('@')[0]} berhenti AFK${user.afkReason ? ' setelah: ' + user.afkReason : ''}\nSelama: ${clockString(new Date() - user.afkTime)}`, { mentions: [sender] });
+        user.afkTime = -1;
+        user.afkReason = '';
+    }
+    
     if (global.db?.users?.[sender]?.afkTime > -1) {
         let user = global.db.users[sender];
         reply(`@${sender.split('@')[0]} berhenti AFK${user.afkReason ? ' setelah: ' + user.afkReason : ''}\nSelama: ${clockString(new Date() - user.afkTime)}`);
         user.afkTime = -1;
         user.afkReason = '';
     }
-
+    
     
     if (!isCmd && !global.activeAutoAI.has(sender) && !(sender in tebakbom)) return;
     
@@ -647,7 +654,7 @@ async function Hc(hc, m, db) {
           let user = global.db.users[sender];
           user.afkTime = +new Date();
           user.afkReason = text;
-          reply(`@${sender.split('@')[0]} telah AFK${text ? ': ' + text : ''}`);
+          reply(`@${sender.split('@')[0]} telah AFK${text ? ': ' + text : ''}`, { mentions: [sender] });
       }
       break
       
