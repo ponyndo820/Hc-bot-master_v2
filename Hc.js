@@ -71,6 +71,25 @@ async function Hc(hc, m, db) {
     	return reply(pickRandom(jwb_salam));
     }
     
+    // Afk
+    let mentionUser = [...new Set([...(m.mentionedJid || []), ...(m.quoted ? [m.quoted.sender] : [])])];
+    for (let jid of mentionUser) {
+        let user = global.db?.users?.[jid];
+        if (!user) continue;
+        let afkTime = user.afkTime;
+        if (!afkTime || afkTime < 0) continue;
+        let reason = user.afkReason || '';
+        reply(`Jangan tag dia!\nDia sedang AFK ${reason ? 'dengan alasan: ' + reason : 'tanpa alasan'}\nSelama: ${clockString(new Date() - afkTime)}`);
+    }
+
+    if (global.db?.users?.[sender]?.afkTime > -1) {
+        let user = global.db.users[sender];
+        reply(`@${sender.split('@')[0]} berhenti AFK${user.afkReason ? ' setelah: ' + user.afkReason : ''}\nSelama: ${clockString(new Date() - user.afkTime)}`);
+        user.afkTime = -1;
+        user.afkReason = '';
+    }
+
+    
     if (!isCmd && !global.activeAutoAI.has(sender) && !(sender in tebakbom)) return;
     
     if (isCmd) {
@@ -619,6 +638,16 @@ async function Hc(hc, m, db) {
       	if (!isCreator) return reply(settings.mess.owr);
       	global.anticall = false;
       	reply('Fitur Anti-Call berhasil *dimatikan*. Bot dapat menerima panggilan lagi.');
+      }
+      break
+      case 'afk': {
+          if (!global.db.users[sender]) {
+              global.db.users[sender] = { afkTime: -1, afkReason: '' };
+          }
+          let user = global.db.users[sender];
+          user.afkTime = +new Date();
+          user.afkReason = text;
+          reply(`@${sender.split('@')[0]} telah AFK${text ? ': ' + text : ''}`);
       }
       break
       

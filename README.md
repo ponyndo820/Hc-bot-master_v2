@@ -48,13 +48,14 @@
 ├── lib
 │   ├── ytmp4
 │   ├── ssweb.rb
-│   ├── quotes.js
 │   ├── function.js
 │   ├── converter.js
 │   ├── randompony.rb
-│   └── quotesislami.json
 ├── src
 │   └── database.js
+├── scrape
+│   ├── quotes.js
+│   └── quotesislami.json
 ├── Hc.js
 ├── main.js
 ├── LICENSE
