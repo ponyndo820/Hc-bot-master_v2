@@ -218,9 +218,10 @@ async function Hc(hc, m, db) {
         }
     }
     // Salam
-    if (/^a(s|ss)alamu('|)alaikum(| )(wr|)( |)(wb |)$/.test(budy?.toLowerCase()) {
-    	const jwb_salam = ['Wa\'alaikumusalam', 'Wa\'alaikumusalam wr wb','Wa\'alaikumusalam Warohmatullahi Wabarokatuh']
-    	reply(pickRandom(jwb_salam))
+    // Salam
+    if (/^a(s|ss)alamu('|)alaikum(| )(wr|)( |)(wb |)$/.test(body?.toLowerCase())) {
+    	const jwb_salam = ['Wa\'alaikumusalam', 'Wa\'alaikumusalam wr wb','Wa\'alaikumusalam Warohmatullahi Wabarokatuh'];
+    	reply(pickRandom(jwb_salam));
     }
     
     // Add case command di sini
