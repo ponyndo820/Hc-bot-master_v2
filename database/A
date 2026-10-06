@@ -7,9 +7,10 @@ Fitur publik
    tovn
    brat
    draw
+   toptv
    ytmp4
-    limit
-    ytmp3
+   limit
+   ytmp3
    limit
    tagme
    ssweb
@@ -25,6 +26,7 @@ Fitur publik
    shutdown
    ytsearch
    cariwaifu
+   totalfitur
    randompony
    randomwaifu
    randomimage
@@ -34,17 +36,16 @@ Fitur publik
 Fitur tidak publik
    spotify
    alyabrat
-   toptv
-   totalfitur
+   
 
 
 logo : Hc
-Version : 2.0.3
+Version : 2.0.5
 Creator : Heart candy
 Author : Muhamad Febrian
 Branding name : ponyndo
-Total fitur publik : 31
-Total fitur tidak publik : 4
+Total fitur publik : 33
+Total fitur tidak publik : 2
 Bot name : Hc-bot-master_v2
 
 
