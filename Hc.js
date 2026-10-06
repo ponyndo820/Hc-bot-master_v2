@@ -1177,7 +1177,9 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}runtime
 │${setv} ${prefix}buylimit
 │${setv} ${prefix}speedtest
+│${setv} ${prefix}totalfitur
 │${setv} ${prefix}request (text)
+│${setv} ${prefix}tovn (reply pesan)
 ╰────❍`)
       }
       break
@@ -1218,6 +1220,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}brat
 │${setv} ${prefix}bratvid
 │${setv} ${prefix}draw (prompt)
+│${setv} ${prefix}toptv (reply video)
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}sticker (send/reply img/vid)
 ╰────❍`)
@@ -1312,6 +1315,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}runtime
 │${setv} ${prefix}buylimit
 │${setv} ${prefix}speedtest
+│${setv} ${prefix}totalfitur
 │${setv} ${prefix}request (text)
 │${setv} ${prefix}tovn (reply pesan)
 ╰┬───❍
@@ -1352,6 +1356,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}brat
 │${setv} ${prefix}bratvid
 │${setv} ${prefix}draw (prompt)
+│${setv} ${prefix}toptv (reply video)
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}sticker (send/reply img/vid)
 ╰────❍`;
