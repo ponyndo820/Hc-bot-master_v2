@@ -604,10 +604,12 @@ async function Hc(hc, m, db) {
       }
       break
       case 'totalfitur': case 'fitur': {
-      	const total = ((fs.readFileSync(__filename).toString()).match(/case'/g) || []).length
+      	const __filename = fileURLToPath(import.meta.url);
+      	const total = ((fs.readFileSync(__filename).toString()).match(/case\s+'/g) || []).length;
       	reply(`Total Fitur : ${total}`);
       }
       break
+
       
       // Random Images Menu
       case 'randomimage': case 'randomimg': case 'randomimages': {
