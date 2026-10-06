@@ -65,6 +65,7 @@ async function Hc(hc, m, db) {
     return await hc.sendMessage(m.key.remoteJid, { react: { text: emoji, key: m.key } });
       
     };
+    const from = m.key.remoteJid;
     
     global.tebakbom = global.tebakbom || {};
     let tebakbom = global.tebakbom;
@@ -339,7 +340,7 @@ async function Hc(hc, m, db) {
         let teks1 = text.split('|')[0] || packname;
         let teks2 = text.split('|')[1] || author;
         let stickerFile = await writeExif(mediaBuffer, { packname: teks1, author: teks2 });
-        await hc.sendMessage(sender, { sticker: { url: stickerFile } }, { quoted: m });
+        await hc.sendMessage(from, { sticker: { url: stickerFile } }, { quoted: m });
         if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
       }
       break
@@ -362,11 +363,11 @@ async function Hc(hc, m, db) {
           const caption = viewOnceMsg[mediaType]?.caption || '';
           
           if (/imageMessage/.test(mediaType)) {
-            await hc.sendMessage(sender, { image: mediaBuffer, caption: caption }, { quoted: m });
+            await hc.sendMessage(from, { image: mediaBuffer, caption: caption }, { quoted: m });
           } else if (/videoMessage/.test(mediaType)) {
-            await hc.sendMessage(sender, { video: mediaBuffer, caption: caption }, { quoted: m });
+            await hc.sendMessage(from, { video: mediaBuffer, caption: caption }, { quoted: m });
           } else if (/audioMessage/.test(mediaType)) {
-            await hc.sendMessage(sender, { audio: mediaBuffer, mimetype: 'audio/mp4', ptt: true }, { quoted: m });
+            await hc.sendMessage(from, { audio: mediaBuffer, mimetype: 'audio/mp4', ptt: true }, { quoted: m });
           }
         } catch (e) {
           console.error(e);
@@ -381,7 +382,7 @@ async function Hc(hc, m, db) {
           const media = await getBuffer(`https://api.siputzx.my.id/api/m/brat?text=${encodeURIComponent(text)}`);
           const stickerFile = await writeExif(media, { packname: packname, author: author });
           
-          await hc.sendMessage(sender, { sticker: { url: stickerFile } }, { quoted: m });
+          await hc.sendMessage(from, { sticker: { url: stickerFile } }, { quoted: m });
         
           if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
         } catch (err) {
@@ -400,7 +401,7 @@ async function Hc(hc, m, db) {
              return reply('Gagal mengambil video brat! Server API mungkin sedang down atau merespons error.');
           }
           const stickerFile = await writeExif(media, { packname: packname, author: author });
-          await hc.sendMessage(sender, { sticker: { url: stickerFile } }, { quoted: m });
+          await hc.sendMessage(from, { sticker: { url: stickerFile } }, { quoted: m });
           
           if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
         } catch (err) {
@@ -438,7 +439,7 @@ async function Hc(hc, m, db) {
           
           const buffer = await image.getBufferAsync(Jimp.default.MIME_JPEG);
           const stickerFile = await writeExif(buffer, { packname: packname, author: author });
-          await hc.sendMessage(sender, { sticker: { url: stickerFile } }, { quoted: m });
+          await hc.sendMessage(from, { sticker: { url: stickerFile } }, { quoted: m });
           
           if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
         } catch (err) {
@@ -455,7 +456,7 @@ async function Hc(hc, m, db) {
           
           const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(text)}?nologo=true&seed=${randomSeed}&width=1024&height=1024&model=deliberate`;
           
-          await hc.sendMessage(sender, { image: { url: imgUrl }, caption: '*By: Heart candy*' }, { quoted: m });
+          await hc.sendMessage(from, { image: { url: imgUrl }, caption: '*By: Heart candy*' }, { quoted: m });
           
           await react('✅');
         } catch (err) {
@@ -485,7 +486,7 @@ async function Hc(hc, m, db) {
           }
           
           try {
-            await hc.sendMessage(sender, { 
+            await hc.sendMessage(from, { 
               image: { url: outputFileName }, 
               caption: `*Screenshot Web Berhasil!*\n*URL:* ${targetUrl}\n*By: Heart candy*` 
             }, { quoted: m });
@@ -535,7 +536,7 @@ async function Hc(hc, m, db) {
           
           const ptvBuffer = await toPTV(mediaBuffer, 'mp4');
           
-          await hc.sendMessage(sender, { 
+          await hc.sendMessage(from, { 
             video: ptvBuffer, 
             ptv: true,
             seconds: 60
@@ -562,7 +563,7 @@ async function Hc(hc, m, db) {
       case 'tagme': {
         const userTag = m.key.participant || sender || sender;
         const userNumber = typeof userTag === 'string' ? userTag.split('@')[0] : sender.split('@')[0];
-        await hc.sendMessage(sender, { 
+        await hc.sendMessage(from, { 
           text: `@${userNumber}`, 
           mentions: [userTag] 
         }, { quoted: m });
@@ -588,7 +589,7 @@ async function Hc(hc, m, db) {
           let audioRes = await toPTT(mediaBuffer, 'mp4');
           let audioData = typeof audioRes === 'string' ? { url: audioRes } : audioRes;
           const waveform = new Uint8Array(Array.from({ length: 64 }, () => Math.floor(Math.random() * 100)));
-          await hc.sendMessage(sender, { 
+          await hc.sendMessage(from, { 
             audio: audioData, 
             mimetype: 'audio/ogg; codecs=opus', 
             ptt: true,
@@ -670,7 +671,7 @@ async function Hc(hc, m, db) {
           if (!imageBuffer) {
             return reply('Maaf, server gambar sedang sibuk atau down.');
           }
-          await hc.sendMessage(sender, { 
+          await hc.sendMessage(from, { 
             image: imageBuffer, 
             caption: `Nih gambar random-nya!` 
           }, { quoted: m });
@@ -689,7 +690,7 @@ async function Hc(hc, m, db) {
           const tempPath = './database/temp/pony.jpg';
           
           if (stdout.trim() === 'SUCCESS' && fs.existsSync(tempPath)) {
-            await hc.sendMessage(sender, {
+            await hc.sendMessage(from, {
               image: { url: tempPath },
               caption: '🐴 *Poooony! Yaaaay~ <3*\n\n*By: Heart candy*'
             }, { quoted: m });
@@ -750,7 +751,7 @@ async function Hc(hc, m, db) {
           const imageBuffer = await getRandomWaifu();
           if (!imageBuffer) return reply('Maaf, server sedang sibuk atau gambar tidak ditemukan.');
           
-          await hc.sendMessage(sender, { 
+          await hc.sendMessage(from, { 
             image: imageBuffer, 
             caption: `*By: Heart candy*\nIstri online-mu sudah datang!` 
           }, { quoted: m });
@@ -768,7 +769,7 @@ async function Hc(hc, m, db) {
           const imageBuffer = await searchWaifu(text);
           if (!imageBuffer) return reply(`Maaf, gambar untuk *${text}* tidak ditemukan. Coba gunakan nama bahasa Inggris atau nama lengkapnya.`);
           
-          await hc.sendMessage(sender, { 
+          await hc.sendMessage(from, { 
             image: imageBuffer, 
             caption: `*By: Heart candy*\nHasil pencarian untuk: *${text}*` 
           }, { quoted: m });
@@ -822,7 +823,7 @@ async function Hc(hc, m, db) {
             extractorArgs: 'youtube:player_client=android,web',
             addHeader: ['referer:https://www.youtube.com']
           });
-          await hc.sendMessage(sender, { 
+          await hc.sendMessage(from, { 
             audio: { url: audioPath }, 
             mimetype: 'audio/mpeg', 
             ptt: false 
@@ -874,7 +875,7 @@ async function Hc(hc, m, db) {
         try {
           const hasil = await ytMp4(ytUrl);
           videoPath = hasil.result;
-          await hc.sendMessage(sender, { 
+          await hc.sendMessage(from, { 
             video: { url: videoPath }, 
             caption: `*📌 Title:* ${hasil.title}\n*✏ Description:* ${hasil.desc ? hasil.desc : '-'}\n*🔴 Channel:* ${hasil.channel}\n*🗓️ Upload at:* ${hasil.uploadDate}` 
           }, { quoted: m });
@@ -930,7 +931,7 @@ async function Hc(hc, m, db) {
           
           if (command === 'ttaudio') {
              if (!data.music) return reply('❌ Audio tidak ditemukan pada postingan ini!');
-             await hc.sendMessage(sender, {
+             await hc.sendMessage(from, {
                audio: { url: data.music },
                mimetype: 'audio/mpeg',
                ptt: false
@@ -938,13 +939,13 @@ async function Hc(hc, m, db) {
           } else {
              if (data.images && data.images.length > 0) {
                for (let img of data.images) {
-                 await hc.sendMessage(sender, { image: { url: img } }, { quoted: m });
+                 await hc.sendMessage(from, { image: { url: img } }, { quoted: m });
                }
                if (data.music) {
-                 await hc.sendMessage(sender, { audio: { url: data.music }, mimetype: 'audio/mpeg', ptt: false }, { quoted: m });
+                 await hc.sendMessage(from, { audio: { url: data.music }, mimetype: 'audio/mpeg', ptt: false }, { quoted: m });
                }
              } else {
-               await hc.sendMessage(sender, {
+               await hc.sendMessage(from, {
                  video: { url: data.play || data.wmplay },
                  caption: `*📌 Title:* ${data.title || '-'}\n*👤 Author:* ${data.author?.nickname || '-'}`
                }, { quoted: m });
@@ -998,9 +999,9 @@ async function Hc(hc, m, db) {
           
           for (let item of result.media) {
             if (item.type === 'video') {
-              await hc.sendMessage(sender, { video: { url: item.download }, caption: `*👤 Author:* ${authorName}\n*By: Heart candy*` }, { quoted: m });
+              await hc.sendMessage(from, { video: { url: item.download }, caption: `*👤 Author:* ${authorName}\n*By: Heart candy*` }, { quoted: m });
             } else {
-              await hc.sendMessage(sender, { image: { url: item.download }, caption: `*👤 Author:* ${authorName}\n*By: Heart candy*` }, { quoted: m });
+              await hc.sendMessage(from, { image: { url: item.download }, caption: `*👤 Author:* ${authorName}\n*By: Heart candy*` }, { quoted: m });
             }
           }
           await react('✅');
@@ -1037,7 +1038,7 @@ async function Hc(hc, m, db) {
             resultText += `🎥 Video ➔ *${prefix}ytmp4 ${vid.url}*\n`;
             resultText += `──────────────────\n\n`;
           }
-          await hc.sendMessage(sender, {
+          await hc.sendMessage(from, {
             image: { url: videos[0].thumbnail },
             caption: resultText.trim()
           }, { quoted: m });
@@ -1082,12 +1083,12 @@ async function Hc(hc, m, db) {
             caption += `📺 *Channel:* ${video.author.name}\n\n`;
             caption += `*By: Heart candy*`;
             
-            await hc.sendMessage(sender, { 
+            await hc.sendMessage(from, { 
               image: { url: video.thumbnail }, 
               caption: caption 
             }, { quoted: m });
             
-            await hc.sendMessage(sender, { 
+            await hc.sendMessage(from, { 
               audio: { url: audioPath }, 
               mimetype: 'audio/mpeg', 
               ptt: false 
@@ -1201,7 +1202,7 @@ async function Hc(hc, m, db) {
 ╰────❍`;
         try {
           const animasiMenu = fs.readFileSync('./src/media/menu.mp4');
-          await hc.sendMessage(sender, {
+          await hc.sendMessage(from, {
             video: animasiMenu,
             caption: menuText,
             gifPlayback: true
@@ -1213,6 +1214,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
+
       
       // Bot menu
       case 'botmenu': {
@@ -1352,6 +1354,7 @@ async function Hc(hc, m, db) {
       }
       break
       // All menu
+      // All menu
       case 'allmenu': {
         await react('✨');
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
@@ -1422,7 +1425,7 @@ async function Hc(hc, m, db) {
         };
         try {
           const animasiMenu = fs.readFileSync('./src/media/menu.mp4');
-          await hc.sendMessage(sender, {
+          await hc.sendMessage(from, {
             video: animasiMenu,
             caption: menuText,
             gifPlayback: true,
@@ -1430,13 +1433,14 @@ async function Hc(hc, m, db) {
           }, { quoted: m });
         } catch (err) {
           console.error("Gagal memuat animasi menu:", err);
-          await hc.sendMessage(sender, {
+          await hc.sendMessage(from, {
             text: menuText,
             contextInfo: channelContext
           }, { quoted: m });
         }
       }
       break
+
       
     } // Penutup case command
   } catch (err) {
