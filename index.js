@@ -113,7 +113,10 @@ async function startHcbot() {
 
   if (!hc.authState.creds.registered) {
     if (settings.pairing_code) {
-      const phoneNumber = await question(chalk.magenta('Masukin nomor bot Kamu disini ya sayang (contoh: 628xxx): '));
+      let phoneNumber = process.env.PHONE_NUMBER;
+      if (!phoneNumber) {
+        phoneNumber = await question(chalk.magenta('Masukin nomor bot Kamu disini ya sayang (contoh: 628xxx): '));
+      }
       const code = await hc.requestPairingCode(phoneNumber.replace(/[^0-9]/g, ''));
       console.log(chalk.green.bold(`\n============================\n[INI CODE PAIRING KAMU SAYANG]: ${code}\n============================\n`));
     } else {
