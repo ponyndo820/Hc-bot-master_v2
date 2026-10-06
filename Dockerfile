@@ -1,4 +1,4 @@
-FROM node:lts-buster
+FROM node:lts-bookworm
 
 RUN apt-get update && \
   apt-get upgrade -y && \
