@@ -1515,19 +1515,19 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}sticker (send/reply img/vid)
 ╰────❍`;
-
-         const channelContext = {
+       
+        const channelContext = {
           forwardingScore: 9999,
-          isForwarded: ucapanWaktu,
+          isForwarded: true,
           forwardedNewsletterMessageInfo: {
             newsletterJid: settings.my.ch,
             newsletterName: 'Join For More Info',
             serverMessageId: null
           }
-       };
+        };
         try {
           const animasiMenu = fs.readFileSync('./src/media/menu.mp4');
-          await hc.sendMessage(sender, {
+          await hc.sendMessage(from, {
             video: animasiMenu,
             caption: menuText,
             gifPlayback: true,
@@ -1535,14 +1535,13 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
           }, { quoted: m });
         } catch (err) {
           console.error("Gagal memuat animasi menu:", err);
-          await hc.sendMessage(sender, {
+          await hc.sendMessage(from, {
             text: menuText,
             contextInfo: channelContext
           }, { quoted: m });
         }
       }
       break
-      
       
     } // Penutup case command
   } catch (err) {
