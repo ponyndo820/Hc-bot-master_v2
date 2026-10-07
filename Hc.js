@@ -705,21 +705,22 @@ async function Hc(hc, m, db) {
         let neww = performance.now();
         let pingMilis = (neww - oldd).toFixed(4);
         let respon = `*K E C E P A T A N   R E S P O N*
-        ${pingMilis} _miliseconds_
-        
-        *R U N T I M E*
-        ${typeof runtime === 'function' ? runtime(process.uptime()) : Math.floor(process.uptime()) + ' detik'}
-        
-        💻 *I N F O   S E R V E R*
-        RAM: ${formatp(os.totalmem() - os.freemem())} / ${formatp(os.totalmem())}
-        
-        _NodeJS Memory Usage_
-        ${Object.keys(used).map((key, _, arr) => `${key.padEnd(Math.max(...arr.map(v => v.length)), ' ')}:${formatp(used[key])}`).join('\n')}
-        
-        ${cpus[0] ? `_Total CPU Usage_
-        ${cpus[0].model.trim()} (${cpu.speed} MHZ)${Object.keys(cpu.times).map(type => `- *${(type + '*').padEnd(6)}: ${(100 * cpu.times[type] / cpu.total).toFixed(2)}%`).join('\n')}
-        
-        _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Object.keys(cpu.times).map(type => `- *${(type + '*').padEnd(6)}:${(100 * cpu.times[type] / cpu.total).toFixed(2)}%`).join('\n')}`).join('\n\n')}` : ''}`.trim();
+${pingMilis} _miliseconds_
+
+*R U N T I M E*
+${typeof runtime === 'function' ? runtime(process.uptime()) : Math.floor(process.uptime()) + ' detik'}
+
+💻 *I N F O   S E R V E R*
+RAM: ${formatp(os.totalmem() - os.freemem())} / ${formatp(os.totalmem())}
+
+_NodeJS Memory Usage_
+${Object.keys(used).map((key, _, arr) => `${key.padEnd(Math.max(...arr.map(v => v.length)), ' ')}:${formatp(used[key])}`).join('\n')}
+
+${cpus[0] ? `_Total CPU Usage_
+${cpus[0].model.trim()} (${cpu.speed} MHZ)${Object.keys(cpu.times).map(type => `- *${(type + '*').padEnd(6)}: ${(100 * cpu.times[type] / cpu.total).toFixed(2)}%`).join('\n')}
+
+_CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Object.keys(cpu.times).map(type => `- *${(type + '*').padEnd(6)}:${(100 * cpu.times[type] / cpu.total).toFixed(2)}%`).join('\n')}`).join('\n\n')}` : ''}`.trim();
+
         await hc.sendMessage(from, { text: respon }, { quoted: m });
       }
       break
