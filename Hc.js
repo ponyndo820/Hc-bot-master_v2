@@ -1422,8 +1422,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}sticker (send/reply img/vid)
 ╰────❍`;
-       await reply({
-         fileName: ucapanWaktu,
+
          const channelContext = {
           forwardingScore: 9999,
           isForwarded: ucapanWaktu,
@@ -1431,12 +1430,12 @@ async function Hc(hc, m, db) {
             newsletterJid: settings.my.ch,
             newsletterName: 'Join For More Info',
             serverMessageId: null
-          }
+          },
           externalAdReply: {
             mediaUrl: settings.my.gh,
             sourceUrl:settings.my.gh,
+             fileName: ucapanWaktu,
           }
-        })
        };
         try {
           const animasiMenu = fs.readFileSync('./src/media/menu.mp4');
