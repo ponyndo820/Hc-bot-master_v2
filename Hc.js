@@ -1272,10 +1272,11 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}aimenu
 │${setv} ${prefix}botmenu
 │${setv} ${prefix}allmenu
+│${setv} ${prefix}doamenu
 │${setv} ${prefix}gamemenu
-│${setv} ${prefix}animemenu
 │${setv} ${prefix}toolsmenu
 │${setv} ${prefix}ownermenu
+│${setv} ${prefix}animemenu
 │${setv} ${prefix}randommenu
 │${setv} ${prefix}quotesmenu
 │${setv} ${prefix}downloadermenu
@@ -1294,7 +1295,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         }
       }
       break
-
       
       // Bot menu
       case 'botmenu': {
@@ -1304,6 +1304,8 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *BOT*
 │${setv} ${prefix}sc
+│${setv} ${prefix}afk
+│${setv} ${prefix}ping
 │${setv} ${prefix}limit
 │${setv} ${prefix}tagme
 │${setv} ${prefix}donasi
@@ -1434,7 +1436,19 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       }
       break
       
-// All menu
+      // Doa menu
+      case 'doamenu': {
+        await reply(`*━━━━━━━━━━━━━━━━━━━━*
+              🌈 *Hc-bot* 🌈
+               *By Heart candy*
+*━━━━━━━━━━━━━━━━━━━━*
+╭──❍ *DOA*
+│${setv} ${prefix}doatahlil
+╰────❍`)
+      }
+      break
+      
+      // All menu
       case 'allmenu': {
         await react('✨');
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
@@ -1443,6 +1457,8 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *BOT*
 │${setv} ${prefix}sc
+│${setv} ${prefix}afk
+│${setv} ${prefix}ping
 │${setv} ${prefix}limit
 │${setv} ${prefix}tagme
 │${setv} ${prefix}donasi
@@ -1455,6 +1471,8 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 ╰┬───❍
 ╭┴─❍ *OWMER*
 │${setv} ${prefix}shutdown
+│${setv} ${prefix}anticall
+│${setv} ${prefix}delanticall
 │${setv} ${prefix}setapikeygemini
 ╰┬──❍
 ╭┴─❍ *QUOTES*
@@ -1485,6 +1503,9 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 ╭┴─❍ *GAME*
 │${setv} ${prefix}tebakbom
 ╰┬───❍
+╭┴─❍ *Doa*
+│${setv} ${prefix}doatahlil
+╰┬──❍
 ╭┴─❍ *TOOLS*
 │${setv} ${prefix}ssweb (url)
 │${setv} ${prefix}brat
