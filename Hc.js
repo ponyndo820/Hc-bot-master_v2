@@ -1380,7 +1380,8 @@ async function Hc(hc, m, db) {
       }
       break
       
-      // All menu
+      
+      // All Menu
       case 'allmenu': {
         await react('✨');
         
@@ -1442,17 +1443,21 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}sticker (send/reply img/vid)
 ╰────❍`;
         
-        
         let menuImage;
         const folderPath = path.join(process.cwd(), './src/media/randomimagemenu');
+        
         try {
           if (fs.existsSync(folderPath)) {
             const files = fs.readdirSync(folderPath).filter(file =>
-              /\.(jpg|jpeg|png|webp)$/i.test(file)
+              /\.(jpg|jpeg|png)$/i.test(file)
             );
+            
             if (files.length > 0) {
               const randomFile = files[Math.floor(Math.random() * files.length)];
+              console.log(chalk.green(`[MENU] Gambar terpilih: ${randomFile}`));
               menuImage = fs.readFileSync(path.join(folderPath, randomFile));
+            } else {
+              console.log(chalk.yellow('[MENU] Folder kosong atau tidak ada file gambar.'));
             }
           }
         } catch (err) {
@@ -1461,19 +1466,21 @@ async function Hc(hc, m, db) {
         if (!menuImage) {
           menuImage = global.fake?.thumbnailUrl || 'https://files.catbox.moe/kbqo64.jpg';
         }
-        const bypassUrl = `https://github.com/ponyndo820?v=${Date.now()}`;
+        const uniqueId = `${Date.now()}_${Math.floor(Math.random() * 999999)}`;
+        
+        const redirectUrl = `https://whatsapp.com/channel/0029Vb6en2iAu3aXA7AcFI0Y?v=${uniqueId}`;
+        let thumbnailConfig = {};
+        if (Buffer.isBuffer(menuImage)) {
+            thumbnailConfig.thumbnail = menuImage;
+        } else {
+            thumbnailConfig.thumbnailUrl = menuImage;
+        }
         let baseDoc = global.fake?.docs || Buffer.alloc(0);
         if (!Buffer.isBuffer(baseDoc)) baseDoc = Buffer.from(String(baseDoc));
-        const docBuffer = Buffer.concat([baseDoc, Buffer.from(`\n//anti-cache-${Date.now()}-${Math.random()}`)]);
+        const docBuffer = Buffer.concat([baseDoc, Buffer.from(`\n//anti-cache-${uniqueId}`)]);
         
         const randomFileLength = String(100000000000000 + Math.floor(Math.random() * 99999));
         const randomPageCount = Math.floor(Math.random() * 100) + 90;
-        let adThumbnailProps = {};
-        if (Buffer.isBuffer(menuImage)) {
-            adThumbnailProps.thumbnail = menuImage;
-        } else if (typeof menuImage === 'string') {
-            adThumbnailProps.thumbnailUrl = menuImage;
-        }
         const fakeDocTypes = global.fake?.listfakedocs || [
             'application/vnd.openxmlformats-officedocument.presentationml.presentation', 
             'application/pdf',
@@ -1504,9 +1511,9 @@ async function Hc(hc, m, db) {
                       previewType: 0,
                       renderLargerThumbnail: true,
                       showAdAttribution: true,
-                      sourceUrl: bypassUrl,
-                      mediaUrl: bypassUrl,
-                      ...adThumbnailProps
+                      sourceUrl: redirectUrl,
+                      mediaUrl: redirectUrl,
+                      ...thumbnailConfig
                   }
               }
           };
