@@ -1361,14 +1361,25 @@ async function Hc(hc, m, db) {
 ╰────❍`)
       }
       break
-      // All menu
+      
       // All menu
       case 'allmenu': {
         await react('✨');
+        // Hitung ucapan waktu berdasarkan WIB
+        const hour = parseInt(new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', hour12: false }));
+        const ucapanWaktu = 
+          hour >= 4 && hour < 11 ? 'Selamat Pagi 🌄' :
+          hour >= 11 && hour < 15 ? 'Selamat Siang 🏙' :
+          hour >= 15 && hour < 18 ? 'Selamat Sore 🌅' :
+          hour >= 18 && hour < 19 ? 'Selamat Petang 🌃' : 'Selamat Malam 🌌';
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
               🌈 *HC-BOT* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
+
+${ucapanWaktu} 👋
+🌐 Github: https://github.com/ponyndo820
+
 ╭──❍ *BOT*
 │${setv} ${prefix}sc
 │${setv} ${prefix}limit
@@ -1422,6 +1433,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}sticker (send/reply img/vid)
 ╰────❍`;
+
         const channelContext = {
           forwardingScore: 9999,
           isForwarded: true,
@@ -1429,17 +1441,9 @@ async function Hc(hc, m, db) {
             newsletterJid: settings.my.ch,
             newsletterName: 'Join For More Info',
             serverMessageId: null
-          },
-            externalAdReply: {
-              title: ucapanWaktu,
-              body: '🗿☕',
-              mediaType: 1,
-              renderLargerThumbnail: true,
-              thumbnailUrl: 'https://files.catbox.moe/9gxjhx.jpg',
-              sourceUrl: 'https://github.com/ponyndo820'
-              
-            }
+          }
         };
+        
         try {
           const animasiMenu = fs.readFileSync('./src/media/menu.mp4');
           await hc.sendMessage(from, {
@@ -1457,7 +1461,6 @@ async function Hc(hc, m, db) {
         }
       }
       break
-
       
     } // Penutup case command
   } catch (err) {
