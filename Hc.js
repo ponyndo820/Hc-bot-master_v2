@@ -670,6 +670,54 @@ async function Hc(hc, m, db) {
           reply(`@${sender.split('@')[0]} telah AFK${text ? ': ' + text : ''}`, { mentions: [sender] });
       }
       break
+      case 'ping': case 'botstatus': case 'statusbot': {
+        const os = require('os');
+        const { performance } = require('perf_hooks');
+        const used = process.memoryUsage();
+        const cpus = os.cpus().map(cpu => {
+          cpu.total = Object.keys(cpu.times).reduce((last, type) => last + cpu.times[type], 0);
+          return cpu;
+        });
+       
+        const cpu = cpus.reduce((last, cpu, _, { length }) => {
+          last.total += cpu.total;
+          last.speed += cpu.speed / length;
+          last.times.user += cpu.times.user;
+          last.times.nice += cpu.times.nice;
+          last.times.sys += cpu.times.sys;
+          last.times.idle += cpu.times.idle;
+          last.times.irq += cpu.times.irq;
+          return last;
+        }, {
+          speed: 0,
+          total: 0,
+          times: { user: 0, nice: 0, sys: 0, idle: 0, irq: 0 }
+        });
+        let oldd = performance.now();
+        await hc.sendMessage(from, { react: { text: '⚡', key: m.key } });
+        let neww = performance.now();
+        let pingMilis = (neww - oldd).toFixed(4);
+        let respon = `*K E C E P A T A N   R E S P O N*\n${pingMilis} _miliseconds_
+        
+        *R U N T I M E*
+        
+        ${runtime(process.uptime())}
+        
+        💻 *I N F O   S E R V E R*
+        
+        RAM: ${formatp(os.totalmem() - os.freemem())} / ${formatp(os.totalmem())}
+        _NodeJS Memory Usage_
+        
+        ${Object.keys(used).map((key, _, arr) => `${key.padEnd(Math.max(...arr.map(v => v.length)), ' ')}:${formatp(used[key])}`).join('\n')}
+        
+        ${cpus[0] ? `_Total CPU Usage_
+        ${cpus[0].model.trim()} (${cpu.speed} MHZ)${Object.keys(cpu.times).map(type => `- *${(type + '*').padEnd(6)}: ${(100 * cpu.times[type] / cpu.total).toFixed(2)}%`).join('\n')}
+        
+        _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Object.keys(cpu.times).map(type => `- *${(type + '*').padEnd(6)}:${(100 * cpu.times[type] / cpu.total).toFixed(2)}%`).join('\n')}`).join('\n\n')}` : ''}`.trim();
+        
+        await hc.sendMessage(from, { text: respon }, { quoted: m });
+      }
+      break
       
       // Random Images Menu
       case 'randomimage': case 'randomimg': case 'randomimages': {
