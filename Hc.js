@@ -5,6 +5,7 @@
    * ❗Peringatan Script ini tidak boleh di perjual belikan. Jika melanggar akan berurusan dengan hukum.
 */
 import fs from 'fs';
+import os from 'os';
 import util from 'util';
 import path from 'path';
 import chalk from 'chalk'; 
@@ -14,6 +15,7 @@ import speed from 'performance-now';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import youtubedl from 'youtube-dl-exec';
+import { performance } from 'perf_hooks';
 import { exec, spawn, execSync } from 'child_process';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getContentType, downloadMediaMessage, generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
