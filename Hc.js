@@ -1383,6 +1383,7 @@ async function Hc(hc, m, db) {
       // All menu
       case 'allmenu': {
         await react('✨');
+        
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
               🌈 *HC-BOT* 🌈
                *By Heart candy*
@@ -1446,18 +1447,42 @@ async function Hc(hc, m, db) {
         try {
           if (fs.existsSync(folderPath)) {
             const files = fs.readdirSync(folderPath).filter(file =>
-            /\.(jpg|jpeg|png|webp)$/i.test(file)
+              /\.(jpg|jpeg|png|webp)$/i.test(file)
             );
-            if (files.length >0){
-              const randomFile = files[Math.floor(Math.random()*files.length)];
+            if (files.length > 0) {
+              const randomFile = files[Math.floor(Math.random() * files.length)];
               menuImage = fs.readFileSync(path.join(folderPath, randomFile));
             }
           }
         } catch (err) {
           console.error(chalk.red('[IMAGE FOLDER ERROR]:'), err);
         }
+        if (!menuImage) {
+          menuImage = global.fake?.thumbnailUrl || 'https://files.catbox.moe/kbqo64.jpg';
+        }
+        try {
+          await hc.sendMessage(from, {
+            image: menuImage,
+            caption: menuText,
+            contextInfo: {
+              forwardingScore: 9999,
+              isForwarded: true,
+              forwardedNewsletterMessageInfo: {
+                newsletterJid: global.my?.ch || '120363421709200388@newsletter',
+                newsletterName: 'Join For More Info',
+                serverMessageId: null
+              }
+            }
+          }, { quoted: m });
+          
+          console.log(chalk.green('[SUCCESS]: Menu gambar berhasil dikirim!'));
+        } catch (sendErr) {
+          console.error(chalk.red('[SEND MENU ERROR]:'), sendErr);
+          await hc.sendMessage(from, { text: menuText }, { quoted: m });
+        }
       }
       break
+      
       
     } // Penutup case command
   } catch (err) {
