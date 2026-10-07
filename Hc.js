@@ -673,8 +673,6 @@ async function Hc(hc, m, db) {
       }
       break
       case 'ping': case 'botstatus': case 'statusbot': {
-        const os = require('os');
-        const { performance } = require('perf_hooks');
         const used = process.memoryUsage();
         const cpus = os.cpus().map(cpu => {
           cpu.total = Object.keys(cpu.times).reduce((last, type) => last + cpu.times[type], 0);
