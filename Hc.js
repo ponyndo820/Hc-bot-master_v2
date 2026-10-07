@@ -1381,7 +1381,7 @@ async function Hc(hc, m, db) {
       break
       
       // All menu
-            case 'allmenu': {
+      case 'allmenu': {
         await react('✨');
         
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
@@ -1419,7 +1419,7 @@ async function Hc(hc, m, db) {
 ╭┴─❍ *ANIME*
 │${setv} ${prefix}randomwaifu
 │${setv} ${prefix}cariwaifu (query)
-╰┬──❍
+╰┬───❍
 ╭┴─❍ *SEARCH*
 │${setv} ${prefix}ytsearch (query)
 ╰┬───❍
@@ -1442,7 +1442,7 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}sticker (send/reply img/vid)
 ╰────❍`;
         
-        // --- Ambil Gambar Acak dari Folder ---
+        
         let menuImage;
         const folderPath = path.join(process.cwd(), './src/media/randomimagemenu');
         try {
@@ -1458,33 +1458,28 @@ async function Hc(hc, m, db) {
         } catch (err) {
           console.error(chalk.red('[IMAGE FOLDER ERROR]:'), err);
         }
-
         if (!menuImage) {
           menuImage = global.fake?.thumbnailUrl || 'https://files.catbox.moe/kbqo64.jpg';
         }
-
-        // --- Konfigurasi Fake Dokumen & Anti-Cache ---
+        const bypassUrl = `https://github.com/ponyndo820?v=${Date.now()}`;
         let baseDoc = global.fake?.docs || Buffer.alloc(0);
         if (!Buffer.isBuffer(baseDoc)) baseDoc = Buffer.from(String(baseDoc));
         const docBuffer = Buffer.concat([baseDoc, Buffer.from(`\n//anti-cache-${Date.now()}-${Math.random()}`)]);
         
         const randomFileLength = String(100000000000000 + Math.floor(Math.random() * 99999));
         const randomPageCount = Math.floor(Math.random() * 100) + 90;
-
         let adThumbnailProps = {};
         if (Buffer.isBuffer(menuImage)) {
             adThumbnailProps.thumbnail = menuImage;
         } else if (typeof menuImage === 'string') {
             adThumbnailProps.thumbnailUrl = menuImage;
         }
-
         const fakeDocTypes = global.fake?.listfakedocs || [
             'application/vnd.openxmlformats-officedocument.presentationml.presentation', 
             'application/pdf',
             'application/msword'
         ];
         const mimeDoc = fakeDocTypes[Math.floor(Math.random() * fakeDocTypes.length)];
-
         try {
           let messagePayload = {
               document: docBuffer,
@@ -1503,29 +1498,26 @@ async function Hc(hc, m, db) {
                       newsletterName: 'Join For More Info'
                   },
                   externalAdReply: {
-                      title: global.author || 'Heart candy',
+                      title: settings.author || 'Heart candy',
                       body: 'Ponyndo Team',
                       mediaType: 1,
                       previewType: 0,
                       renderLargerThumbnail: true,
                       showAdAttribution: true,
-                      sourceUrl: 'https://github.com/ponyndo820',
-                      mediaUrl: 'https://github.com/ponyndo820',
+                      sourceUrl: bypassUrl,
+                      mediaUrl: bypassUrl,
                       ...adThumbnailProps
                   }
               }
           };
-
           await hc.sendMessage(from, messagePayload, { quoted: m });
           console.log(chalk.green('[SUCCESS]: Menu fake dokumen berhasil terkirim!'));
-
         } catch (sendErr) {
           console.error(chalk.red('[SEND MENU ERROR]:'), sendErr);
           await hc.sendMessage(from, { text: menuText }, { quoted: m });
         }
       }
-      break;
-
+      break
       
       
     } // Penutup case command
