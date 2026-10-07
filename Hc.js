@@ -147,6 +147,14 @@ async function Hc(hc, m, db) {
         }
     }
     
+    const hour = parseInt(new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', hour12: false }));
+    const ucapanWaktu = 
+    hour >= 4 && hour < 11 ? 'Selamat Pagi 🌄' :
+    hour >= 11 && hour < 15 ? 'Selamat Siang 🏙' :
+    hour >= 15 && hour < 18 ? 'Selamat Sore 🌅' :
+  hour >= 18 && hour < 19 ? 'Selamat Petang 🌃' : 'Selamat Malam 🌌';
+
+
    /*const isVip = isCreator || (db.users[sender]?.vip || false);
    const isBan = db.users[sender]?.ban || false; 
    const isLimit = isCreator || (db.users[sender]?.limit > 0 || false);
@@ -1421,7 +1429,16 @@ async function Hc(hc, m, db) {
             newsletterJid: settings.my.ch,
             newsletterName: 'Join For More Info',
             serverMessageId: null
-          }
+          },
+            externalAdReply: {
+              title: ucapanWaktu,
+              body: '🗿☕',
+              mediaType: 1,
+              renderLargerThumbnail: true,
+              thumbnailUrl: 'https://files.catbox.moe/9gxjhx.jpg',
+              sourceUrl: 'https://github.com/ponyndo820'
+              
+            }
         };
         try {
           const animasiMenu = fs.readFileSync('./src/media/menu.mp4');
