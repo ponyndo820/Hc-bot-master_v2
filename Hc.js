@@ -1422,21 +1422,23 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}sticker (send/reply img/vid)
 ╰────❍`;
-
-         const channelContext = {
+        const channelContext = {
           forwardingScore: 9999,
-          isForwarded: ucapanWaktu,
+          isForwarded: true,
           forwardedNewsletterMessageInfo: {
             newsletterJid: settings.my.ch,
             newsletterName: 'Join For More Info',
             serverMessageId: null
           },
           externalAdReply: {
-            mediaUrl: settings.my.gh,
-            sourceUrl:settings.my.gh,
-             fileName: ucapanWaktu,
+            title: ucapanWaktu,
+            body: 'By Heart candy',
+            mediaType: 1,
+            renderLargerThumbnail: false,
+            sourceUrl: settings.my.gh,
+            mediaUrl: settings.my.gh
           }
-       };
+        };
         try {
           const animasiMenu = fs.readFileSync('./src/media/menu.mp4');
           await hc.sendMessage(sender, {
