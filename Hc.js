@@ -225,7 +225,7 @@ async function Hc(hc, m, db) {
                         }
                     }
                     
-                    await reply(`*GAME TELAH BERAKHIR*\nKamu terkena bomb\n\n ${brd.join('')}\n\n*Terpilih :* ${game.pick}\n_Pengurangan Limit : 1_`);
+                    await reply(`*GAME TELAH BERAKHIR*\nKamu terkena bom\n\n ${brd.join('')}\n\n*Terpilih :* ${game.pick}\n_Pengurangan Limit : 1_`);
                     try { await react('😂'); } catch (e) {}
                     
                     delete global.tebakbom[sender];
@@ -251,7 +251,7 @@ async function Hc(hc, m, db) {
                         db.users[userJid].money = (db.users[userJid].money || 0) + 6000;
                     }
                     
-                    await reply(`*KAMU HEBAT ಠ⁠ᴥ⁠ಠ*\n\n${brd.join('')}\n\n*Terpilih :* ${game.pick}\n*Sisa nyawa :* ${game.nyawa.join('')}\n*Bomb :* ${game.bomb}\nBonus Money 💰 *+6000*`);
+                    await reply(`*KAMU HEBAT ಠ⁠ᴥ⁠ಠ*\n\n${brd.join('')}\n\n*Terpilih :* ${game.pick}\n*Sisa nyawa :* ${game.nyawa.join('')}\n*Bom :* ${game.bomb}\nBonus Money 💰 *+6000*`);
                     
                     delete global.tebakbom[sender];
                 } else {
@@ -1168,7 +1168,7 @@ async function Hc(hc, m, db) {
         
       }
       break
-      // Game menu
+      // Game Menu
       case 'tebakbom': {
         if (tebakbom[sender]) return reply('Masih Ada Sesi Yang Belum Diselesaikan!')
         tebakbom[sender] = {
@@ -1188,6 +1188,25 @@ async function Hc(hc, m, db) {
       }
       break
       
+      // Doa Menu
+      case 'doatahlil': {
+          let { result } = JSON.parse(fs.readFileSync('./scrape/tahlil.json','utf-8'))
+        let caption = result.map((v,i) => {
+          return `
+				*${i + 1}.*${v.title}
+				
+				❃ Arabic:
+				${v.arabic}
+				
+				❃ Translate:
+				${v.translation}$$l
+				`.trim()
+				}).join('\n\n')
+				return reply(`${caption}`)
+        
+      }
+      break
+      
       // Menu
       case 'menu': {
         await react('✨');
@@ -1195,7 +1214,6 @@ async function Hc(hc, m, db) {
               🌈 *HC-BOT* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
-
 ╭──❍ *MENU*
 │${setv} ${prefix}aimenu
 │${setv} ${prefix}botmenu
@@ -1422,37 +1440,21 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}sticker (send/reply img/vid)
 ╰────❍`;
-        const channelContext = {
-          forwardingScore: 9999,
-          isForwarded: true,
-          forwardedNewsletterMessageInfo: {
-            newsletterJid: settings.my.ch,
-            newsletterName: 'Join For More Info',
-            serverMessageId: null
-          },
-          externalAdReply: {
-            title: ucapanWaktu,
-            body: 'By Heart candy',
-            mediaType: 1,
-            renderLargerThumbnail: false,
-            sourceUrl: settings.my.gh,
-            mediaUrl: settings.my.gh
-          }
-        };
+        
+        let menuImage;
+        const folderPath = path.join(process.cwd(), './src/media/randomimagemenu');
         try {
-          const animasiMenu = fs.readFileSync('./src/media/menu.mp4');
-          await hc.sendMessage(sender, {
-            video: animasiMenu,
-            caption: menuText,
-            gifPlayback: true,
-            contextInfo: channelContext
-          }, { quoted: m });
+          if (fs.existsSync(folderPath)) {
+            const files = fs.readdirSync(folderPath).filter(file =>
+            /\.(jpg|jpeg|png|webp)$/i.test(file)
+            );
+            if (files.length >0){
+              const randomFile = files[Math.floor(Math.random()*files.length)];
+              menuImage = fs.readFileSync(path.join(folderPath, randomFile));
+            }
+          }
         } catch (err) {
-          console.error("Gagal memuat animasi menu:", err);
-          await hc.sendMessage(sender, {
-            text: menuText,
-            contextInfo: channelContext
-          }, { quoted: m });
+          console.error(chalk.red('[IMAGE FOLDER ERROR]:'), err);
         }
       }
       break
