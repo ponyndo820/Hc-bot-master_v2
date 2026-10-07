@@ -1380,11 +1380,9 @@ async function Hc(hc, m, db) {
       }
       break
       
-      
-      // All Menu
+// All menu
       case 'allmenu': {
         await react('✨');
-        
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
               🌈 *HC-BOT* 🌈
                *By Heart candy*
@@ -1442,86 +1440,30 @@ async function Hc(hc, m, db) {
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}sticker (send/reply img/vid)
 ╰────❍`;
-        
-        let menuImage;
-        const folderPath = path.join(process.cwd(), './src/media/randomimagemenu');
-        
-        try {
-          if (fs.existsSync(folderPath)) {
-            const files = fs.readdirSync(folderPath).filter(file =>
-              /\.(jpg|jpeg|png)$/i.test(file)
-            );
-            
-            if (files.length > 0) {
-              const randomFile = files[Math.floor(Math.random() * files.length)];
-              console.log(chalk.green(`[MENU] Gambar terpilih: ${randomFile}`));
-              menuImage = fs.readFileSync(path.join(folderPath, randomFile));
-            } else {
-              console.log(chalk.yellow('[MENU] Folder kosong atau tidak ada file gambar.'));
-            }
+
+         const channelContext = {
+          forwardingScore: 9999,
+          isForwarded: ucapanWaktu,
+          forwardedNewsletterMessageInfo: {
+            newsletterJid: settings.my.ch,
+            newsletterName: 'Join For More Info',
+            serverMessageId: null
           }
-        } catch (err) {
-          console.error(chalk.red('[IMAGE FOLDER ERROR]:'), err);
-        }
-        if (!menuImage) {
-          menuImage = global.fake?.thumbnailUrl || 'https://files.catbox.moe/kbqo64.jpg';
-        }
-        const uniqueId = `${Date.now()}_${Math.floor(Math.random() * 999999)}`;
-        
-        const redirectUrl = `https://whatsapp.com/channel/0029Vb6en2iAu3aXA7AcFI0Y?v=${uniqueId}`;
-        let thumbnailConfig = {};
-        if (Buffer.isBuffer(menuImage)) {
-            thumbnailConfig.thumbnail = menuImage;
-        } else {
-            thumbnailConfig.thumbnailUrl = menuImage;
-        }
-        let baseDoc = global.fake?.docs || Buffer.alloc(0);
-        if (!Buffer.isBuffer(baseDoc)) baseDoc = Buffer.from(String(baseDoc));
-        const docBuffer = Buffer.concat([baseDoc, Buffer.from(`\n//anti-cache-${uniqueId}`)]);
-        
-        const randomFileLength = String(100000000000000 + Math.floor(Math.random() * 99999));
-        const randomPageCount = Math.floor(Math.random() * 100) + 90;
-        const fakeDocTypes = global.fake?.listfakedocs || [
-            'application/vnd.openxmlformats-officedocument.presentationml.presentation', 
-            'application/pdf',
-            'application/msword'
-        ];
-        const mimeDoc = fakeDocTypes[Math.floor(Math.random() * fakeDocTypes.length)];
+       };
         try {
-          let messagePayload = {
-              document: docBuffer,
-              mimetype: mimeDoc,
-              fileName: `${ucapanWaktu}.pdf`, 
-              pageCount: randomPageCount,
-              fileLength: randomFileLength,
-              caption: menuText,
-              contextInfo: {
-                  mentionedJid: [sender, '0@s.whatsapp.net'],
-                  forwardingScore: 9999,
-                  isForwarded: true,
-                  forwardedNewsletterMessageInfo: {
-                      newsletterJid: global.my?.ch || '120363421709200388@newsletter', 
-                      serverMessageId: 100,
-                      newsletterName: 'Join For More Info'
-                  },
-                  externalAdReply: {
-                      title: settings.author || 'Heart candy',
-                      body: 'Ponyndo Team',
-                      mediaType: 1,
-                      previewType: 0,
-                      renderLargerThumbnail: true,
-                      showAdAttribution: true,
-                      sourceUrl: redirectUrl,
-                      mediaUrl: redirectUrl,
-                      ...thumbnailConfig
-                  }
-              }
-          };
-          await hc.sendMessage(from, messagePayload, { quoted: m });
-          console.log(chalk.green('[SUCCESS]: Menu fake dokumen berhasil terkirim!'));
-        } catch (sendErr) {
-          console.error(chalk.red('[SEND MENU ERROR]:'), sendErr);
-          await hc.sendMessage(from, { text: menuText }, { quoted: m });
+          const animasiMenu = fs.readFileSync('./src/media/menu.mp4');
+          await hc.sendMessage(sender, {
+            video: animasiMenu,
+            caption: menuText,
+            gifPlayback: true,
+            contextInfo: channelContext
+          }, { quoted: m });
+        } catch (err) {
+          console.error("Gagal memuat animasi menu:", err);
+          await hc.sendMessage(sender, {
+            text: menuText,
+            contextInfo: channelContext
+          }, { quoted: m });
         }
       }
       break
