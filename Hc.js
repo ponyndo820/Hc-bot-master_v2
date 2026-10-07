@@ -1365,21 +1365,10 @@ async function Hc(hc, m, db) {
       // All menu
       case 'allmenu': {
         await react('✨');
-        // Hitung ucapan waktu berdasarkan WIB
-        const hour = parseInt(new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', hour12: false }));
-        const ucapanWaktu = 
-          hour >= 4 && hour < 11 ? 'Selamat Pagi 🌄' :
-          hour >= 11 && hour < 15 ? 'Selamat Siang 🏙' :
-          hour >= 15 && hour < 18 ? 'Selamat Sore 🌅' :
-          hour >= 18 && hour < 19 ? 'Selamat Petang 🌃' : 'Selamat Malam 🌌';
         const menuText = `*━━━━━━━━━━━━━━━━━━━━*
               🌈 *HC-BOT* 🌈
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
-
-${ucapanWaktu} 👋
-🌐 Github: https://github.com/ponyndo820
-
 ╭──❍ *BOT*
 │${setv} ${prefix}sc
 │${setv} ${prefix}limit
@@ -1433,20 +1422,25 @@ ${ucapanWaktu} 👋
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}sticker (send/reply img/vid)
 ╰────❍`;
-
-        const channelContext = {
+       await reply({
+         fileName: ucapanWaktu,
+         const channelContext = {
           forwardingScore: 9999,
-          isForwarded: true,
+          isForwarded: ucapanWaktu,
           forwardedNewsletterMessageInfo: {
             newsletterJid: settings.my.ch,
             newsletterName: 'Join For More Info',
             serverMessageId: null
           }
-        };
-        
+          externalAdReply: {
+            mediaUrl: settings.my.gh,
+            sourceUrl:settings.my.gh,
+          }
+        })
+       };
         try {
           const animasiMenu = fs.readFileSync('./src/media/menu.mp4');
-          await hc.sendMessage(from, {
+          await hc.sendMessage(sender, {
             video: animasiMenu,
             caption: menuText,
             gifPlayback: true,
@@ -1454,7 +1448,7 @@ ${ucapanWaktu} 👋
           }, { quoted: m });
         } catch (err) {
           console.error("Gagal memuat animasi menu:", err);
-          await hc.sendMessage(from, {
+          await hc.sendMessage(sender, {
             text: menuText,
             contextInfo: channelContext
           }, { quoted: m });
