@@ -501,7 +501,7 @@ async function Hc(hc, m, db) {
         const uniqueId = sender.replace(/[^0-9]/g, '') + Date.now();
         const outputFileName = `./temp_${uniqueId}.png`;
         
-        execFile(`ruby ./lib/ssweb.rb "${targetUrl}" "${outputFileName}" desktop`, async (error, stdout, stderr) => {
+        exec(`ruby ./lib/ssweb.rb "${targetUrl}" "${outputFileName}" desktop`, async (error, stdout, stderr) => {
           if (error) {
             console.error("Gagal mengeksekusi script Ruby:", error);
             await react('❌');
