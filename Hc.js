@@ -8,6 +8,7 @@ import fs from 'fs';
 import os from 'os';
 import util from 'util';
 import path from 'path';
+import pino from 'pino';
 import chalk from 'chalk'; 
 import yts from 'yt-search';
 import { promisify } from 'util';
@@ -20,6 +21,7 @@ import { exec, spawn, execSync } from 'child_process';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getContentType, downloadMediaMessage, generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
 
+const require = createRequire(import.meta.url);
 
 import settings from './settings.js';
 import { igdl } from './lib/igdl.js';
@@ -263,6 +265,33 @@ async function Hc(hc, m, db) {
                 return !0;
             }
         }
+    }
+    
+    // Jadi bot
+    const botNumber = hc.user.id.split(':')[0];
+    const isJadibot = botNumber !== settings.ownerNumber[0]; 
+    global.warnedUsers = global.warnedUsers || {};
+    if (!global.warnedUsers[botNumber]) {
+        global.warnedUsers[botNumber] = [];
+    }
+    if (isCmd && isJadibot && senderClean !== botNumber) {
+        const senderNumber = sender.split('@')[0];
+        
+        if (!global.warnedUsers[botNumber].includes(senderNumber)) {
+            const warningMsg = "⚠️ *PERINGATAN*\nNomor ini bukan nomor owner resmi. Owner utama tidak bertanggung jawab atas segala pembelian yang mengatasnamakan bot ini.";
+            
+            await reply(warningMsg);
+            global.warnedUsers[botNumber].push(senderNumber);
+            
+            await new Promise(resolve => setTimeout(resolve, 1500));
+        }
+    }
+    if (isCreator) {
+    db.users = db.users || {};
+    db.users[sender] = db.users[sender] || {};
+    db.users[sender].limit = 999999999;
+    db.users[sender].money = 999999999;
+    db.users[sender].premium = true;
     }
     
     // Add case command di sini
@@ -752,6 +781,52 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         }
       }
       break
+      case 'jadibot': {
+        if (isJadibot) return reply("Fitur ini hanya bisa digunakan di Bot Utama!");
+        const { default: makeWASocket, useMultiFileAuthState } = require('@whiskeysockets/baileys');
+        const { state, saveCreds } = await useMultiFileAuthState(`./database/jadibot/${sender.split('@')[0]}`);
+        const jadibotSock = makeWASocket({
+          logger: pino({ level: "silent" }),
+          printQRInTerminal: false,
+          auth: state,
+          browser: ["Ubuntu", "Chrome", "20.0.04"]
+          
+        });
+        if (!jadibotSock.authState.creds.registered) {
+        let phoneNumber = sender.split('@')[0];
+        let code = await jadibotSock.requestPairingCode(phoneNumber);
+        let formattedCode = code?.match(/.{1,4}/g)?.join("-") || code;
+        
+        reply(`KODE PAIRING ANDA: *${formattedCode}*\n\nSilakan masukkan kode ini di WhatsApp Anda (Perangkat Tautkan) untuk menjadi bot. Limit & Money Anda akan otomatis unlimited setelah berhasil terhubung.`);
+        }
+        jadibotSock.ev.on('creds.update', saveCreds);
+        jadibotSock.ev.on('connection.update', async (update) => {
+          const { connection, lastDisconnect } = update;
+          if (connection === 'open') {
+            db.users = db.users || {};
+            db.users[sender] = db.users[sender] || {};
+            db.users[sender].limit = 999999999;
+            db.users[sender].money = 999999999;
+            reply("✅ Berhasil terhubung! Nomor Anda sekarang menjadi bot. Anda memiliki akses Owner di session Anda sendiri dan Limit & Money Anda di bot utama sekarang Unlimited.");
+            }
+            if (connection === 'close') {
+            console.log(`Koneksi jadibot ${sender.split('@')[0]} terputus.`);
+            }
+            });
+            jadibotSock.ev.on('messages.upsert', async chatUpdate => {
+              try {
+                if (!chatUpdate.messages) return;
+                const msg = chatUpdate.messages[0];
+                if (!msg.message) return;
+                await Hc(jadibotSock, msg, db);
+              } catch (err) {
+                console.log(err);
+              }
+              
+            });
+      }
+      break
+      
       
       // Random Images Menu
       case 'randomimage': case 'randomimg': case 'randomimages': {
