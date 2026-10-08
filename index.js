@@ -121,7 +121,7 @@ async function startHcbot() {
       
       await new Promise((resolve) => setTimeout(resolve, 3000));
       const code = await hc.requestPairingCode(phoneNumber.replace(/[^0-9]/g, ''));
-      console.log(chalk.green.bold(`\n============================\n[INI CODE PAIRING KAMU SAYANG]: ${code}\n============================\n`));
+      console.log(chalk.green.bold(`\n=======================================\n[INI CODE PAIRING KAMU SAYANG]: ${code}\n=======================================\n`));
     } else {
       console.log(chalk.yellowBright('[SYSTEM] Mode QR Code aktif. silahkan scan QR Code yang muncul di terminal.'));
     }
