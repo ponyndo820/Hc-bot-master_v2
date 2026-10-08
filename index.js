@@ -139,7 +139,7 @@ async function startHcbot() {
       
       // AUTO BACKUP DATABASE (Setiap 6 Jam)
       setInterval(async () => {
-          let dbPath = path.join(process.cwd(), 'database', settings.tempatDB || 'database.json');
+          let dbPath = path.join(process.cwd(), settings.tempatDB || 'database.json');
           
           if (fs.existsSync(dbPath)) {
               let ownerJid = settings.ownerNumber[0] + '@s.whatsapp.net';

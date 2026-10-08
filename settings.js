@@ -55,9 +55,7 @@ settings.APIs = {
   Gemini: 'https://aistudio.google.com/api-keys',
 }
 
-settings.APIKeys = {
-  'https://aistudio.google.com/api-keys': 'YOUR_API_KEY',
-}
+settings.APIKeys = 'YOUR_API_KEY';
 
 settings.limit = {
   free: 15,

@@ -1282,7 +1282,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 				${v.arabic}
 				
 				❃ Translate:
-				${v.translation}$$l
+				
 				`.trim()
 				}).join('\n\n')
 				return reply(`${caption}`)
@@ -1302,7 +1302,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 						${v.arabic}
 						
 						❃ Translate :
-						*{v.translation}
+						${v.translation}
 						`.trim()
 					}).join('\n\n')
 					return reply(`${caption}`)
