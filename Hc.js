@@ -531,18 +531,32 @@ async function Hc(hc, m, db) {
       }
       break
       case 'toaud': case 'toaudio': {
-        if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin Dijadikan Audio Dengan Caption ${prefix + command}`)
-        await react('⏳')
-        let media = await downloadMediaMessage(qmsg)
-        try { 
-          audio = await toAudio(media, 'mp4')
-        await reply({ audio: { url: audio }, mimetype: 'audio/mpeg'})
-        if (fs.existsSync(audio)) fs.unlinkSync(audio)
-        } finally {
-          if (fs.existsSync(media)) fs.unlinkSync(media)
+        if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin Dijadikan Audio Dengan Caption ${prefix + command}`);
+        await react('⏳');
+        const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
+        try {
+          let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+          let audio = await toAudio(mediaBuffer, 'mp4');
+          let audioData = typeof audio === 'string' ? { url: audio } : audio;
+          
+          await hc.sendMessage(from, { 
+            audio: audioData, 
+            mimetype: 'audio/mpeg' 
+          }, { quoted: m });
+          
+          await react('✅');
+          
+          if (typeof audio === 'string' && fs.existsSync(audio)) {
+            fs.unlinkSync(audio);
+          }
+        } catch (e) {
+          console.error("Error toaudio:", e);
+          await react('❌');
+          await reply('❌ Gagal mengonversi media menjadi audio!');
         }
       }
       break
+
       
       //Bot Menu
       case 'sc': case 'script': {
