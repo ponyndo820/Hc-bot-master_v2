@@ -20,9 +20,10 @@ import { exec, spawn, execSync } from 'child_process';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getContentType, downloadMediaMessage, generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
 
-import { ytMp4 } from './lib/ytmp4.js';
+
 import settings from './settings.js';
 import { igdl } from './lib/igdl.js';
+import { ytMp4 } from './lib/ytmp4.js';
 import { GroupUpdate, LoadDataBase } from './src/message.js';
 import { writeExif, toAudio, toPTT, toPTV, toVideo } from './lib/converter.js';
 import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime, sleep, clockString } from './lib/function.js';
@@ -303,6 +304,18 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      case 'anticall': {
+      	if (!isCreator) return reply(settings.mess.owr);
+      	global.anticall = true;
+      	reply('Fitur Anti-Call berhasil *diaktifkan*. Bot akan menolak panggilan secara otomatis.');
+      }
+      break
+      case 'delanticall': {
+      	if (!isCreator) return reply(settings.mess.owr);
+      	global.anticall = false;
+      	reply('Fitur Anti-Call berhasil *dimatikan*. Bot dapat menerima panggilan lagi.');
+      }
+      break
       
       // Quotes Menu
       case 'quotes': {
@@ -488,7 +501,7 @@ async function Hc(hc, m, db) {
         const uniqueId = sender.replace(/[^0-9]/g, '') + Date.now();
         const outputFileName = `./temp_${uniqueId}.png`;
         
-        exec(`ruby ./lib/ssweb.rb "${targetUrl}" "${outputFileName}" desktop`, async (error, stdout, stderr) => {
+        execFile(`ruby ./lib/ssweb.rb "${targetUrl}" "${outputFileName}" desktop`, async (error, stdout, stderr) => {
           if (error) {
             console.error("Gagal mengeksekusi script Ruby:", error);
             await react('❌');
@@ -517,46 +530,16 @@ async function Hc(hc, m, db) {
         });
       }
       break
-      case 'toptv': case 'ptv': {
-        const checkQuoted = m.message.extendedTextMessage?.contextInfo?.quotedMessage;
-        if (!checkQuoted) {
-          return reply(`Silakan reply video dengan caption ${prefix + command} untuk mengubahnya menjadi PTV!`);
-        }
-        
-        const citatedMessage = m.message.extendedTextMessage.contextInfo;
-        const targetMsg = {
-          key: {
-            remoteJid: sender,
-            fromMe: false,
-            id: citatedMessage.stanzaId,
-            participant: citatedMessage.participant || sender
-          },
-          message: citatedMessage.quotedMessage
-        };
-        const mediaType = getContentType(targetMsg.message);
-        if (!mediaType || !mediaType.includes('video')) {
-          return reply(`Pesan yang Anda reply bukan video! Kirim atau reply video dengan caption ${prefix + command}.`);
-        }
-        
-        await react('⏳');
-        try {
-          
-          const mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
-          if (!mediaBuffer) throw new Error('Gagal mengunduh buffer media.');
-          
-          const ptvBuffer = await toPTV(mediaBuffer, 'mp4');
-          
-          await hc.sendMessage(from, { 
-            video: ptvBuffer, 
-            ptv: true,
-            seconds: 60
-          }, { quoted: m });
-          
-          await react('✅');
-        } catch (err) {
-          console.error("Error toPTV:", err);
-          await react('❌');
-          reply(`❌ Gagal mengonversi video menjadi PTV: ${err.message || 'Terjadi kesalahan sistem.'}`);
+      case 'toaud': case 'toaudio': {
+        if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin Dijadikan Audio Dengan Caption ${prefix + command}`)
+        await react('⏳')
+        let media = await downloadMediaMessage(qmsg)
+        try { 
+          audio = await toAudio(media, 'mp4')
+        await reply({ audio: { url: audio }, mimetype: 'audio/mpeg'})
+        if (fs.existsSync(audio)) fs.unlinkSync(audio)
+        } finally {
+          if (fs.existsSync(media)) fs.unlinkSync(media)
         }
       }
       break
@@ -650,18 +633,6 @@ async function Hc(hc, m, db) {
       	reply(`Total Fitur : ${total}`);
       }
       break
-      case 'anticall': {
-      	if (!isCreator) return reply(settings.mess.owr);
-      	global.anticall = true;
-      	reply('Fitur Anti-Call berhasil *diaktifkan*. Bot akan menolak panggilan secara otomatis.');
-      }
-      break
-      case 'delanticall': {
-      	if (!isCreator) return reply(settings.mess.owr);
-      	global.anticall = false;
-      	reply('Fitur Anti-Call berhasil *dimatikan*. Bot dapat menerima panggilan lagi.');
-      }
-      break
       case 'afk': {
           if (!global.db.users[sender]) {
               global.db.users[sender] = { afkTime: -1, afkReason: '' };
@@ -722,6 +693,49 @@ ${cpus[0].model.trim()} (${cpu.speed} MHZ)${Object.keys(cpu.times).map(type => `
 _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Object.keys(cpu.times).map(type => `- *${(type + '*').padEnd(6)}:${(100 * cpu.times[type] / cpu.total).toFixed(2)}%`).join('\n')}`).join('\n\n')}` : ''}`.trim();
 
         await hc.sendMessage(from, { text: respon }, { quoted: m });
+      }
+      break
+      case 'toptv': case 'ptv': {
+        const checkQuoted = m.message.extendedTextMessage?.contextInfo?.quotedMessage;
+        if (!checkQuoted) {
+          return reply(`Silakan reply video dengan caption ${prefix + command} untuk mengubahnya menjadi PTV!`);
+        }
+        
+        const citatedMessage = m.message.extendedTextMessage.contextInfo;
+        const targetMsg = {
+          key: {
+            remoteJid: sender,
+            fromMe: false,
+            id: citatedMessage.stanzaId,
+            participant: citatedMessage.participant || sender
+          },
+          message: citatedMessage.quotedMessage
+        };
+        const mediaType = getContentType(targetMsg.message);
+        if (!mediaType || !mediaType.includes('video')) {
+          return reply(`Pesan yang Anda reply bukan video! Kirim atau reply video dengan caption ${prefix + command}.`);
+        }
+        
+        await react('⏳');
+        try {
+          
+          const mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+          if (!mediaBuffer) throw new Error('Gagal mengunduh buffer media.');
+          
+          const ptvBuffer = await toPTV(mediaBuffer, 'mp4');
+          
+          await hc.sendMessage(from, { 
+            video: ptvBuffer, 
+            ptv: true,
+            seconds: 60
+          }, { quoted: m });
+          
+          await react('✅');
+        } catch (err) {
+          console.error("Error toPTV:", err);
+          await react('❌');
+          reply(`❌ Gagal mengonversi video menjadi PTV: ${err.message || 'Terjadi kesalahan sistem.'}`);
+        }
       }
       break
       
@@ -1222,6 +1236,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         
       }
       break
+      
       // Game Menu
       case 'tebakbom': {
         if (tebakbom[sender]) return reply('Masih Ada Sesi Yang Belum Diselesaikan!')
@@ -1258,6 +1273,25 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 				}).join('\n\n')
 				return reply(`${caption}`)
         
+      }
+      break
+      case 'doaharian': {
+        let src = JSON.parse(fs.readFileSync('./scrape/doaharian.json','utf-8'))
+        let caption = src.map((v,i) => {
+          return`
+						*${i + 1}.*${v.title}
+						
+						❃ Latin :
+						${v.latin}
+						
+						❃ Arabic :
+						${v.arabic}
+						
+						❃ Translate :
+						*{v.translation}
+						`.trim()
+					}).join('\n\n')
+					return reply(`${caption}`)
       }
       break
       
@@ -1315,6 +1349,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}totalfitur
 │${setv} ${prefix}request (text)
 │${setv} ${prefix}tovn (reply pesan)
+│${setv} ${prefix}toptv (reply video)
 ╰────❍`)
       }
       break
@@ -1326,7 +1361,9 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *OWNER*
+│${setv} ${prefix}anticall
 │${setv} ${prefix}shutdown
+│${setv} ${prefix}delanticall
 │${setv} ${prefix}setapikeygemini
 ╰────❍`)
       }
@@ -1354,8 +1391,8 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 ╭──❍ *TOOLS*
 │${setv} ${prefix}brat
 │${setv} ${prefix}bratvid
+│${setv} ${prefix}ssweb (url)
 │${setv} ${prefix}draw (prompt)
-│${setv} ${prefix}toptv (reply video)
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}sticker (send/reply img/vid)
 ╰────❍`)
@@ -1468,10 +1505,11 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}totalfitur
 │${setv} ${prefix}request (text)
 │${setv} ${prefix}tovn (reply pesan)
+│${setv} ${prefix}toptv (reply video)
 ╰┬───❍
 ╭┴─❍ *OWMER*
-│${setv} ${prefix}shutdown
 │${setv} ${prefix}anticall
+│${setv} ${prefix}shutdown
 │${setv} ${prefix}delanticall
 │${setv} ${prefix}setapikeygemini
 ╰┬──❍
@@ -1507,11 +1545,10 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}doatahlil
 ╰┬──❍
 ╭┴─❍ *TOOLS*
-│${setv} ${prefix}ssweb (url)
 │${setv} ${prefix}brat
 │${setv} ${prefix}bratvid
+│${setv} ${prefix}ssweb (url)
 │${setv} ${prefix}draw (prompt)
-│${setv} ${prefix}toptv (reply video)
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}sticker (send/reply img/vid)
 ╰────❍`;
