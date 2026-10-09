@@ -666,7 +666,7 @@ async function Hc(hc, m, db) {
         } catch (e) {
           console.error("Error togif:", e);
           await react('❌');
-          await reply(`settings.mess.fil`);
+          await reply(settings.mess.fil);
         }
       }
       break
