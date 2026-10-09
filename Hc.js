@@ -783,21 +783,29 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       break
       case 'jadibot': {
         if (isJadibot) return reply("Fitur ini hanya bisa digunakan di Bot Utama!");
+        let inputNum = text ? text.replace(/[^0-9]/g, '') : sender.split('@')[0].replace(/[^0-9]/g, '');
+        if (!inputNum || inputNum.length < 10) {
+          return reply(`⚠️ Silakan masukkan nomor WhatsApp yang valid!\n\n*Contoh:* ${prefix}jadibot 6285823709413`);
+        }
         const { default: makeWASocket, useMultiFileAuthState } = require('@whiskeysockets/baileys');
         const { state, saveCreds } = await useMultiFileAuthState(`./database/jadibot/${sender.split('@')[0]}`);
         const jadibotSock = makeWASocket({
           logger: pino({ level: "silent" }),
           printQRInTerminal: false,
           auth: state,
-          browser: ["Ubuntu", "Chrome", "20.0.04"]
-          
+          browser: ['Mac OS', 'Chrome', '10.15.7'],
         });
         if (!jadibotSock.authState.creds.registered) {
-        let phoneNumber = sender.split('@')[0];
-        let code = await jadibotSock.requestPairingCode(phoneNumber);
-        let formattedCode = code?.match(/.{1,4}/g)?.join("-") || code;
-        
-        reply(`KODE PAIRING ANDA: *${formattedCode}*\n\nSilakan masukkan kode ini di WhatsApp Anda (Perangkat Tautkan) untuk menjadi bot. Limit & Money Anda akan otomatis unlimited setelah berhasil terhubung.`);
+          await reply(`⏳ *Sedang memproses kode pairing untuk nomor ${inputNum}, mohon tunggu...*`);
+          await sleep(4000);
+          try {
+            let code = await jadibotSock.requestPairingCode(inputNum);
+            let formattedCode = code?.match(/.{1,4}/g)?.join("-") || code;
+            reply(`KODE PAIRING ANDA: *${formattedCode}*\n\nSilakan masukkan kode ini di WhatsApp pada perangkat nomor *${inputNum}* (Tautkan Perangkat) untuk menjadi bot.`);
+          } catch (err) {
+            console.error("Gagal mengambil kode pairing jadibot:", err);
+            reply("❌ Gagal mengambil kode pairing. Pastikan nomor sudah benar dan coba lagi beberapa saat lagi.");
+          }
         }
         jadibotSock.ev.on('creds.update', saveCreds);
         jadibotSock.ev.on('connection.update', async (update) => {
@@ -808,25 +816,23 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
             db.users[sender].limit = 999999999;
             db.users[sender].money = 999999999;
             reply("✅ Berhasil terhubung! Nomor Anda sekarang menjadi bot. Anda memiliki akses Owner di session Anda sendiri dan Limit & Money Anda di bot utama sekarang Unlimited.");
-            }
-            if (connection === 'close') {
+          }
+          if (connection === 'close') {
             console.log(`Koneksi jadibot ${sender.split('@')[0]} terputus.`);
-            }
-            });
-            jadibotSock.ev.on('messages.upsert', async chatUpdate => {
-              try {
-                if (!chatUpdate.messages) return;
-                const msg = chatUpdate.messages[0];
-                if (!msg.message) return;
-                await Hc(jadibotSock, msg, db);
-              } catch (err) {
-                console.log(err);
-              }
-              
-            });
+          }
+        });
+        jadibotSock.ev.on('messages.upsert', async chatUpdate => {
+          try {
+            if (!chatUpdate.messages) return;
+            const msg = chatUpdate.messages[0];
+            if (!msg.message) return;
+            await Hc(jadibotSock, msg, db);
+          } catch (err) {
+            console.log(err);
+          }
+        });
       }
       break
-      
       
       // Random Images Menu
       case 'randomimage': case 'randomimg': case 'randomimages': {
