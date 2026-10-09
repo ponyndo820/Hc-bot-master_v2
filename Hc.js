@@ -152,14 +152,14 @@ async function Hc(hc, m, db) {
         }
     }
     
-    const hour = parseInt(new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', hour12: false }));
+    /*const hour = parseInt(new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', hour12: false }));
     const ucapanWaktu = 
     hour >= 4 && hour < 11 ? 'Selamat Pagi 🌄' :
     hour >= 11 && hour < 15 ? 'Selamat Siang 🏙' :
     hour >= 15 && hour < 18 ? 'Selamat Sore 🌅' :
-  hour >= 18 && hour < 19 ? 'Selamat Petang 🌃' : 'Selamat Malam 🌌';
-
-
+    hour >= 18 && hour < 19 ? 'Selamat Petang 🌃' : 'Selamat Malam 🌌';*/
+    
+    
    /*const isVip = isCreator || (db.users[sender]?.vip || false);
    const isBan = db.users[sender]?.ban || false; 
    const isLimit = isCreator || (db.users[sender]?.limit > 0 || false);
@@ -188,7 +188,6 @@ async function Hc(hc, m, db) {
     
     // Tebak bom
     let pilih = '🌀', bomb = '💣';
-    
     if (sender in global.tebakbom) {
         let textBody = (body || '').trim();
         const isNumberInput = /^([1-9]|10)$/.test(textBody);
@@ -585,7 +584,36 @@ async function Hc(hc, m, db) {
         }
       }
       break
-
+      case 'tomp3': {
+        if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin Dijadikan Audio Dengan Caption ${prefix + command}`)
+        return react('⏳')
+        let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+        try {
+          let audio = await toAudio(media, 'mp4')
+          await reply({ document: { url: audio }, mimetype: 'audio/mpeg', fileName: ` Convert By ${settings.author}.mp3`})
+          if (fs.existsSync(audio)) fs.unlinkSync(audio)
+        } finally {
+          if (fs.existsSync(media)) fs.unlinkSync(media)
+        }
+      }
+      break
+      case 'togif': {
+        if (!/webp|video/.test(mime)) return reply(`Reply Video/Stiker dengan caption *${prefix + command}*`)
+        return react('⏳')
+        let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+        let ran = `./database/temp/${getRandom('.mp4')}`;
+        exec(`ffmpeg -y -i"${media}" -an -vf"scale=trunc(iw/2)*2:trunc(ih/2)*2" -pix_fmt yuv420p -c:v libx264 -preset veryfast "${ran}"`, async(err) => {
+          try {
+            if (err) return reply(settings.mess.fil);
+            await reply({ video: { url: ran }, gifPlayback: true, caption: settings.mess.don, gifAttribution: pickRandom(['Heart candy','ponyndo','TENOR','GIPHY']})
+          } finally {
+            if (fs.existsSync(media)) fs.unlinkSync(media)
+            if (fs.existsSync(ran)) fs.unlinkSync(ran)
+          }
+        })
+      }
+      break
+      
       
       //Bot Menu
       case 'sc': case 'script': {
@@ -782,7 +810,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       }
       break
       case 'jadibot': {
-        if (isJadibot) return reply("Fitur ini hanya bisa digunakan di Bot Utama!");
+        if (isJadibot) return reply(`Fitur ini hanya bisa digunakan di Bot Utama! ${settings.ownerNumber} `);
         const fs = (await import('fs')).default;
         const NodeCache = (await import('node-cache')).default;
         const baileys = await import('@whiskeysockets/baileys');
@@ -794,7 +822,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         } = baileys;
         const makeWaSocket = baileys.default?.default || baileys.default || baileys.makeWASocket || baileys;
         const pino = (await import('pino')).default;
-        let inputNum = text ? text.replace(/[^0-9]/g, '') : sender.split('@')[0].replace(/[^0-9]/g, '');
+        let inputNum = text ? text.replace(/[^0-9]/g, '')
         if (!inputNum || inputNum.length < 10) {
           return reply(`⚠️ Silakan masukkan nomor WhatsApp yang valid!\n\n*Contoh:* ${prefix}jadibot 62858Xxxx`);
         }

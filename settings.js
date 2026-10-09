@@ -43,12 +43,13 @@ settings.my = {
 }
 
 settings.mess = {
-  owr: "Khusus Owner Ya Sayang❗",
-  adm: "Khusus Admin Ya Sayang❗",
-  fit: "Fitur Ini Belum Tersedia Ya Sayang ❗",
-  qud: "Reply pesannya ya Sayang❗",
-  don: "selesai✅",
-  priv: "kuhusus Privat Chat Ya Sayang❗"
+  don: "Selesai✅",
+  fil: "Yah Gagal ☹️"
+  owr: "Khusus Owner Ya Sayang 😔",
+  adm: "Khusus Admin Ya Sayang 😔",
+  qud: "Reply Pesannya ya Sayang ✉️",
+  priv: "kuhusus Privat Chat Ya Sayang 🔏"
+  fit: "Fitur Ini Belum Tersedia  Untuk publik Ya Sayang 🤔",
 }
 
 settings.APIs = {
