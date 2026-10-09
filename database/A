@@ -22,6 +22,8 @@ Fitur publik
    sticker
    request
    sticker
+   jadibot
+   toaudio
    buylimit
    tebakbom
    speedtes
@@ -29,6 +31,7 @@ Fitur publik
    ytsearch
    cariwaifu
    doatahlil
+   doaharian
    totalfitur
    randompony
    delanticall
@@ -40,18 +43,15 @@ Fitur publik
 Fitur tidak publik
    spotify
    alyabrat
-   toaudio
-   doaharian
-   jadibot
 
 
 logo : Hc
-Version : 2.0.6
+Version : 2.0.7
 Creator : Heart candy
 Author : Muhamad Febrian
 Branding name : ponyndo
-Total fitur publik : 37
-Total fitur tidak publik : 5
+Total fitur publik : 40
+Total fitur tidak publik : 2
 Bot name : Hc-bot-master_v2
 
 
