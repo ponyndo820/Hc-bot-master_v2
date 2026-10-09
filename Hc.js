@@ -622,38 +622,52 @@ async function Hc(hc, m, db) {
           let videoUrl = null;
           if (mime.includes('webp')) {
             try {
-              const blob = new Blob([mediaBuffer], { type: 'image/webp' });
+              const { default: axios } = await import('axios');
+              const { default: FormData } = await import('form-data');
               const formData = new FormData();
-              formData.append('new-image', blob, 'sticker.webp');
-              const res1 = await fetch('https://ezgif.com/webp-to-mp4', {
-                method: 'POST',
-                body: formData
+              formData.append('new-image-url', '');
+              formData.append('new-image', mediaBuffer, { filename: 'sticker.webp' });
+              const uploadRes = await axios({
+                method: 'post',
+                url: 'https://ezgif.com/webp-to-mp4',
+                data: formData,
+                headers: {
+                  ...formData.getHeaders(),
+                  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+                }
               });
-              const html1 = await res1.text();
-              const fileId = html1.match(/name="file"\s+value="([^"]+)"/)?.[1];
-              if (fileId) {
-                const formData2 = new FormData();
-                formData2.append('file', fileId);
-                formData2.append('convert', 'Convert WebP to MP4!');
-                const res2 = await fetch(`https://ezgif.com/webp-to-mp4/${fileId}`, {
-                  method: 'POST',
-                  body: formData2
+              const html = uploadRes.data;
+              const fileMatch = html.match(/name="file"\s+value="([^"]+)"/);
+              if (fileMatch && fileMatch[1]) {
+                const fileId = fileMatch[1];
+                const convertForm = new FormData();
+                convertForm.append('file', fileId);
+                convertForm.append('convert', 'Convert WebP to MP4!');
+                const convertRes = await axios({
+                  method: 'post',
+                  url: 'https://ezgif.com/webp-to-mp4/' + fileId,
+                  data: convertForm,
+                  headers: {
+                    ...convertForm.getHeaders(),
+                    'User-Agent': 'Mozilla/5.0'
+                  }
                 });
-                const html2 = await res2.text();
-                videoUrl = html2.match(/<source\s+src="([^"]+\.mp4)"/i)?.[1] || html2.match(/src="(\/\/cdn\.ezgif\.com\/[^"]+\.mp4)"/i)?.[1];
-                if (videoUrl && videoUrl.startsWith('//')) {
-                  videoUrl = 'https:' + videoUrl;
+                const html2 = convertRes.data;
+                const videoMatch = html2.match(/<source\s+src="([^"]+\.mp4)"/i) || html2.match(/src="(\/\/cdn\.ezgif\.com\/[^"]+\.mp4)"/i);
+                
+                if (videoMatch && videoMatch[1]) {
+                  videoUrl = videoMatch[1].startsWith('//') ? 'https:' + videoMatch[1] : videoMatch[1];
                 }
               }
             } catch (err) {
-              console.error("Ezgif Gagal:", err);
+              console.error("Ezgif Scraping Gagal:", err.message);
             }
           }
           if (videoUrl) {
             await hc.sendMessage(from, { 
               video: { url: videoUrl }, 
               gifPlayback: true, 
-              caption: settings.mess?.don, 
+              caption: settings.mess?.don || 'Selesai!', 
               gifAttribution: pickRandom(['Heart candy', 'ponyndo', 'TENOR', 'GIPHY'])
             }, { quoted: m });
             await react('✅');
@@ -664,11 +678,12 @@ async function Hc(hc, m, db) {
             await hc.sendMessage(from, { 
               video: videoData, 
               gifPlayback: true, 
-              caption: settings.mess?.don, 
+              caption: settings.mess?.don || 'Selesai!', 
               gifAttribution: pickRandom(['Heart candy', 'ponyndo', 'TENOR', 'GIPHY'])
             }, { quoted: m });
             await react('✅');
             
+            const fs = (await import('fs')).default || await import('fs');
             if (typeof videoRes === 'string' && fs.existsSync(videoRes)) {
               fs.unlinkSync(videoRes);
             }
