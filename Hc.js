@@ -1518,6 +1518,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}limit
 │${setv} ${prefix}tagme
 │${setv} ${prefix}donasi
+│${setv} ${prefix}jadibot
 │${setv} ${prefix}runtime
 │${setv} ${prefix}buylimit
 │${setv} ${prefix}speedtest
@@ -1566,6 +1567,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 ╭──❍ *TOOLS*
 │${setv} ${prefix}brat
 │${setv} ${prefix}bratvid
+│${setv} ${prefix}toaudio
 │${setv} ${prefix}ssweb (url)
 │${setv} ${prefix}draw (prompt)
 │${setv} ${prefix}rvo (reply pesan viewone)
@@ -1656,6 +1658,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *DOA*
 │${setv} ${prefix}doatahlil
+│${setv} ${prefix}doaharian
 ╰────❍`)
       }
       break
@@ -1675,6 +1678,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}tagme
 │${setv} ${prefix}donasi
 │${setv} ${prefix}runtime
+│${setv} ${prefix}jadibot
 │${setv} ${prefix}buylimit
 │${setv} ${prefix}speedtest
 │${setv} ${prefix}totalfitur
@@ -1682,7 +1686,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}tovn (reply pesan)
 │${setv} ${prefix}toptv (reply video)
 ╰┬───❍
-╭┴─❍ *OWMER*
+╭┴─❍ *OWNER*
 │${setv} ${prefix}anticall
 │${setv} ${prefix}shutdown
 │${setv} ${prefix}delanticall
@@ -1718,10 +1722,12 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 ╰┬───❍
 ╭┴─❍ *Doa*
 │${setv} ${prefix}doatahlil
+│${setv} ${prefix}doaharian
 ╰┬──❍
 ╭┴─❍ *TOOLS*
 │${setv} ${prefix}brat
 │${setv} ${prefix}bratvid
+│${setv} ${prefix}toaudio
 │${setv} ${prefix}ssweb (url)
 │${setv} ${prefix}draw (prompt)
 │${setv} ${prefix}rvo (reply pesan viewone)
