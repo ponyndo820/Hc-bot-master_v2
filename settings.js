@@ -44,11 +44,11 @@ settings.my = {
 
 settings.mess = {
   don: "Selesai✅",
-  fil: "Yah Gagal ☹️"
+  fil: "Yah Gagal ☹️",
   owr: "Khusus Owner Ya Sayang 😔",
   adm: "Khusus Admin Ya Sayang 😔",
   qud: "Reply Pesannya ya Sayang ✉️",
-  priv: "kuhusus Privat Chat Ya Sayang 🔏"
+  priv: "kuhusus Privat Chat Ya Sayang 🔏",
   fit: "Fitur Ini Belum Tersedia  Untuk publik Ya Sayang 🤔",
 }
 
