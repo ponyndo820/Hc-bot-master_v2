@@ -631,7 +631,7 @@ async function Hc(hc, m, db) {
                 videoUrl = res.result;
               }
             } catch (err) {
-              console.error("Gagal convert webp ke mp4 via uploader:", err.message);
+              console.error("Gagal convert webp ke mp4:", err.message);
             } finally {
               if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
             }
@@ -666,7 +666,7 @@ async function Hc(hc, m, db) {
         } catch (e) {
           console.error("Error togif:", e);
           await react('❌');
-          await reply(settings.mess.fil);
+          await reply('❌ Terjadi kesalahan saat memproses media.');
         }
       }
       break
