@@ -617,73 +617,124 @@ async function Hc(hc, m, db) {
         await react('⏳');
         const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
         
-        const uniqueId = Date.now();
-        const tmpInput = `./database/temp/input_${uniqueId}.${mime.includes('webp') ? 'webp' : 'mp4'}`;
-        const tmpClean = `./database/temp/clean_${uniqueId}.webp`;
-        const tmpOutput = `./database/temp/output_${uniqueId}.mp4`;
         try {
           let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
           if (!mediaBuffer) return reply('❌ Gagal mengunduh media.');
-          fs.writeFileSync(tmpInput, mediaBuffer);
-          let cmd = '';
+          let resultVideo = null;
           if (mime.includes('webp')) {
-            cmd = `(webpmux -strip exif "${tmpInput}" -o "${tmpClean}" 2>/dev/null || cp "${tmpInput}" "${tmpClean}") && ffmpeg -y -c:v libwebp -i "${tmpClean}" -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -pix_fmt yuv420p -c:v libx264 -preset veryfast "${tmpOutput}"`;
-          } else {
-            cmd = `ffmpeg -y -i "${tmpInput}" -an -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -pix_fmt yuv420p -c:v libx264 -preset veryfast "${tmpOutput}"`;
-          }
-          exec(cmd, async (err) => {
             try {
-              if (err || !fs.existsSync(tmpOutput) || fs.statSync(tmpOutput).size === 0) {
-                const fallbackCmd = `ffmpeg -y -i "${tmpInput}" -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -pix_fmt yuv420p -c:v libx264 -preset veryfast "${tmpOutput}"`;
-                
-                exec(fallbackCmd, async (err2) => {
-                  try {
-                    if (err2 || !fs.existsSync(tmpOutput) || fs.statSync(tmpOutput).size === 0) {
-                      console.error("FFmpeg Error Final:", err2 || err);
-                      await react('❌');
-                      return reply('❌ Gagal mengonversi stiker/video menjadi GIF.');
-                    }
-                    await sendGifResult();
-                  } catch (e) {
-                    console.error(e);
-                  } finally {
-                    cleanUp();
-                  }
+              const blob = new Blob([mediaBuffer], { type: 'image/webp' });
+              const formData = new FormData();
+              formData.append('new-image', blob, 'sticker.webp');
+              const res1 = await fetch('https://ezgif.com/webp-to-mp4', {
+                method: 'POST',
+                body: formData
+              });
+              const html1 = await res1.text();
+              const fileId = html1.match(/name="file"\s+value="([^"]+)"/)?.[1];
+              if (fileId) {
+                const formData2 = new FormData();
+                formData2.append('file', fileId);
+                formData2.append('convert', 'Convert WebP to MP4!');
+                const res2 = await fetch(`https://ezgif.com/webp-to-mp4/${fileId}`, {
+                  method: 'POST',
+                  body: formData2
                 });
-              } else {
-                await sendGifResult();
-                cleanUp();
+                const html2 = await res2.text();
+                let videoUrl = html2.match(/<source\s+src="([^"]+\.mp4)"/i)?.[1] || html2.match(/src="(\/\/cdn\.ezgif\.com\/[^"]+\.mp4)"/i)?.[1];
+                if (videoUrl) {
+                  if (videoUrl.startsWith('//')) videoUrl = 'https:' + videoUrl;
+                  const vidRes = await fetch(videoUrl);
+                  const arrayBuf = await vidRes.arrayBuffer();
+                  resultVideo = Buffer.from(arrayBuf);
+                }
               }
-            } catch (e) {
-              console.error(e);
-              cleanUp();
+            } catch (ezErr) {
+              console.log("Ezgif gagal, mencoba fallback FFmpeg lokal...", ezErr.message);
             }
-          });
-          async function sendGifResult() {
-            await hc.sendMessage(from, { 
-              video: { url: tmpOutput }, 
-              gifPlayback: true, 
-              caption: settings.mess?.don || 'Selesai!', 
-              gifAttribution: pickRandom(['Heart candy', 'ponyndo', 'TENOR', 'GIPHY'])
-            }, { quoted: m });
-            await react('✅');
+            if (!resultVideo) {
+              const uniqueId = Date.now();
+              const tmpInput = `./database/temp/input_${uniqueId}.webp`;
+              const tmpOutput = `./database/temp/output_${uniqueId}.mp4`;
+              const cleanBuffer = (buf) => {
+                try {
+                  if (!buf || buf.length < 12) return buf;
+                  if (buf.toString('utf8', 0, 4) !== 'RIFF' || buf.toString('utf8', 8, 12) !== 'WEBP') return buf;
+                  let offset = 12, chunks = [], totalSize = 4;
+                  while (offset < buf.length) {
+                    if (offset + 8 > buf.length) break;
+                    const fourCC = buf.toString('utf8', offset, offset + 4);
+                    const chunkSize = buf.readUInt32LE(offset + 4);
+                    const paddedSize = chunkSize + (chunkSize % 2);
+                    const chunkEnd = offset + 8 + paddedSize;
+                    if (chunkEnd > buf.length + 1) break;
+                    if (fourCC !== 'EXIF') {
+                      const chunkData = buf.subarray(offset, Math.min(chunkEnd, buf.length));
+                      chunks.push(chunkData);
+                      totalSize += chunkData.length;
+                    }
+                    offset = chunkEnd;
+                  }
+                  const header = Buffer.alloc(12);
+                  header.write('RIFF', 0);
+                  header.writeUInt32LE(totalSize, 4);
+                  header.write('WEBP', 8);
+                  return Buffer.concat([header, ...chunks]);
+                } catch (e) { return buf; }
+              };
+              fs.writeFileSync(tmpInput, cleanBuffer(mediaBuffer));
+              await new Promise((resolve) => {
+                exec(`ffmpeg -y -i "${tmpInput}" -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -pix_fmt yuv420p -c:v libx264 -preset veryfast "${tmpOutput}"`, (err) => {
+                  if (!err && fs.existsSync(tmpOutput) && fs.statSync(tmpOutput).size > 0) {
+                    resultVideo = { url: tmpOutput };
+                  }
+                  resolve();
+                });
+              });
+              setTimeout(() => {
+                if (fs.existsSync(tmpInput)) fs.unlinkSync(tmpInput);
+              }, 2000);
+            }
+          } else {
+            const uniqueId = Date.now();
+            const tmpInput = `./database/temp/input_${uniqueId}.mp4`;
+            const tmpOutput = `./database/temp/output_${uniqueId}.mp4`;
+            fs.writeFileSync(tmpInput, mediaBuffer);
+            await new Promise((resolve) => {
+              exec(`ffmpeg -y -i "${tmpInput}" -an -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -pix_fmt yuv420p -c:v libx264 -preset veryfast "${tmpOutput}"`, (err) => {
+                if (!err && fs.existsSync(tmpOutput) && fs.statSync(tmpOutput).size > 0) {
+                  resultVideo = { url: tmpOutput };
+                }
+                resolve();
+              });
+            });
+            setTimeout(() => {
+              if (fs.existsSync(tmpInput)) fs.unlinkSync(tmpInput);
+            }, 2000);
           }
-          function cleanUp() {
-            if (fs.existsSync(tmpInput)) fs.unlinkSync(tmpInput);
-            if (fs.existsSync(tmpClean)) fs.unlinkSync(tmpClean);
-            if (fs.existsSync(tmpOutput)) fs.unlinkSync(tmpOutput);
+          if (!resultVideo) {
+            await react('❌');
+            return reply('❌ Gagal mengonversi stiker/video menjadi GIF.');
+          }
+          await hc.sendMessage(from, { 
+            video: resultVideo, 
+            gifPlayback: true, 
+            caption: settings.mess?.don || 'Selesai!', 
+            gifAttribution: pickRandom(['Heart candy', 'ponyndo', 'TENOR', 'GIPHY'])
+          }, { quoted: m });
+          await react('✅');
+          if (typeof resultVideo === 'object' && resultVideo.url && fs.existsSync(resultVideo.url)) {
+            setTimeout(() => {
+              if (fs.existsSync(resultVideo.url)) fs.unlinkSync(resultVideo.url);
+            }, 3000);
           }
         } catch (e) {
           console.error("Error togif:", e);
           await react('❌');
           await reply('❌ Terjadi kesalahan saat memproses media.');
-          if (fs.existsSync(tmpInput)) fs.unlinkSync(tmpInput);
-          if (fs.existsSync(tmpClean)) fs.unlinkSync(tmpClean);
-          if (fs.existsSync(tmpOutput)) fs.unlinkSync(tmpOutput);
         }
       }
       break
-
       
       //Bot Menu
       case 'sc': case 'script': {
