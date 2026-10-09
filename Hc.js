@@ -633,27 +633,41 @@ async function Hc(hc, m, db) {
               if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
             }
             if (res && res.status && res.result) {
-              const videoBuffer = await getBuffer(res.result);
-              if (!videoBuffer) throw new Error('Gagal mengunduh hasil video dari Ezgif.');
-              await hc.sendMessage(from, { 
-                video: videoBuffer, 
-                gifPlayback: true, 
-                caption: settings.mess?.don || 'Selesai!', 
-                gifAttribution: pickRandom(['Heart candy', 'ponyndo', 'TENOR', 'GIPHY'])
-              }, { quoted: m });
-              await react('✅');
+              try {
+                const axiosModule = await import('axios');
+                const axios = axiosModule.default || axiosModule;
+                
+                const vidFetch = await axios.get(res.result, { responseType: 'arraybuffer' });
+                const finalBuffer = Buffer.from(vidFetch.data);
+                await hc.sendMessage(from, { 
+                  video: finalBuffer, 
+                  gifPlayback: true, 
+                  caption: settings.mess?.don || 'Selesai!', 
+                  gifAttribution: pickRandom(['Heart candy', 'ponyndo', 'TENOR', 'GIPHY'])
+                }, { quoted: m });
+                await react('✅');
+              } catch (downloadErr) {
+                console.error("Gagal mendownload hasil video:", downloadErr);
+                await react('❌');
+                return reply('❌ Gagal mengambil hasil konversi MP4 dari server.');
+              }
             } else {
               await react('❌');
               return reply('❌ Gagal mengonversi stiker bergerak menjadi GIF.');
             }
           } else {
             let videoRes = await toVideo(mediaBuffer, 'mp4');
-            let videoData = typeof videoRes === 'string' ? { url: videoRes } : videoRes;
+            let videoBuffer;
+            if (typeof videoRes === 'string' && fs.existsSync(videoRes)) {
+              videoBuffer = fs.readFileSync(videoRes);
+            } else {
+              videoBuffer = videoRes;
+            }
             
             await hc.sendMessage(from, { 
-              video: videoData, 
+              video: videoBuffer, 
               gifPlayback: true, 
-              caption: settings.mess?.don || 'Selesai!', 
+              caption: settings.mess?.don, 
               gifAttribution: pickRandom(['Heart candy', 'ponyndo', 'TENOR', 'GIPHY'])
             }, { quoted: m });
             await react('✅');
