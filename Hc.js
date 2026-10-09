@@ -783,12 +783,15 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       break
       case 'jadibot': {
         if (isJadibot) return reply("Fitur ini hanya bisa digunakan di Bot Utama!");
+        const fs = require('fs');
         let inputNum = text ? text.replace(/[^0-9]/g, '') : sender.split('@')[0].replace(/[^0-9]/g, '');
         if (!inputNum || inputNum.length < 10) {
-          return reply(`⚠️ Silakan masukkan nomor WhatsApp yang valid!\n\n*Contoh:* ${prefix}jadibot 6285823709413`);
+          return reply(`⚠️ Silakan masukkan nomor WhatsApp yang valid!\n\n*Contoh:* ${prefix}jadibot 62858xxxx`);
         }
         const { default: makeWASocket, useMultiFileAuthState } = require('@whiskeysockets/baileys');
-        const { state, saveCreds } = await useMultiFileAuthState(`./database/jadibot/${sender.split('@')[0]}`);
+        
+        const sessionPath = `./database/jadibot/${inputNum}`;
+        const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
         const jadibotSock = makeWASocket({
           logger: pino({ level: "silent" }),
           printQRInTerminal: false,
@@ -804,7 +807,11 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
             reply(`KODE PAIRING ANDA: *${formattedCode}*\n\nSilakan masukkan kode ini di WhatsApp pada perangkat nomor *${inputNum}* (Tautkan Perangkat) untuk menjadi bot.`);
           } catch (err) {
             console.error("Gagal mengambil kode pairing jadibot:", err);
-            reply("❌ Gagal mengambil kode pairing. Pastikan nomor sudah benar dan coba lagi beberapa saat lagi.");
+            reply("❌ Gagal mengambil kode pairing. Koneksi ditolak, menghapus data sesi yang korup...");
+            if (sessionPath.startsWith('./database/jadibot/') && fs.existsSync(sessionPath)) {
+              fs.rmSync(sessionPath, { recursive: true, force: true });
+            }
+            return;
           }
         }
         jadibotSock.ev.on('creds.update', saveCreds);
@@ -815,10 +822,16 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
             db.users[sender] = db.users[sender] || {};
             db.users[sender].limit = 999999999;
             db.users[sender].money = 999999999;
-            reply("✅ Berhasil terhubung! Nomor Anda sekarang menjadi bot. Anda memiliki akses Owner di session Anda sendiri dan Limit & Money Anda di bot utama sekarang Unlimited.");
+            reply(`✅ Berhasil terhubung! Nomor *${inputNum}* sekarang resmi menjadi bot.`);
           }
           if (connection === 'close') {
-            console.log(`Koneksi jadibot ${sender.split('@')[0]} terputus.`);
+            console.log(`Koneksi jadibot ${inputNum} terputus.`);
+            if (!jadibotSock.authState.creds.registered) {
+              if (sessionPath.startsWith('./database/jadibot/') && fs.existsSync(sessionPath)) {
+                fs.rmSync(sessionPath, { recursive: true, force: true });
+                console.log(`🗑️ Data sesi jadibot ${inputNum} berhasil dihapus karena gagal terhubung.`);
+              }
+            }
           }
         });
         jadibotSock.ev.on('messages.upsert', async chatUpdate => {
