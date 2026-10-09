@@ -822,7 +822,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         } = baileys;
         const makeWaSocket = baileys.default?.default || baileys.default || baileys.makeWASocket || baileys;
         const pino = (await import('pino')).default;
-        let inputNum = text ? text.replace(/[^0-9]/g, '')
+       let inputNum = text.replace(/[^0-9]/g, '');
         if (!inputNum || inputNum.length < 10) {
           return reply(`⚠️ Silakan masukkan nomor WhatsApp yang valid!\n\n*Contoh:* ${prefix}jadibot 62858Xxxx`);
         }
