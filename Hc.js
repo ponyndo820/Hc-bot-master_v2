@@ -267,15 +267,15 @@ async function Hc(hc, m, db) {
     }
     
     // Jadi bot
-    const botNumber = hc.user.id.split(':')[0];
-    const isJadibot = botNumber !== isCreator; 
+    const botNumber = hc.user.id.split(':')[0].replace(/[^0-9]/g, '');
+    const isOwnerBot = settings.ownerNumber.some(owner => botNumber === owner.replace(/[^0-9]/g, ''));
+    const isJadibot = !!hc.isJadibot || !isOwnerBot; 
     global.warnedUsers = global.warnedUsers || {};
     if (!global.warnedUsers[botNumber]) {
         global.warnedUsers[botNumber] = [];
     }
     if (isCmd && isJadibot && senderClean !== botNumber) {
-        const senderNumber = sender.split('@')[0];
-        
+        const senderNumber = sender.split('@')[0].replace(/[^0-9]/g, '');
         if (!global.warnedUsers[botNumber].includes(senderNumber)) {
             const warningMsg = "⚠️ *PERINGATAN*\nNomor ini bukan nomor owner resmi. Owner utama tidak bertanggung jawab atas segala pembelian yang mengatasnamakan bot ini.";
             
@@ -285,6 +285,7 @@ async function Hc(hc, m, db) {
             await new Promise(resolve => setTimeout(resolve, 1500));
         }
     }
+
     if (isCreator) {
     db.users = db.users || {};
     db.users[sender] = db.users[sender] || {};
@@ -615,48 +616,28 @@ async function Hc(hc, m, db) {
         if (!/webp|video/.test(mime)) return reply(`Reply Video/Stiker dengan caption *${prefix + command}*`);
         await react('⏳');
         const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
-        let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
-        
-        const tmpInput = `./database/temp/input_${Date.now()}.${mime.split('/')[1] || 'mp4'}`;
-        const tmpOutput = `./database/temp/output_${Date.now()}.mp4`;
-        
         try {
-          fs.writeFileSync(tmpInput, mediaBuffer);
-          
-          exec(`ffmpeg -y -i "${tmpInput}" -an -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -pix_fmt yuv420p -c:v libx264 -preset veryfast "${tmpOutput}"`, async (err) => {
-            try {
-              if (err) {
-                console.error("FFmpeg error:", err);
-                await react('❌');
-                return reply(settings.mess?.fil || '❌ Gagal mengonversi media ke GIF.');
-              }
-              
-              await hc.sendMessage(from, { 
-                video: { url: tmpOutput }, 
-                gifPlayback: true, 
-                caption: settings.mess?.don || 'Selesai!', 
-                gifAttribution: pickRandom(['Heart candy', 'ponyndo', 'TENOR', 'GIPHY'])
-              }, { quoted: m });
-              
-              await react('✅');
-            } catch (e) {
-              console.error(e);
-            } finally {
-              if (fs.existsSync(tmpInput)) fs.unlinkSync(tmpInput);
-              if (fs.existsSync(tmpOutput)) fs.unlinkSync(tmpOutput);
-            }
-          });
+          let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+          if (!mediaBuffer) return reply('❌ Gagal mengunduh media.');
+          let videoRes = await toVideo(mediaBuffer, mime.includes('webp') ? 'webp' : 'mp4');
+          let videoData = typeof videoRes === 'string' ? { url: videoRes } : videoRes;
+          await hc.sendMessage(from, { 
+            video: videoData, 
+            gifPlayback: true, 
+            caption: settings.mess?.don || 'Selesai!', 
+            gifAttribution: pickRandom(['Heart candy', 'ponyndo', 'TENOR', 'GIPHY'])
+          }, { quoted: m });
+          await react('✅');
+          if (typeof videoRes === 'string' && fs.existsSync(videoRes)) {
+            fs.unlinkSync(videoRes);
+          }
         } catch (e) {
           console.error("Error togif:", e);
           await react('❌');
-          await reply('❌ Terjadi kesalahan saat memproses media.');
-          if (fs.existsSync(tmpInput)) fs.unlinkSync(tmpInput);
-          if (fs.existsSync(tmpOutput)) fs.unlinkSync(tmpOutput);
+          await reply('❌ Gagal mengonversi stiker/video menjadi GIF!');
         }
       }
       break
-
-      
       
       //Bot Menu
       case 'sc': case 'script': {
