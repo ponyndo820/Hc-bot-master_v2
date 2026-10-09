@@ -784,30 +784,44 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       case 'jadibot': {
         if (isJadibot) return reply("Fitur ini hanya bisa digunakan di Bot Utama!");
         const fs = require('fs');
+      
+        const { 
+          default: makeWaSocket, 
+          useMultiFileAuthState, 
+          fetchLatestBaileysVersion, 
+          makeCacheableSignalKeyStore 
+        } = require('@whiskeysockets/baileys');
+        const pino = require('pino');
         let inputNum = text ? text.replace(/[^0-9]/g, '') : sender.split('@')[0].replace(/[^0-9]/g, '');
         if (!inputNum || inputNum.length < 10) {
           return reply(`⚠️ Silakan masukkan nomor WhatsApp yang valid!\n\n*Contoh:* ${prefix}jadibot 62858xxxx`);
         }
-        const { default: makeWASocket, useMultiFileAuthState } = require('@whiskeysockets/baileys');
         
         const sessionPath = `./database/jadibot/${inputNum}`;
         const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
-        const jadibotSock = makeWASocket({
-          logger: pino({ level: "silent" }),
+        const { version } = await fetchLatestBaileysVersion();
+        const hcOptions = {
+          version,
+          logger: pino({ level: 'silent' }),
           printQRInTerminal: false,
-          auth: state,
+          auth: {
+            creds: state.creds,
+            keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' }))
+          },
           browser: ['Mac OS', 'Chrome', '10.15.7'],
-        });
+          generateHighQualityLinkPreview: true
+        };
+        const jadibotSock = makeWaSocket(hcOptions);
         if (!jadibotSock.authState.creds.registered) {
           await reply(`⏳ *Sedang memproses kode pairing untuk nomor ${inputNum}, mohon tunggu...*`);
-          await sleep(4000);
+          await new Promise((resolve) => setTimeout(resolve, 3000));
           try {
             let code = await jadibotSock.requestPairingCode(inputNum);
             let formattedCode = code?.match(/.{1,4}/g)?.join("-") || code;
             reply(`KODE PAIRING ANDA: *${formattedCode}*\n\nSilakan masukkan kode ini di WhatsApp pada perangkat nomor *${inputNum}* (Tautkan Perangkat) untuk menjadi bot.`);
           } catch (err) {
             console.error("Gagal mengambil kode pairing jadibot:", err);
-            reply("❌ Gagal mengambil kode pairing. Koneksi ditolak, menghapus data sesi yang korup...");
+            reply("❌ Gagal mengambil kode pairing. Server menolak koneksi.");
             if (sessionPath.startsWith('./database/jadibot/') && fs.existsSync(sessionPath)) {
               fs.rmSync(sessionPath, { recursive: true, force: true });
             }
@@ -817,6 +831,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         jadibotSock.ev.on('creds.update', saveCreds);
         jadibotSock.ev.on('connection.update', async (update) => {
           const { connection, lastDisconnect } = update;
+          
           if (connection === 'open') {
             db.users = db.users || {};
             db.users[sender] = db.users[sender] || {};
@@ -824,12 +839,14 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
             db.users[sender].money = 999999999;
             reply(`✅ Berhasil terhubung! Nomor *${inputNum}* sekarang resmi menjadi bot.`);
           }
+          
           if (connection === 'close') {
             console.log(`Koneksi jadibot ${inputNum} terputus.`);
+            
             if (!jadibotSock.authState.creds.registered) {
               if (sessionPath.startsWith('./database/jadibot/') && fs.existsSync(sessionPath)) {
                 fs.rmSync(sessionPath, { recursive: true, force: true });
-                console.log(`🗑️ Data sesi jadibot ${inputNum} berhasil dihapus karena gagal terhubung.`);
+                console.log(`🗑️ Data sesi jadibot ${inputNum} berhasil dihapus karena gagal tertaut.`);
               }
             }
           }
