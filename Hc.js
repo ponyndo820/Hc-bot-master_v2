@@ -26,6 +26,7 @@ const require = createRequire(import.meta.url);
 import settings from './settings.js';
 import { igdl } from './lib/igdl.js';
 import { ytMp4 } from './lib/ytmp4.js';
+import { webp2mp4File } from './lib/uploader.js'
 import { GroupUpdate, LoadDataBase } from './src/message.js';
 import { writeExif, toAudio, toPTT, toPTV, toVideo } from './lib/converter.js';
 import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime, sleep, clockString } from './lib/function.js';
@@ -616,63 +617,38 @@ async function Hc(hc, m, db) {
         if (!/webp|video/.test(mime)) return reply(`Reply Video/Stiker dengan caption *${prefix + command}*`);
         await react('⏳');
         const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
+        
         try {
           let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
           if (!mediaBuffer) return reply('❌ Gagal mengunduh media.');
           let videoUrl = null;
           if (mime.includes('webp')) {
+            const tmpPath = `./database/temp/stiker_${Date.now()}.webp`;
             try {
-              const { default: axios } = await import('axios');
-              const { default: FormData } = await import('form-data');
-              const formData = new FormData();
-              formData.append('new-image-url', '');
-              formData.append('new-image', mediaBuffer, { filename: 'sticker.webp' });
-              const uploadRes = await axios({
-                method: 'post',
-                url: 'https://ezgif.com/webp-to-mp4',
-                data: formData,
-                headers: {
-                  ...formData.getHeaders(),
-                  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-                }
-              });
-              const html = uploadRes.data;
-              const fileMatch = html.match(/name="file"\s+value="([^"]+)"/);
-              if (fileMatch && fileMatch[1]) {
-                const fileId = fileMatch[1];
-                const convertForm = new FormData();
-                convertForm.append('file', fileId);
-                convertForm.append('convert', 'Convert WebP to MP4!');
-                const convertRes = await axios({
-                  method: 'post',
-                  url: 'https://ezgif.com/webp-to-mp4/' + fileId,
-                  data: convertForm,
-                  headers: {
-                    ...convertForm.getHeaders(),
-                    'User-Agent': 'Mozilla/5.0'
-                  }
-                });
-                const html2 = convertRes.data;
-                const videoMatch = html2.match(/<source\s+src="([^"]+\.mp4)"/i) || html2.match(/src="(\/\/cdn\.ezgif\.com\/[^"]+\.mp4)"/i);
-                
-                if (videoMatch && videoMatch[1]) {
-                  videoUrl = videoMatch[1].startsWith('//') ? 'https:' + videoMatch[1] : videoMatch[1];
-                }
+              fs.writeFileSync(tmpPath, mediaBuffer);
+              let res = await webp2mp4File(tmpPath);
+              if (res && res.result) {
+                videoUrl = res.result;
               }
             } catch (err) {
-              console.error("Ezgif Scraping Gagal:", err.message);
+              console.error("Gagal convert webp ke mp4 via uploader:", err.message);
+            } finally {
+              if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
             }
-          }
-          if (videoUrl) {
-            await hc.sendMessage(from, { 
-              video: { url: videoUrl }, 
-              gifPlayback: true, 
-              caption: settings.mess?.don || 'Selesai!', 
-              gifAttribution: pickRandom(['Heart candy', 'ponyndo', 'TENOR', 'GIPHY'])
-            }, { quoted: m });
-            await react('✅');
+            if (videoUrl) {
+              await hc.sendMessage(from, { 
+                video: { url: videoUrl }, 
+                gifPlayback: true, 
+                caption: settings.mess?.don || 'Selesai!', 
+                gifAttribution: pickRandom(['Heart candy', 'ponyndo', 'TENOR', 'GIPHY'])
+              }, { quoted: m });
+              await react('✅');
+            } else {
+              await react('❌');
+              return reply('❌ Gagal mengonversi stiker bergerak menjadi GIF.');
+            }
           } else {
-            let videoRes = await toVideo(mediaBuffer, mime.includes('webp') ? 'webp' : 'mp4');
+            let videoRes = await toVideo(mediaBuffer, 'mp4');
             let videoData = typeof videoRes === 'string' ? { url: videoRes } : videoRes;
             
             await hc.sendMessage(from, { 
@@ -683,7 +659,6 @@ async function Hc(hc, m, db) {
             }, { quoted: m });
             await react('✅');
             
-            const fs = (await import('fs')).default || await import('fs');
             if (typeof videoRes === 'string' && fs.existsSync(videoRes)) {
               fs.unlinkSync(videoRes);
             }
@@ -691,7 +666,7 @@ async function Hc(hc, m, db) {
         } catch (e) {
           console.error("Error togif:", e);
           await react('❌');
-          await reply('❌ Gagal mengonversi stiker/video menjadi GIF/Video!');
+          await reply(`settings.mess.fil`);
         }
       }
       break
