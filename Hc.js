@@ -783,23 +783,32 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       break
       case 'jadibot': {
         if (isJadibot) return reply("Fitur ini hanya bisa digunakan di Bot Utama!");
-        const fs = require('fs');
-      
+        const fs = (await import('fs')).default;
+        const NodeCache = (await import('node-cache')).default;
         const { 
           default: makeWaSocket, 
           useMultiFileAuthState, 
           fetchLatestBaileysVersion, 
-          makeCacheableSignalKeyStore 
-        } = require('@whiskeysockets/baileys');
-        const pino = require('pino');
+          makeCacheableSignalKeyStore,
+          DisconnectReason 
+        } = await import('@whiskeysockets/baileys');
+        const pino = (await import('pino')).default;
         let inputNum = text ? text.replace(/[^0-9]/g, '') : sender.split('@')[0].replace(/[^0-9]/g, '');
         if (!inputNum || inputNum.length < 10) {
-          return reply(`⚠️ Silakan masukkan nomor WhatsApp yang valid!\n\n*Contoh:* ${prefix}jadibot 62858xxxx`);
+          return reply(`⚠️ Silakan masukkan nomor WhatsApp yang valid!\n\n*Contoh:* ${prefix}jadibot 62858Xxxx`);
         }
         
         const sessionPath = `./database/jadibot/${inputNum}`;
+        
+        if (fs.existsSync(sessionPath)) {
+            const hasCreds = fs.existsSync(`${sessionPath}/creds.json`);
+            if (!hasCreds) {
+                fs.rmSync(sessionPath, { recursive: true, force: true });
+            }
+        }
         const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
         const { version } = await fetchLatestBaileysVersion();
+        const msgRetryCounterCache = new NodeCache();
         const hcOptions = {
           version,
           logger: pino({ level: 'silent' }),
@@ -809,16 +818,18 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
             keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' }))
           },
           browser: ['Mac OS', 'Chrome', '10.15.7'],
-          generateHighQualityLinkPreview: true
+          msgRetryCounterCache,
+          generateHighQualityLinkPreview: true,
+          syncFullHistory: false
         };
         const jadibotSock = makeWaSocket(hcOptions);
         if (!jadibotSock.authState.creds.registered) {
           await reply(`⏳ *Sedang memproses kode pairing untuk nomor ${inputNum}, mohon tunggu...*`);
-          await new Promise((resolve) => setTimeout(resolve, 3000));
+          await new Promise((resolve) => setTimeout(resolve, 4000));
           try {
             let code = await jadibotSock.requestPairingCode(inputNum);
             let formattedCode = code?.match(/.{1,4}/g)?.join("-") || code;
-            reply(`KODE PAIRING ANDA: *${formattedCode}*\n\nSilakan masukkan kode ini di WhatsApp pada perangkat nomor *${inputNum}* (Tautkan Perangkat) untuk menjadi bot.`);
+            reply(`KODE PAIRING ANDA: *${formattedCode}*\n\n⚠️ *PENTING:*\nPastikan Anda memasukkan kode ini di HP dengan nomor WhatsApp *${inputNum}*.\n\nCara: Buka WA ➔ Setelan ➔ Tautkan Perangkat ➔ Tautkan dengan nomor telepon.`);
           } catch (err) {
             console.error("Gagal mengambil kode pairing jadibot:", err);
             reply("❌ Gagal mengambil kode pairing. Server menolak koneksi.");
@@ -829,6 +840,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
           }
         }
         jadibotSock.ev.on('creds.update', saveCreds);
+        
         jadibotSock.ev.on('connection.update', async (update) => {
           const { connection, lastDisconnect } = update;
           
@@ -841,12 +853,13 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
           }
           
           if (connection === 'close') {
-            console.log(`Koneksi jadibot ${inputNum} terputus.`);
+            const statusCode = lastDisconnect?.error?.output?.statusCode;
+            console.log(`Koneksi jadibot ${inputNum} terputus. Status Code: ${statusCode}`);
             
             if (!jadibotSock.authState.creds.registered) {
               if (sessionPath.startsWith('./database/jadibot/') && fs.existsSync(sessionPath)) {
                 fs.rmSync(sessionPath, { recursive: true, force: true });
-                console.log(`🗑️ Data sesi jadibot ${inputNum} berhasil dihapus karena gagal tertaut.`);
+                console.log(`🗑️ Data sesi jadibot ${inputNum} dihapus karena gagal tertaut.`);
               }
             }
           }
