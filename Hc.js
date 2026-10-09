@@ -268,7 +268,7 @@ async function Hc(hc, m, db) {
     
     // Jadi bot
     const botNumber = hc.user.id.split(':')[0];
-    const isJadibot = botNumber !== settings.ownerNumber[0]; 
+    const isJadibot = botNumber !== isCreator; 
     global.warnedUsers = global.warnedUsers || {};
     if (!global.warnedUsers[botNumber]) {
         global.warnedUsers[botNumber] = [];
@@ -585,34 +585,77 @@ async function Hc(hc, m, db) {
       }
       break
       case 'tomp3': {
-        if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin Dijadikan Audio Dengan Caption ${prefix + command}`)
-        return react('⏳')
+        if (!/video|audio/.test(mime)) return reply(`Kirim/Reply Video/Audio Yang Ingin Dijadikan Audio dengan caption *${prefix + command}*`);
+        await react('⏳');
+        const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
         let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+        let audioRes = await toAudio(mediaBuffer, 'mp4');
+        let audioPath = typeof audioRes === 'string' ? audioRes : null;
+        
         try {
-          let audio = await toAudio(media, 'mp4')
-          await reply({ document: { url: audio }, mimetype: 'audio/mpeg', fileName: ` Convert By ${settings.author}.mp3`})
-          if (fs.existsSync(audio)) fs.unlinkSync(audio)
+          let docData = audioPath ? { url: audioPath } : audioRes;
+          await hc.sendMessage(from, { 
+            document: docData, 
+            mimetype: 'audio/mpeg', 
+            fileName: `Convert_By_${settings.author || 'Heart_candy'}.mp3`
+          }, { quoted: m });
+          await react('✅');
+        } catch (err) {
+          console.error("Error tomp3:", err);
+          await react('❌');
+          await reply('❌ Gagal mengonversi media menjadi MP3!');
         } finally {
-          if (fs.existsSync(media)) fs.unlinkSync(media)
+          if (audioPath && fs.existsSync(audioPath)) {
+            fs.unlinkSync(audioPath);
+          }
         }
       }
       break
       case 'togif': {
-        if (!/webp|video/.test(mime)) return reply(`Reply Video/Stiker dengan caption *${prefix + command}*`)
-        return react('⏳')
+        if (!/webp|video/.test(mime)) return reply(`Reply Video/Stiker dengan caption *${prefix + command}*`);
+        await react('⏳');
+        const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
         let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
-        let ran = `./database/temp/${getRandom('.mp4')}`;
-        exec(`ffmpeg -y -i"${media}" -an -vf"scale=trunc(iw/2)*2:trunc(ih/2)*2" -pix_fmt yuv420p -c:v libx264 -preset veryfast "${ran}"`, async(err) => {
-          try {
-            if (err) return reply(settings.mess.fil);
-            await reply({ video: { url: ran }, gifPlayback: true, caption: settings.mess.don, gifAttribution: pickRandom(['Heart candy','ponyndo','TENOR','GIPHY'])})
-          } finally {
-            if (fs.existsSync(media)) fs.unlinkSync(media)
-            if (fs.existsSync(ran)) fs.unlinkSync(ran)
-          }
-        })
+        
+        const tmpInput = `./database/temp/input_${Date.now()}.${mime.split('/')[1] || 'mp4'}`;
+        const tmpOutput = `./database/temp/output_${Date.now()}.mp4`;
+        
+        try {
+          fs.writeFileSync(tmpInput, mediaBuffer);
+          
+          exec(`ffmpeg -y -i "${tmpInput}" -an -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -pix_fmt yuv420p -c:v libx264 -preset veryfast "${tmpOutput}"`, async (err) => {
+            try {
+              if (err) {
+                console.error("FFmpeg error:", err);
+                await react('❌');
+                return reply(settings.mess?.fil || '❌ Gagal mengonversi media ke GIF.');
+              }
+              
+              await hc.sendMessage(from, { 
+                video: { url: tmpOutput }, 
+                gifPlayback: true, 
+                caption: settings.mess?.don || 'Selesai!', 
+                gifAttribution: pickRandom(['Heart candy', 'ponyndo', 'TENOR', 'GIPHY'])
+              }, { quoted: m });
+              
+              await react('✅');
+            } catch (e) {
+              console.error(e);
+            } finally {
+              if (fs.existsSync(tmpInput)) fs.unlinkSync(tmpInput);
+              if (fs.existsSync(tmpOutput)) fs.unlinkSync(tmpOutput);
+            }
+          });
+        } catch (e) {
+          console.error("Error togif:", e);
+          await react('❌');
+          await reply('❌ Terjadi kesalahan saat memproses media.');
+          if (fs.existsSync(tmpInput)) fs.unlinkSync(tmpInput);
+          if (fs.existsSync(tmpOutput)) fs.unlinkSync(tmpOutput);
+        }
       }
       break
+
       
       
       //Bot Menu
