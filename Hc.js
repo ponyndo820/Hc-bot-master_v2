@@ -785,13 +785,14 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         if (isJadibot) return reply("Fitur ini hanya bisa digunakan di Bot Utama!");
         const fs = (await import('fs')).default;
         const NodeCache = (await import('node-cache')).default;
+        const baileys = await import('@whiskeysockets/baileys');
         const { 
-          default: makeWaSocket, 
           useMultiFileAuthState, 
           fetchLatestBaileysVersion, 
           makeCacheableSignalKeyStore,
           DisconnectReason 
-        } = await import('@whiskeysockets/baileys');
+        } = baileys;
+        const makeWaSocket = baileys.default?.default || baileys.default || baileys.makeWASocket || baileys;
         const pino = (await import('pino')).default;
         let inputNum = text ? text.replace(/[^0-9]/g, '') : sender.split('@')[0].replace(/[^0-9]/g, '');
         if (!inputNum || inputNum.length < 10) {
@@ -806,74 +807,110 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
                 fs.rmSync(sessionPath, { recursive: true, force: true });
             }
         }
-        const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
-        const { version } = await fetchLatestBaileysVersion();
-        const msgRetryCounterCache = new NodeCache();
-        const hcOptions = {
-          version,
-          logger: pino({ level: 'silent' }),
-          printQRInTerminal: false,
-          auth: {
-            creds: state.creds,
-            keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' }))
-          },
-          browser: ['Mac OS', 'Chrome', '10.15.7'],
-          msgRetryCounterCache,
-          generateHighQualityLinkPreview: true,
-          syncFullHistory: false
-        };
-        const jadibotSock = makeWaSocket(hcOptions);
-        if (!jadibotSock.authState.creds.registered) {
-          await reply(`⏳ *Sedang memproses kode pairing untuk nomor ${inputNum}, mohon tunggu...*`);
-          await new Promise((resolve) => setTimeout(resolve, 4000));
-          try {
-            let code = await jadibotSock.requestPairingCode(inputNum);
-            let formattedCode = code?.match(/.{1,4}/g)?.join("-") || code;
-            reply(`KODE PAIRING ANDA: *${formattedCode}*\n\n⚠️ *PENTING:*\nPastikan Anda memasukkan kode ini di HP dengan nomor WhatsApp *${inputNum}*.\n\nCara: Buka WA ➔ Setelan ➔ Tautkan Perangkat ➔ Tautkan dengan nomor telepon.`);
-          } catch (err) {
-            console.error("Gagal mengambil kode pairing jadibot:", err);
-            reply("❌ Gagal mengambil kode pairing. Server menolak koneksi.");
-            if (sessionPath.startsWith('./database/jadibot/') && fs.existsSync(sessionPath)) {
-              fs.rmSync(sessionPath, { recursive: true, force: true });
-            }
-            return;
-          }
-        }
-        jadibotSock.ev.on('creds.update', saveCreds);
+        let currentSock = null;
+        let codeRequested = false;
+        let reconnectTimer = null;
         
-        jadibotSock.ev.on('connection.update', async (update) => {
-          const { connection, lastDisconnect } = update;
-          
-          if (connection === 'open') {
-            db.users = db.users || {};
-            db.users[sender] = db.users[sender] || {};
-            db.users[sender].limit = 999999999;
-            db.users[sender].money = 999999999;
-            reply(`✅ Berhasil terhubung! Nomor *${inputNum}* sekarang resmi menjadi bot.`);
+        const msgRetryCounterCache = new NodeCache(); 
+        async function startJadibotProcess() {
+          if (reconnectTimer) clearTimeout(reconnectTimer);
+          if (currentSock) {
+            try {
+              currentSock.ev.removeAllListeners();
+              if (typeof currentSock.end === 'function') {
+                currentSock.end(undefined);
+              } else if (currentSock.ws && typeof currentSock.ws.close === 'function') {
+                currentSock.ws.close();
+              }
+            } catch (e) {}
           }
+          const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
+          const { version } = await fetchLatestBaileysVersion();
+          const hcOptions = {
+            version,
+            logger: pino({ level: 'silent' }),
+            printQRInTerminal: false,
+            auth: {
+              creds: state.creds,
+              keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' }))
+            },
+            browser: ['Mac OS', 'Chrome', '10.15.7'],
+            msgRetryCounterCache,
+            generateHighQualityLinkPreview: true,
+            syncFullHistory: false
+          };
+          const jadibotSock = makeWaSocket(hcOptions);
+          currentSock = jadibotSock;
+          jadibotSock.ev.on('creds.update', saveCreds);
           
-          if (connection === 'close') {
-            const statusCode = lastDisconnect?.error?.output?.statusCode;
-            console.log(`Koneksi jadibot ${inputNum} terputus. Status Code: ${statusCode}`);
+          jadibotSock.ev.on('connection.update', async (update) => {
+            const { connection, lastDisconnect } = update;
             
-            if (!jadibotSock.authState.creds.registered) {
-              if (sessionPath.startsWith('./database/jadibot/') && fs.existsSync(sessionPath)) {
-                fs.rmSync(sessionPath, { recursive: true, force: true });
-                console.log(`🗑️ Data sesi jadibot ${inputNum} dihapus karena gagal tertaut.`);
+            if (connection === 'open') {
+              db.users = db.users || {};
+              db.users[sender] = db.users[sender] || {};
+              db.users[sender].limit = 999999999;
+              db.users[sender].money = 999999999;
+              reply(`✅ Berhasil terhubung! Nomor *${inputNum}* sekarang resmi menjadi bot.`);
+            }
+            
+            if (connection === 'close') {
+              const statusCode = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.code;
+              console.log(`Koneksi jadibot ${inputNum} terputus. Kode Status: ${statusCode}`);
+              
+              const isRestart = statusCode === DisconnectReason.restartRequired || statusCode === 515;
+              const isLoggedOut = statusCode === DisconnectReason.loggedOut || statusCode === DisconnectReason.badSession || statusCode === 401;
+              if (isRestart) {
+                console.log(`🔄 Menginisialisasi ulang jadibot ${inputNum} untuk menyelesaikan penautan...`);
+                reconnectTimer = setTimeout(() => startJadibotProcess(), 3000);
+              } else if (!jadibotSock.authState.creds.registered) {
+                console.log(`❌ Penautan jadibot ${inputNum} gagal atau dibatalkan.`);
+                if (sessionPath.startsWith('./database/jadibot/') && fs.existsSync(sessionPath)) {
+                  fs.rmSync(sessionPath, { recursive: true, force: true });
+                }
+                reply(`❌ Gagal menautkan perangkat untuk nomor *${inputNum}*. Silakan coba lagi dengan perintah *${prefix}jadibot*.`);
+              } else if (isLoggedOut) {
+                if (sessionPath.startsWith('./database/jadibot/') && fs.existsSync(sessionPath)) {
+                  fs.rmSync(sessionPath, { recursive: true, force: true });
+                }
+                reply(`❌ Sesi jadibot *${inputNum}* terputus atau dikeluarkan.`);
+              } else {
+                reconnectTimer = setTimeout(() => startJadibotProcess(), 5000);
               }
             }
+          });
+          jadibotSock.ev.on('messages.upsert', async chatUpdate => {
+            try {
+              if (!chatUpdate.messages) return;
+              const msg = chatUpdate.messages[0];
+              if (!msg.message) return;
+              await Hc(jadibotSock, msg, db);
+            } catch (err) {
+              console.log(err);
+            }
+          });
+          if (!jadibotSock.authState.creds.registered && !codeRequested) {
+            codeRequested = true;
+            await reply(`⏳ *Sedang memproses kode pairing untuk nomor ${inputNum}, mohon tunggu...*`);
+            setTimeout(async () => {
+              if (currentSock === jadibotSock) {
+                try {
+                  let code = await jadibotSock.requestPairingCode(inputNum);
+                  let formattedCode = code?.match(/.{1,4}/g)?.join("-") || code;
+                  await reply(`KODE PAIRING ANDA: *${formattedCode}*\n\n⚠️ *PENTING:*\nPastikan Anda memasukkan kode ini di HP dengan nomor WhatsApp *${inputNum}*.\n\nCara: Buka WA ➔ Setelan ➔ Perangkat Tertaut ➔ Tautkan dengan nomor telepon.`);
+                } catch (err) {
+                  console.error("Gagal mengambil kode pairing jadibot:", err);
+                  await reply("❌ Gagal mengambil kode pairing. Pastikan nomor aktif dan coba kembali.");
+                  if (sessionPath.startsWith('./database/jadibot/') && fs.existsSync(sessionPath)) {
+                    fs.rmSync(sessionPath, { recursive: true, force: true });
+                  }
+                  codeRequested = false; 
+                }
+              }
+            }, 4000);
           }
-        });
-        jadibotSock.ev.on('messages.upsert', async chatUpdate => {
-          try {
-            if (!chatUpdate.messages) return;
-            const msg = chatUpdate.messages[0];
-            if (!msg.message) return;
-            await Hc(jadibotSock, msg, db);
-          } catch (err) {
-            console.log(err);
-          }
-        });
+        }
+        await startJadibotProcess();
       }
       break
       
