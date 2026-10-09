@@ -621,23 +621,22 @@ async function Hc(hc, m, db) {
         try {
           let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
           if (!mediaBuffer) return reply('❌ Gagal mengunduh media.');
-          let videoUrl = null;
           if (mime.includes('webp')) {
             const tmpPath = `./database/temp/stiker_${Date.now()}.webp`;
+            let res = null;
             try {
               fs.writeFileSync(tmpPath, mediaBuffer);
-              let res = await webp2mp4File(tmpPath);
-              if (res && res.result) {
-                videoUrl = res.result;
-              }
+              res = await webp2mp4File(tmpPath);
             } catch (err) {
-              console.error("Gagal convert webp ke mp4:", err.message);
+              console.error("Gagal convert webp ke mp4 via uploader:", err.message);
             } finally {
               if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
             }
-            if (videoUrl) {
+            if (res && res.status && res.result) {
+              const videoBuffer = await getBuffer(res.result);
+              if (!videoBuffer) throw new Error('Gagal mengunduh hasil video dari Ezgif.');
               await hc.sendMessage(from, { 
-                video: { url: videoUrl }, 
+                video: videoBuffer, 
                 gifPlayback: true, 
                 caption: settings.mess?.don || 'Selesai!', 
                 gifAttribution: pickRandom(['Heart candy', 'ponyndo', 'TENOR', 'GIPHY'])
