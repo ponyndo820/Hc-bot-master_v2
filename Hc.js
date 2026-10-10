@@ -26,6 +26,7 @@ const require = createRequire(import.meta.url);
 import settings from './settings.js';
 import { igdl } from './lib/igdl.js';
 import { ytMp4 } from './lib/ytmp4.js';
+import { removeBg } from './lib/removebg.js';
 import { startJadibot, isJadibotActive } from './lib/jadibot.js';
 import { webp2mp4File } from './lib/uploader.js';
 import { GroupUpdate, LoadDataBase } from './src/message.js';
@@ -685,6 +686,32 @@ async function Hc(hc, m, db) {
           console.error("Error togif:", e);
           await react('❌');
           await reply('❌ Terjadi kesalahan saat memproses media.');
+        }
+      }
+      break
+      case 'removebackground': case 'removebg': case 'nobg': {
+        if (!/image\/(jpeg|jpg|png)/.test(mime)) return reply(`Kirim/Reply gambar (jpg/png) yang ingin dihapus background-nya dengan caption *${prefix + command}*`);
+        await react('⏳');
+        const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
+        try {
+          const mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+          if (!mediaBuffer) throw new Error('Gagal mengunduh gambar');
+          const resultUrl = await removeBg(mediaBuffer);
+          if (!resultUrl) {
+            await react('❌');
+            return reply('❌ Gagal menghapus background. Server sedang bermasalah, coba lagi nanti.');
+          }
+          await hc.sendMessage(from, {
+            document: { url: resultUrl },
+            mimetype: 'image/png',
+            fileName: `removebg_${Date.now()}.png`
+          }, { quoted: m });
+          await react('✅');
+          await reply(settings.mess.don);
+        } catch (e) {
+          console.error('Error removebg:', e);
+          await react('❌');
+          await reply('❌ Terjadi kesalahan saat memproses gambar!');
         }
       }
       break
