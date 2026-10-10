@@ -320,11 +320,12 @@ async function Hc(hc, m, db) {
         
         try {
           let settingsContent = fs.readFileSync('./settings.js', 'utf-8');
+          let found = false;
           settingsContent = settingsContent.replace(
-            /settings\.APIKeys\s*=\s*\{[\s\S]*?\}/,
-            `settings.APIKeys = '${key}'`
+            /settings\.APIKeys\s*=\s*(?:'[^']*'|"[^"]*"|\{[\s\S]*?\})[ \t]*;?/,
+            () => { found = true; return `settings.APIKeys = ${JSON.stringify(key)};`; }
           );
-          
+          if (!found) throw new Error('Baris settings.APIKeys tidak ditemukan di settings.js');
           fs.writeFileSync('./settings.js', settingsContent, 'utf-8');
           reply('✅ API Key Gemini berhasil disimpan secara permanen ke *settings.js*!');
           await react('✅')

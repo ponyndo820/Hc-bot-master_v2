@@ -11,12 +11,14 @@ import chalk from 'chalk';
 import mongoose from 'mongoose';
 import { fileURLToPath } from 'url';
 
-import '../settings.js';
+
+import settings from '../settings.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
 class MongoDB {
-	constructor(url = settings.tempatDB, options = { useNewUrlParser: true, useUnifiedTopology: true, serverSelectionTimeoutMS: 5000 }) {
+	constructor(url = settings.tempatDB, options = { serverSelectionTimeoutMS: 5000
+	}) {
 		this.url = url
 		this._model = null
 		this.options = options
@@ -116,6 +118,8 @@ class JsonDB {
 					data = JSON.parse(fs.readFileSync(this.file + '.bak'))
 					fs.writeFileSync(this.file, JSON.stringify(data, null, 2))
 				} else {
+					try { fs.renameSync(this.file, `${this.file}.corrupt-${Date.now()}`) } catch {}
+					console.error('❗ File database rusak dan tidak ada .bak. File lama disimpan sebagai .corrupt-*')
 					data = this.data
 					fs.writeFileSync(this.file, JSON.stringify(this.data, null, 2))
 				}
@@ -146,7 +150,9 @@ class JsonDB {
 					}
 					return value;
 				}, 2);
-				fs.writeFileSync(this.file, safeData);
+				const tmp = this.file + '.tmp';
+				fs.writeFileSync(tmp, safeData);
+				fs.renameSync(tmp, this.file);
 			}
 		} catch (e) {
 			console.error('❌ Penulisan ke database gagal: ', e);
