@@ -13,6 +13,7 @@ import readline from 'readline';
 import makeWaSocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
 
 import { Hc } from './Hc.js';
+import { restoreJadibots } from './lib/jadibot.js';
 import settings from './settings.js';
 import { printMessageLog } from './lib/function.js';
 import { dataBase, cmdDel, checkStatus } from './src/database.js';
@@ -136,6 +137,12 @@ async function startHcbot() {
       startHcbot();
     } else if (connection === 'open') {
       console.log(chalk.yellowBright(`[SYSTEM] ${settings.botName} Berhasil Terhubung!`));
+
+      // AUTO RESTORE JADIBOT (sekali saja per proses)
+      if (!global._jadibotRestored) {
+        global._jadibotRestored = true;
+        restoreJadibots({ Hc, getDb: () => global.db }).catch(console.log);
+      }
       
       // AUTO BACKUP DATABASE (Setiap 6 Jam)
       setInterval(async () => {
@@ -191,6 +198,12 @@ async function startHcbot() {
     try {
       const m = chatUpdate.messages[0];
       if (!m.message) return;
+      
+      m.chat = m.key.remoteJid;
+      m.isGroup = m.chat.endsWith('@g.us');
+      m.sender = m.key.fromMe
+        ? (hc.user.id.split(':')[0] + '@s.whatsapp.net')
+        : (m.key.participant || m.key.remoteJid);
       
       await printMessageLog(hc, m);
       await Hc(hc, m, global.db);

@@ -26,7 +26,8 @@ const require = createRequire(import.meta.url);
 import settings from './settings.js';
 import { igdl } from './lib/igdl.js';
 import { ytMp4 } from './lib/ytmp4.js';
-import { webp2mp4File } from './lib/uploader.js'
+import { startJadibot, isJadibotActive } from './lib/jadibot.js';
+import { webp2mp4File } from './lib/uploader.js';
 import { GroupUpdate, LoadDataBase } from './src/message.js';
 import { writeExif, toAudio, toPTT, toPTV, toVideo } from './lib/converter.js';
 import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime, sleep, clockString } from './lib/function.js';
@@ -575,6 +576,7 @@ async function Hc(hc, m, db) {
           }, { quoted: m });
           
           await react('✅');
+          await reply(settings.mess.don)
           
           if (typeof audio === 'string' && fs.existsSync(audio)) {
             fs.unlinkSync(audio);
@@ -582,6 +584,7 @@ async function Hc(hc, m, db) {
         } catch (e) {
           console.error("Error toaudio:", e);
           await react('❌');
+          await reply(settings.mess.fil)
           await reply('❌ Gagal mengonversi media menjadi audio!');
         }
       }
@@ -599,9 +602,10 @@ async function Hc(hc, m, db) {
           await hc.sendMessage(from, { 
             document: docData, 
             mimetype: 'audio/mpeg', 
-            fileName: `Convert_By_${settings.author || 'Heart_candy'}.mp3`
+            fileName: `Convert_By: ${settings.author}.mp3`
           }, { quoted: m });
           await react('✅');
+          await reply(settings.mess.don)
         } catch (err) {
           console.error("Error tomp3:", err);
           await react('❌');
@@ -879,135 +883,29 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       }
       break
       case 'jadibot': {
-        if (isJadibot) return reply(`Fitur ini hanya bisa digunakan di Bot Utama! ${settings.ownerNumber} `);
-        const fs = (await import('fs')).default;
-        const NodeCache = (await import('node-cache')).default;
-        const baileys = await import('@whiskeysockets/baileys');
-        const { 
-          useMultiFileAuthState, 
-          fetchLatestBaileysVersion, 
-          makeCacheableSignalKeyStore,
-          DisconnectReason 
-        } = baileys;
-        const makeWaSocket = baileys.default?.default || baileys.default || baileys.makeWASocket || baileys;
-        const pino = (await import('pino')).default;
-       let inputNum = text.replace(/[^0-9]/g, '');
+        if (hc.isJadibot) return reply(`Fitur ini hanya bisa digunakan di Bot Utama!`);
+        const inputNum = text.replace(/[^0-9]/g, '');
         if (!inputNum || inputNum.length < 10) {
           return reply(`⚠️ Silakan masukkan nomor WhatsApp yang valid!\n\n*Contoh:* ${prefix}jadibot 62858Xxxx`);
-        }
-        
-        const sessionPath = `./database/jadibot/${inputNum}`;
-        
-        if (fs.existsSync(sessionPath)) {
-            const hasCreds = fs.existsSync(`${sessionPath}/creds.json`);
-            if (!hasCreds) {
-                fs.rmSync(sessionPath, { recursive: true, force: true });
-            }
-        }
-        let currentSock = null;
-        let codeRequested = false;
-        let reconnectTimer = null;
-        
-        const msgRetryCounterCache = new NodeCache(); 
-        async function startJadibotProcess() {
-          if (reconnectTimer) clearTimeout(reconnectTimer);
-          if (currentSock) {
-            try {
-              currentSock.ev.removeAllListeners();
-              if (typeof currentSock.end === 'function') {
-                currentSock.end(undefined);
-              } else if (currentSock.ws && typeof currentSock.ws.close === 'function') {
-                currentSock.ws.close();
-              }
-            } catch (e) {}
-          }
-          const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
-          const { version } = await fetchLatestBaileysVersion();
-          const hcOptions = {
-            version,
-            logger: pino({ level: 'silent' }),
-            printQRInTerminal: false,
-            auth: {
-              creds: state.creds,
-              keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' }))
-            },
-            browser: ['Mac OS', 'Chrome', '10.15.7'],
-            msgRetryCounterCache,
-            generateHighQualityLinkPreview: true,
-            syncFullHistory: false
-          };
-          const jadibotSock = makeWaSocket(hcOptions);
-          currentSock = jadibotSock;
-          jadibotSock.ev.on('creds.update', saveCreds);
           
-          jadibotSock.ev.on('connection.update', async (update) => {
-            const { connection, lastDisconnect } = update;
-            
-            if (connection === 'open') {
-              db.users = db.users || {};
-              db.users[sender] = db.users[sender] || {};
-              db.users[sender].limit = 999999999;
-              db.users[sender].money = 999999999;
-              reply(`✅ Berhasil terhubung! Nomor *${inputNum}* sekarang resmi menjadi bot.`);
-            }
-            
-            if (connection === 'close') {
-              const statusCode = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.code;
-              console.log(`Koneksi jadibot ${inputNum} terputus. Kode Status: ${statusCode}`);
-              
-              const isRestart = statusCode === DisconnectReason.restartRequired || statusCode === 515;
-              const isLoggedOut = statusCode === DisconnectReason.loggedOut || statusCode === DisconnectReason.badSession || statusCode === 401;
-              if (isRestart) {
-                console.log(`🔄 Menginisialisasi ulang jadibot ${inputNum} untuk menyelesaikan penautan...`);
-                reconnectTimer = setTimeout(() => startJadibotProcess(), 3000);
-              } else if (!jadibotSock.authState.creds.registered) {
-                console.log(`❌ Penautan jadibot ${inputNum} gagal atau dibatalkan.`);
-                if (sessionPath.startsWith('./database/jadibot/') && fs.existsSync(sessionPath)) {
-                  fs.rmSync(sessionPath, { recursive: true, force: true });
-                }
-                reply(`❌ Gagal menautkan perangkat untuk nomor *${inputNum}*. Silakan coba lagi dengan perintah *${prefix}jadibot*.`);
-              } else if (isLoggedOut) {
-                if (sessionPath.startsWith('./database/jadibot/') && fs.existsSync(sessionPath)) {
-                  fs.rmSync(sessionPath, { recursive: true, force: true });
-                }
-                reply(`❌ Sesi jadibot *${inputNum}* terputus atau dikeluarkan.`);
-              } else {
-                reconnectTimer = setTimeout(() => startJadibotProcess(), 5000);
-              }
-            }
-          });
-          jadibotSock.ev.on('messages.upsert', async chatUpdate => {
-            try {
-              if (!chatUpdate.messages) return;
-              const msg = chatUpdate.messages[0];
-              if (!msg.message) return;
-              await Hc(jadibotSock, msg, db);
-            } catch (err) {
-              console.log(err);
-            }
-          });
-          if (!jadibotSock.authState.creds.registered && !codeRequested) {
-            codeRequested = true;
-            await reply(`⏳ *Sedang memproses kode pairing untuk nomor ${inputNum}, mohon tunggu...*`);
-            setTimeout(async () => {
-              if (currentSock === jadibotSock) {
-                try {
-                  let code = await jadibotSock.requestPairingCode(inputNum);
-                  let formattedCode = code?.match(/.{1,4}/g)?.join("-") || code;
-                  await reply(`KODE PAIRING ANDA: *${formattedCode}*\n\n⚠️ *PENTING:*\nPastikan Anda memasukkan kode ini di HP dengan nomor WhatsApp *${inputNum}*.\n\nCara: Buka WA ➔ Setelan ➔ Perangkat Tertaut ➔ Tautkan dengan nomor telepon.`);
-                } catch (err) {
-                  console.error("Gagal mengambil kode pairing jadibot:", err);
-                  await reply("❌ Gagal mengambil kode pairing. Pastikan nomor aktif dan coba kembali.");
-                  if (sessionPath.startsWith('./database/jadibot/') && fs.existsSync(sessionPath)) {
-                    fs.rmSync(sessionPath, { recursive: true, force: true });
-                  }
-                  codeRequested = false; 
-                }
-              }
-            }, 4000);
-          }
         }
-        await startJadibotProcess();
+        if (isJadibotActive(inputNum)) return reply(`⚠️ Nomor *${inputNum}* sudah aktif sebagai bot.`);
+        
+        await startJadibot(inputNum, {
+          Hc,
+          getDb: () => global.db,
+          notify: reply,
+          pair: true,
+          onOpen: () => {
+            global.db.users = global.db.users || {};
+            global.db.users[sender] = global.db.users[sender] || {};
+            global.db.users[sender].limit = 999999999;
+            global.db.users[sender].money = 999999999;
+            
+          },
+          
+        });
+        
       }
       break
       

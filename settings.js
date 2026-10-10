@@ -23,7 +23,7 @@ const settings = {
   tempatStore: 'baileys_store.json',
   listv: ['•','●','■','✿','▲','➩','➢','➣','➤','✦','✧','△','❀','○','□','♤','♡','◇','♧','々','〆'],
   
-  // Daftar command yang bebas limit (tidak mengurangi limit)
+   // Daftar command yang bebas limit (tidak mengurangi limit)
     bypasslimit: [
     'menu', 'allmenu', 'botmenu', 'ownermenu', 'quotesmenu', 
     'toolsmenu', 'animemenu', 'downloadermenu', 'searchmenu', 
