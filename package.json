@@ -54,6 +54,7 @@
     "awesome-phonenumber": "^6.8.0",
     "@google/generative-ai": "^0.24.1",
     "@whiskeysockets/baileys": "^7.0.0-rc13",
+    "@imgly/background-removal-node": "^1.4.5",
     "ytdl-core": "npm:@distube/ytdl-core@latest"
   }
 }

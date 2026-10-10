@@ -26,7 +26,7 @@ const require = createRequire(import.meta.url);
 import settings from './settings.js';
 import { igdl } from './lib/igdl.js';
 import { ytMp4 } from './lib/ytmp4.js';
-import { removeBg } from './lib/removebg.js';
+import { removeBg, setRemoveBgKey } from './lib/removebg.js';
 import { startJadibot, isJadibotActive } from './lib/jadibot.js';
 import { webp2mp4File } from './lib/uploader.js';
 import { GroupUpdate, LoadDataBase } from './src/message.js';
@@ -347,6 +347,21 @@ async function Hc(hc, m, db) {
       	if (!isCreator) return reply(settings.mess.owr);
       	global.anticall = false;
       	reply('Fitur Anti-Call berhasil *dimatikan*. Bot dapat menerima panggilan lagi.');
+      }
+      break
+      case 'setremovebg': case 'setapikeyremovebg': {
+        if (!isCreator) return reply(settings.mess.owr);
+        if (!text) return reply(`Masukkan API Key remove.bg-nya!\nContoh: *${prefix + command} abcDEF123...*\n\nDaftar gratis & ambil key di https://www.remove.bg/api`);
+        try {
+          setRemoveBgKey(text.trim());
+          await reply('✅ API Key remove.bg berhasil disimpan ke *apikey_removebg.json*!');
+          await react('✅');
+          try { await hc.sendMessage(from, { delete: m.key }); } catch {}
+        } catch (err) {
+          console.error(err);
+          await reply('❌ Gagal menyimpan API Key.');
+          await react('❌');
+        }
       }
       break
       
@@ -696,13 +711,13 @@ async function Hc(hc, m, db) {
         try {
           const mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
           if (!mediaBuffer) throw new Error('Gagal mengunduh gambar');
-          const resultUrl = await removeBg(mediaBuffer);
-          if (!resultUrl) {
+          const result = await removeBg(mediaBuffer);
+          if (!result.buffer) {
             await react('❌');
-            return reply('❌ Gagal menghapus background. Server sedang bermasalah, coba lagi nanti.');
+            return reply(`❌ Gagal menghapus background.\n\n${result.errors.map(e => '• ' + e).join('\n')}\n\nAtur API key dengan *${prefix}setremovebg <apikey>*`);
           }
           await hc.sendMessage(from, {
-            document: { url: resultUrl },
+            document: result.buffer,
             mimetype: 'image/png',
             fileName: `removebg_${Date.now()}.png`
           }, { quoted: m });
