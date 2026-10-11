@@ -704,7 +704,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
-      case 'removebackground': case 'removebg': case 'nobg': {
+      case 'removebackground': case 'removebg': case 'nobg': case 'rmbg': {
         if (!/image\/(jpeg|jpg|png)/.test(mime)) return reply(`Kirim/Reply gambar (jpg/png) yang ingin dihapus background-nya dengan caption *${prefix + command}*`);
         await react('⏳');
         const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
@@ -719,7 +719,7 @@ async function Hc(hc, m, db) {
           await hc.sendMessage(from, {
             document: result.buffer,
             mimetype: 'image/png',
-            fileName: `removebg_${Date.now()}.png`
+            fileName: `removebg_By: ${settings.author}.png`
           }, { quoted: m });
           await react('✅');
           await reply(settings.mess.don);
