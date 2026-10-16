@@ -16,6 +16,7 @@ import speed from 'performance-now';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import youtubedl from 'youtube-dl-exec';
+import { ytdlpBaseOptions, youtubeErrorMessage, saveYoutubeCookies } from './lib/ytdlp-opts.js';
 import { performance } from 'perf_hooks';
 import { exec, spawn, execSync } from 'child_process';
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -1070,6 +1071,27 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       break
       
       // Downloader Menu
+      case 'setytcookies': case 'setytcookie': {
+        if (!isCreator) return reply(settings.mess.owr);
+        let rawCookies = text || '';
+        if (!rawCookies.trim() && isQuoted) {
+          const q = contextInfo.quotedMessage;
+          rawCookies = q.conversation || q.extendedTextMessage?.text || '';
+        }
+        if (!rawCookies.trim()) {
+          return reply(`Kirim cookies YouTube (format Netscape / cookies.txt).\n\nCara: tempel isinya setelah perintah, atau reply pesan yang berisi cookies dengan *${prefix}setytcookies*.`);
+        }
+        try {
+          const hasil = saveYoutubeCookies(rawCookies);
+          await reply(`✅ Cookies YouTube tersimpan (${hasil.count} cookies).\nSilakan coba *${prefix}ytmp3*. Pesan berisi cookies akan dihapus otomatis.`);
+          await react('✅');
+        } catch (err) {
+          await reply('❌ ' + err.message);
+          await react('❌');
+        }
+        try { await hc.sendMessage(from, { delete: m.key }); } catch (e) {}
+      }
+      break
       case 'ytmp3': {
         let ytUrl = '';
         if (text) {
@@ -1103,14 +1125,11 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         try {
           audioPath = path.join('./database/temp', `audio_${Date.now()}.mp3`);
           await youtubedl(ytUrl, {
+            ...ytdlpBaseOptions(),
             extractAudio: true,
             audioFormat: 'mp3',
             output: audioPath,
-            noCheckCertificates: true,
-            noWarnings: true,
-            preferFreeFormats: true,
-            extractorArgs: 'youtube:player_client=android,web',
-            addHeader: ['referer:https://www.youtube.com']
+            preferFreeFormats: true
           });
           await hc.sendMessage(from, { 
             audio: { url: audioPath }, 
@@ -1119,7 +1138,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
           }, { quoted: m });
         } catch (err) {
           console.error("Error ytmp3:", err);
-          await reply('❌ Gagal mengunduh audio dari YouTube. Pastikan link-nya benar!');
+          await reply(youtubeErrorMessage(err, '❌ Gagal mengunduh audio dari YouTube. Pastikan link-nya benar!'));
         } finally {
           if (audioPath && fs.existsSync(audioPath)) {
             try {
@@ -1170,7 +1189,8 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
           }, { quoted: m });
         } catch (e) {
           console.error("Error ytmp4:", e);
-          await reply('❌ Gagal memproses video YouTube. Pastikan link valid!');
+          // [PERBAIKAN] Pesan jelas bila server diblokir anti-bot YouTube
+          await reply(youtubeErrorMessage(e, '❌ Gagal memproses video YouTube. Pastikan link valid!'));
         } finally {
           if (videoPath && fs.existsSync(videoPath)) {
             try {
