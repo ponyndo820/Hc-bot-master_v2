@@ -144,35 +144,50 @@ async function startHcbot() {
         restoreJadibots({ Hc, getDb: () => global.db }).catch(console.log);
       }
       
-      // AUTO BACKUP DATABASE (Setiap 6 Jam)
-      setInterval(async () => {
-          let dbPath = path.join(process.cwd(), settings.tempatDB || 'database.json');
-          
-          if (fs.existsSync(dbPath)) {
-              let ownerJid = settings.ownerNumber[0] + '@s.whatsapp.net';
-              await hc.sendMessage(ownerJid, {
-                  document: fs.readFileSync(dbPath),
-                  mimetype: 'application/json',
-                  fileName: `Backup_DB_${new Date().toISOString().split('T')[0]}.json`,
-                  caption: '📂 *AUTO BACKUP DATABASE*\nBerikut adalah file cadangan database otomatis bot (Interval 6 Jam).'
-              });
-              console.log(chalk.green('[SYSTEM] Auto Backup Database berhasil dikirim ke Owner.'));
+      // [PERBAIKAN] Simpan referensi terbaru; interval di bawah memakai soket & database yang aktif
+      global.hcMain = hc;
+      global.dbConnector = dbConnector;
+
+      // AUTO BACKUP DATABASE (setiap 6 jam)
+      // [PERBAIKAN] Dibuat sekali saja (sebelumnya menumpuk setiap bot reconnect), mengirim isi global.db
+      // langsung (path file lama salah: database/ tidak ikut), dan dibungkus try/catch.
+      if (!global._backupInterval) {
+        global._backupInterval = setInterval(async () => {
+          try {
+            if (!global.hcMain || !global.db) return;
+            const ownerJid = settings.ownerNumber[0].replace(/[^0-9]/g, '') + '@s.whatsapp.net';
+            await global.hcMain.sendMessage(ownerJid, {
+              document: Buffer.from(JSON.stringify(global.db, null, 2)),
+              mimetype: 'application/json',
+              fileName: `Backup_DB_${new Date().toISOString().split('T')[0]}.json`,
+              caption: '📂 *AUTO BACKUP DATABASE*\nBerikut adalah file cadangan database otomatis bot (Interval 6 Jam).'
+            });
+            console.log(chalk.green('[SYSTEM] Auto Backup Database berhasil dikirim ke Owner.'));
+          } catch (e) {
+            console.log(chalk.red('[SYSTEM] Auto Backup gagal:'), e.message);
           }
-      }, 6 * 60 * 60 * 1000);
-      
-      // AUTO RESET LIMIT (Tepat Pukul 00:00)
-      setInterval(() => {
-          let now = new Date();
-          if (now.getHours() === 0 && now.getMinutes() === 0 && now.getSeconds() === 0) {
-              if (global.db && global.db.users) {
-                  for (let user in global.db.users) {
-                      global.db.users[user].limit = settings.limit.free;
-                  }
-                  console.log(chalk.green('[SYSTEM] Limit harian semua user telah di-reset!'));
-                  dbConnector.write(global.db);
-              }
+        }, 6 * 60 * 60 * 1000);
+      }
+
+      // AUTO RESET LIMIT (sekali per hari)
+      // [PERBAIKAN] Dulu mengecek detik tepat 00:00:00 (terlewat bila bot lag). Sekarang sekali per tanggal,
+      // tercatat di db.lastLimitReset, dan tetap jalan walau bot mati saat tengah malam.
+      if (!global._resetInterval) {
+        const resetLimit = async () => {
+          const today = new Date().toDateString();
+          if (!global.db || global.db.lastLimitReset === today) return;
+          for (const id in global.db.users || {}) {
+            const u = global.db.users[id];
+            if (u.vip) continue;
+            u.limit = u.premium ? settings.limit.premium : settings.limit.free;
           }
-      }, 1000);
+          global.db.lastLimitReset = today;
+          console.log(chalk.green('[SYSTEM] Limit harian semua user telah di-reset!'));
+          await global.dbConnector.write(global.db);
+        };
+        resetLimit();
+        global._resetInterval = setInterval(resetLimit, 60 * 1000);
+      }
     }
   });
   
