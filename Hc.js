@@ -16,9 +16,7 @@ import speed from 'performance-now';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import youtubedl from 'youtube-dl-exec';
-// [PERBAIKAN] Opsi yt-dlp (cookies/proxy) + pesan error anti-bot YouTube
-import { ytdlpBaseOptions, youtubeErrorMessage, saveYoutubeCookies, updateYtdlp, isYoutubeBotBlock } from './lib/ytdlp-opts.js';
-// [PERBAIKAN] Jalur cadangan unduhan YouTube lewat API SaveNow
+import { ytdlpBaseOptions, youtubeErrorMessage, saveYoutubeCookies, updateYtdlp, isYoutubeBotBlock } from './lib/ytdlp-opts.js
 import { getSavenowKey, setSavenowKey, savenowToFile } from './lib/savenow.js';
 import { performance } from 'perf_hooks';
 import { exec, spawn, execSync } from 'child_process';
@@ -1072,9 +1070,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         }
       }
       break
-      
-      // Downloader Menu
-      // [PERBAIKAN] Command baru: simpan API key SaveNow (database/apikey_savenow.json)
       case 'setsavenow': case 'setsavenowkey': {
         if (!isCreator) return reply(settings.mess.owr);
         const keySn = (text || '').trim();
@@ -1090,8 +1085,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         try { await hc.sendMessage(from, { delete: m.key }); } catch (e) {}
       }
       break
-
-      // [PERBAIKAN] Command baru: perbarui yt-dlp dan tampilkan versinya (.updateytdlp [stable])
       case 'updateytdlp': {
         if (!isCreator) return reply(settings.mess.owr);
         await react('⏳');
@@ -1105,8 +1098,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         }
       }
       break
-
-      // [PERBAIKAN] Command baru: simpan cookies YouTube langsung ke bot (database/yt-cookies.txt)
       case 'setytcookies': case 'setytcookie': {
         if (!isCreator) return reply(settings.mess.owr);
         let rawCookies = text || '';
@@ -1125,11 +1116,9 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
           await reply('❌ ' + err.message);
           await react('❌');
         }
-        // Hapus pesan yang berisi cookies (isinya setara kata sandi akun)
         try { await hc.sendMessage(from, { delete: m.key }); } catch (e) {}
       }
       break
-
       case 'ytmp3': {
         let ytUrl = '';
         if (text) {
@@ -1162,7 +1151,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         let audioPath = null;
         try {
           audioPath = path.join('./database/temp', `audio_${Date.now()}.mp3`);
-          // [PERBAIKAN] Opsi diambil dari lib/ytdlp-opts.js (mendukung YT_COOKIES / YT_PROXY)
           await youtubedl(ytUrl, {
             ...ytdlpBaseOptions(),
             extractAudio: true,
@@ -1177,9 +1165,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
           }, { quoted: m });
         } catch (err) {
           console.error("Error ytmp3:", err);
-          // [PERBAIKAN] Pesan jelas bila server diblokir anti-bot YouTube
           const failMsg = youtubeErrorMessage(err, '❌ Gagal mengunduh audio dari YouTube. Pastikan link-nya benar!');
-          // [PERBAIKAN] Jalur cadangan: bila diblokir anti-bot dan API key SaveNow tersedia, unduh lewat API
           if (isYoutubeBotBlock(err) && getSavenowKey()) {
             try {
               await reply('🔁 YouTube memblokir server, mencoba jalur cadangan...');
@@ -1242,10 +1228,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
           }, { quoted: m });
         } catch (e) {
           console.error("Error ytmp4:", e);
-          // [PERBAIKAN] Pesan jelas bila server diblokir anti-bot YouTube
           const failMsg = youtubeErrorMessage(e, '❌ Gagal memproses video YouTube. Pastikan link valid!');
-          // [PERBAIKAN] Jalur cadangan: bila diblokir anti-bot dan API key SaveNow tersedia, unduh lewat API
-          // (resolusi diatur lewat variabel SAVENOW_VIDEO_FORMAT, bawaan 480)
           if (isYoutubeBotBlock(e) && getSavenowKey()) {
             try {
               await reply('🔁 YouTube memblokir server, mencoba jalur cadangan...');
