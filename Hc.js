@@ -16,7 +16,7 @@ import speed from 'performance-now';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import youtubedl from 'youtube-dl-exec';
-import { ytdlpBaseOptions, youtubeErrorMessage, saveYoutubeCookies, updateYtdlp, isYoutubeBotBlock } from './lib/ytdlp-opts.js
+import { ytdlpBaseOptions, youtubeErrorMessage, saveYoutubeCookies, updateYtdlp, isYoutubeBotBlock } from './lib/ytdlp-opts.js';
 import { getSavenowKey, setSavenowKey, savenowToFile } from './lib/savenow.js';
 import { performance } from 'perf_hooks';
 import { exec, spawn, execSync } from 'child_process';
