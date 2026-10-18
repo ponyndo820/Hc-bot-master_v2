@@ -29,6 +29,7 @@
 
 	yarn install or npm install
 	yarn start or npm start
+	📖 **Panduan lengkap instalasi dan penggunaan:** [Panduanrun.md](Panduan%20penggunaan/Panduanrun.md)
 
 # Install pkg⬇️
 
