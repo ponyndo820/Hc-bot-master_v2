@@ -1,6 +1,6 @@
 # Panduan Menjalankan Hc-bot-master_v2
 
-Bot WhatsApp berbasis Baileys (multi device) dengan tema MLP. Panduan ini merangkum instalasi di **Termux (Android)** dan **Railway**, pengaturan rahasia (API key, cookies), fitur jadibot dan downloader YouTube, serta daftar masalah yang pernah muncul beserta solusinya.
+Bot WhatsApp berbasis Baileys (multi device) dengan tema MLP. Panduan ini merangkum instalasi di **Termux (Android)** dan **Railway**, pengaturan rahasia (API key, cookies), manajemen database dan sesi, fitur jadibot dan downloader YouTube, serta daftar masalah yang pernah muncul beserta solusinya.
 
 > Jangan pernah menaruh API key, cookies, atau folder sesi di GitHub. Lihat bagian **Keamanan**.
 
@@ -20,7 +20,8 @@ Bot WhatsApp berbasis Baileys (multi device) dengan tema MLP. Panduan ini merang
 ├── database/            data bot (database.json, jadibot/, temp/, kunci API, cookies)
 ├── lib/                 modul pendukung
 │   ├── converter.js     konversi ffmpeg (.toaudio, .togif, dll)
-│   ├── jadibot.js       sesi jadibot + pemulihan otomatis
+│   ├── jadibot.js       sesi jadibot + pemulihan otomatis + stopJadibot
+│   ├── maintenance.js   backup, info/arsip/hapus sesi, pembersihan sampah
 │   ├── ytmp4.js         unduh video YouTube
 │   ├── ytdlp-opts.js    opsi yt-dlp, cookies, pembaruan yt-dlp
 │   ├── savenow.js       jalur cadangan unduhan lewat API SaveNow
@@ -57,7 +58,7 @@ pkg install yarn
 pkg install nodejs
 pkg install ffmpeg
 pkg install imagemagick
-pkg install python ffmpeg
+pkg install python
 ```
 
 ### 3.2 Ambil kode dan pasang dependensi
@@ -105,7 +106,14 @@ pm2 stop hc-bot        # hentikan
 
 Agar bot otomatis jalan saat HP menyala, pasang **Termux:Boot** (dari F-Droid, satu sumber dengan Termux) dan buat skrip di `~/.termux/boot/` yang menjalankan perintah `pm2 resurrect` atau `cd ~/Hc-bot-master_v2 && node main.js`.
 
-### 3.6 Memperbarui kode
+### 3.6 Catatan untuk fitur YouTube dan arsip sesi
+
+- `.ytmp3` dan `.ytmp4` memakai yt-dlp. Saat bot menyala, yt-dlp **diperbarui otomatis** (log menampilkan `[YTDLP] versi ...`).
+- Opsi JavaScript yt-dlp (`--js-runtimes node` dan `--remote-components ejs:github`) aktif otomatis bila versi yt-dlp cukup baru, jadi tidak perlu mengatur variabel apa pun di Termux.
+- Di Termux (IP rumahan) cookies YouTube biasanya tidak diperlukan.
+- `.getsession` memakai perintah `tar`, yang sudah ada di Termux. Bila belum, pasang dengan `pkg install tar`.
+
+### 3.7 Memperbarui kode
 
 ```bash
 cd ~/Hc-bot-master_v2
@@ -143,8 +151,8 @@ Tanpa Volume, setelah **setiap deploy** Anda harus:
 | `YT_COOKIES` | Isi `cookies.txt` YouTube (format Netscape), cadangan bila file cookies tidak ada |
 | `YT_COOKIES_FILE` | Path ke file `cookies.txt` |
 | `YT_PROXY` | Proxy untuk yt-dlp, mis. `http://user:pass@host:port` |
-| `YT_JS_RUNTIME` | Runtime JavaScript untuk yt-dlp, isi `node` |
-| `YT_REMOTE_COMPONENTS` | Komponen tambahan yt-dlp, isi `ejs:github` |
+| `YT_JS_RUNTIME` | Runtime JavaScript untuk yt-dlp. **Aktif otomatis (`node`)** bila yt-dlp versi 2025.11.12 atau lebih baru. Isi nilai lain untuk menimpa, atau `off` untuk mematikan |
+| `YT_REMOTE_COMPONENTS` | Komponen tambahan yt-dlp. **Aktif otomatis (`ejs:github`)** bila yt-dlp mendukung. Isi `off` untuk mematikan |
 | `YT_DEBUG` | `1` = tampilkan peringatan yt-dlp di log (untuk mencari penyebab error) |
 | `YT_AUTO_UPDATE` | `0` = matikan pembaruan otomatis yt-dlp saat bot menyala |
 | `SAVENOW_API_KEY` | API key SaveNow (jalur cadangan unduhan YouTube) |
@@ -152,7 +160,7 @@ Tanpa Volume, setelah **setiap deploy** Anda harus:
 | `SAVENOW_BASE` | Alamat dasar API SaveNow (biasanya tidak perlu diubah) |
 | `PORT` / `SERVER_PORT` | Port server bila platform menyediakannya |
 
-Konfigurasi yang terbukti bekerja untuk `.ytmp3` dan `.ytmp4` di Railway: `YT_JS_RUNTIME=node`, `YT_REMOTE_COMPONENTS=ejs:github`, dan cookies YouTube dari `.setytcookies`. `YT_DEBUG=1` boleh dimatikan setelah semuanya stabil.
+`.ytmp3` dan `.ytmp4` sudah terbukti berfungsi di **Railway** (dengan cookies YouTube dari `.setytcookies`) dan di **Termux**. Opsi JavaScript yt-dlp sekarang aktif otomatis, jadi `YT_JS_RUNTIME` dan `YT_REMOTE_COMPONENTS` tidak wajib diisi lagi. Keduanya hanya dipakai untuk menimpa nilai bawaan atau mematikannya. `YT_DEBUG=1` boleh dimatikan setelah semuanya stabil.
 
 ---
 
@@ -187,39 +195,68 @@ Isi yang benar diawali `# Netscape HTTP Cookie File` dan memuat nama seperti `SI
 
 ---
 
-## 7. Fitur penting
+## 7. Manajemen database dan sesi (khusus owner)
 
-### 7.1 Downloader YouTube (`.ytmp3`, `.ytmp4`)
+Semua command di bagian ini **hanya bisa dipakai owner** dan **hanya di Bot Utama** (jadibot menolaknya). Setiap command punya fungsi sendiri.
+
+| Command | Fungsi |
+|---|---|
+| `.backup` | Kirim file cadangan database (`Backup_DB_<tanggal>.json`) ke chat saat itu juga |
+| `.database` | Tampilkan ringkasan database: jenis penyimpanan (JSON atau MongoDB), jumlah user dan grup, ukuran, waktu terakhir disimpan, reset limit terakhir, dan status auto backup |
+| `.autobackup <jam>` | Aktifkan atau ubah interval auto backup (angka 1 sampai 168). Tanpa angka, menampilkan status |
+| `.delautobackup` | Matikan auto backup |
+| `.session` | Info sesi bot utama (nomor, status login, jumlah dan ukuran file) dan daftar jadibot (aktif atau tidak) |
+| `.getsession` | Kirim arsip `.tar.gz` sesi **bot utama** |
+| `.getsession <nomor>` | Kirim arsip sesi **satu jadibot** |
+| `.deletesession` | Hapus sesi bot utama. Perlu konfirmasi: `.deletesession ya` |
+| `.deletesession <nomor>` | Hapus dan hentikan sesi satu jadibot |
+| `.deletesampah` | Hapus isi `database/temp`, file `.tmp`, dan `.corrupt-*` di folder database |
+
+Catatan penting:
+
+- **Auto backup**: bawaannya aktif setiap 6 jam dan dikirim ke nomor pertama di `ownerNumber`. Pengaturan dari `.autobackup` dan `.delautobackup` tersimpan di database (`db.autoBackup`), jadi bertahan setelah restart. Hanya ada satu timer walau bot reconnect.
+- **`.getsession` mengirim kunci login WhatsApp.** Siapa pun yang memegang arsipnya bisa mengambil alih nomor itu. Perintah ini hanya jalan di chat pribadi. Simpan arsipnya, lalu hapus pesannya dari chat.
+- **`.deletesession` (tanpa nomor)** menghapus folder `sessions/`, lalu proses keluar dengan kode 1 sehingga `main.js` memuat ulang bot dan meminta **pairing ulang**. Di Railway, kode pairing muncul di Deploy Logs. Perangkat bot di WhatsApp tetap perlu dikeluarkan manual lewat **Perangkat tertaut**.
+- **`.deletesampah`** tidak menyentuh `sessions/`, `database.json`, file `.bak`, maupun `database/jadibot/`. File yang berumur kurang dari 2 menit dilewati karena bisa sedang dipakai unduhan atau konversi.
+- Data pada `.database` untuk MongoDB hanya menampilkan data di memori. Backup selalu berasal dari data yang sedang aktif di memori.
+
+---
+
+## 8. Fitur penting
+
+### 8.1 Downloader YouTube (`.ytmp3`, `.ytmp4`)
 
 - Bot mencoba **yt-dlp** lebih dulu (dengan cookies bila tersedia).
 - Bila gagal karena blokir anti-bot YouTube dan API key SaveNow tersedia, bot memakai jalur cadangan SaveNow dan memberi tahu "mencoba jalur cadangan".
-- Server di datacenter (Railway dan sejenisnya) sering diblokir YouTube. Di Termux (IP rumahan) biasanya tidak perlu cookies.
+- Server di datacenter (Railway dan sejenisnya) sering diblokir YouTube, sehingga perlu cookies. Di Termux (IP rumahan) biasanya tidak perlu cookies.
+- Opsi JavaScript yt-dlp aktif otomatis, dan yt-dlp diperbarui otomatis saat bot menyala. Gunakan `.updateytdlp` untuk memperbarui manual.
 - Unduhan YouTube dapat melanggar ketentuan layanan YouTube. Pakai untuk keperluan pribadi.
 
-### 7.2 Jadibot (`.jadibot <nomor>`)
+### 8.2 Jadibot (`.jadibot <nomor>`)
 
 - Menjadikan nomor lain sebagai bot dengan kode pairing (nomor harus diawali kode negara, mis. `62...`).
 - Sesi tersimpan di `database/jadibot/<nomor>/`.
 - Saat bot utama dinyalakan ulang, semua jadibot yang sesinya terdaftar **tersambung kembali otomatis** (`restoreJadibots`), dengan jeda 3 detik per sesi.
 - Sesi hanya dihapus bila WhatsApp benar-benar mengeluarkan perangkat atau pairing tidak selesai.
+- Untuk melihat, mengarsipkan, atau menghapus sesi jadibot, pakai `.session`, `.getsession <nomor>`, dan `.deletesession <nomor>`.
 - Saat ada yang pairing, bot bisa terasa lag beberapa menit karena sinkronisasi awal WhatsApp. Itu normal.
 - Command ini belum dibatasi hanya untuk owner. Pertimbangkan membatasinya, karena tiap jadibot membuka koneksi baru dan memakai RAM.
 
-### 7.3 Konversi media
+### 8.3 Konversi media
 
 - `.toaudio`, `.togif`, stiker, dan sejenisnya memakai `ffmpeg` lewat `lib/converter.js`.
 - File sementara ditulis ke `database/temp/`.
 - Konversi webp ke mp4 memakai Ezgif (`lib/uploader.js`), yang bergantung pada situs itu dan bisa gagal kapan saja.
 
-### 7.4 Interval otomatis (di `index.js`)
+### 8.4 Interval otomatis (di `index.js`)
 
-- Backup database ke nomor owner setiap 6 jam.
+- Backup database ke nomor owner (bawaan setiap 6 jam, bisa diatur lewat `.autobackup` dan dimatikan lewat `.delautobackup`).
 - Reset limit harian sekali per tanggal (tercatat di `db.lastLimitReset`).
 - Keduanya hanya dibuat sekali walau bot reconnect.
 
 ---
 
-## 8. Keamanan dan `.gitignore`
+## 9. Keamanan dan `.gitignore`
 
 Isi `.gitignore` yang dianjurkan:
 
@@ -255,7 +292,7 @@ Bila rahasia sempat ter-push ke repo publik, anggap sudah bocor: keluarkan peran
 
 ---
 
-## 9. Alur kerja saat mengubah kode
+## 10. Alur kerja saat mengubah kode
 
 1. Edit file.
 2. Cek sintaks sebelum push (di Termux):
@@ -270,7 +307,7 @@ Tip: salin file lewat file manager atau fitur **Upload files** di GitHub. Menemp
 
 ---
 
-## 10. Pemecahan masalah
+## 11. Pemecahan masalah
 
 | Pesan error | Penyebab | Solusi |
 |---|---|---|
@@ -281,17 +318,19 @@ Tip: salin file lewat file manager atau fitur **Upload files** di GitHub. Menemp
 | `ENOENT ... lib/..database/temp/...` | Path salah (`..database`, tanpa garis miring) | Pakai `../database/temp` (sudah diperbaiki di `converter.js`) |
 | `SyntaxError: Invalid or unexpected token` pada baris import | Tanda kutip penutup atau titik koma hilang | Lengkapi baris itu, lalu `node --check` |
 | `Sign in to confirm you're not a bot` | YouTube memblokir IP server | Kirim `.setytcookies`, atau pakai SaveNow / proxy / jalankan di Termux |
-| `Requested format is not available` | yt-dlp tidak bisa menyelesaikan tantangan JavaScript YouTube | Set `YT_JS_RUNTIME=node` dan `YT_REMOTE_COMPONENTS=ejs:github`, lalu deploy |
+| `Requested format is not available` | yt-dlp tidak menjalankan JavaScript YouTube (perintah di log tidak memuat `--js-runtimes`) | Pakai `lib/ytdlp-opts.js` terbaru (opsi aktif otomatis) dan kirim `.updateytdlp`. Cara darurat: `export YT_JS_RUNTIME=node YT_REMOTE_COMPONENTS=ejs:github` sebelum menjalankan bot |
 | `The page needs to be reloaded` | yt-dlp versi lama | Kirim `.updateytdlp` |
 | Perintah di log tidak memuat `--cookies` | Cookies hilang setelah deploy, atau `ytmp4.js` lama | Kirim ulang `.setytcookies`; pastikan `lib/ytmp4.js` terbaru |
 | Jadibot logout setelah restart | Sesi tidak dipulihkan, atau folder hilang di Railway | Pakai `lib/jadibot.js` terbaru dan Volume `/app/database` |
 | Variabel Railway tidak berlaku | Masih draft | Tekan **Deploy** / **Apply changes** |
 | `.setgemini` tampak berhasil tapi hilang saat restart | Pola penggantian tidak cocok dengan bentuk string `APIKeys` | Gunakan `Hc.js` terbaru |
 | Log Termux penuh pesan `@newsletter` | Kiriman saluran WhatsApp ikut dicetak | Bisa difilter di `index.js` bila mengganggu |
+| `.getsession` gagal membuat arsip | Perintah `tar` tidak tersedia | Di Termux: `pkg install tar` |
+| Bot minta pairing ulang setelah `.deletesession` | Memang disengaja: sesi bot utama sudah dihapus | Masukkan kode pairing baru, atau di Railway lihat kode di Deploy Logs |
 
 ---
 
-## 11. Daftar command pengelolaan
+## 12. Daftar command pengelolaan
 
 ```
 .menu              daftar fitur
@@ -302,4 +341,13 @@ Tip: salin file lewat file manager atau fitur **Upload files** di GitHub. Menemp
 .setsavenow        simpan API key SaveNow       (owner)
 .setytcookies      simpan cookies YouTube       (owner)
 .updateytdlp       perbarui yt-dlp              (owner)
+
+.backup            kirim cadangan database sekarang      (owner)
+.database          info ringkas database                 (owner)
+.autobackup <jam>  aktifkan/ubah interval auto backup    (owner)
+.delautobackup     matikan auto backup                   (owner)
+.session           info sesi bot utama dan jadibot       (owner)
+.getsession [nomor] kirim arsip sesi                     (owner, chat pribadi)
+.deletesession [nomor|ya] hapus sesi                     (owner)
+.deletesampah      bersihkan file sampah                 (owner)
 ```
