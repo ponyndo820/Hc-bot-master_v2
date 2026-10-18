@@ -1137,6 +1137,11 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         
       }
       break
+      case 'version': case 'versi': case 'v': {
+        const pkg = require('./package.json');
+        reply(`*Bot Version:* v${pkg.version}`);
+      }
+      break
       
       // Random Images Menu
       case 'randomimage': case 'randomimg': case 'randomimages': {

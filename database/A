@@ -50,14 +50,15 @@ Fitur tidak publik
 Fitur owner tidak publik 
    backup              1
    session             2
-   getsession          3
-   autobackup          4
-   setsavenow          5
-   updateytdlp         6
-   deletesampah        7
-   setytcookies        8
-   delautobackup       9
-   deletesession       10
+   version             3
+   getsession          4
+   autobackup          5
+   setsavenow          6
+   updateytdlp         7
+   deletesampah        8
+   setytcookies        9
+   delautobackup       10
+   deletesession       11
 
 logo: Hc
 Version: 2.0.7
