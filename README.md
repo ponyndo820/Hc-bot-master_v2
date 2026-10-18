@@ -29,7 +29,10 @@
 
 	yarn install or npm install
 	yarn start or npm start
-📖 **Panduan lengkap instalasi dan penggunaan:** [Panduanrun.md](Panduan%20penggunaan/Panduanrun.md)
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="Panduan%20penggunaan/Panduanrun.md">
+    <img src="https://img.shields.io/badge/Panduan-Lengkap-3B82F6?logo=readthedocs&logoColor=white" alt="Panduan Lengkap">
+  </a>
 
 # Install pkg⬇️
 
