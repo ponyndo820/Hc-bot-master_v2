@@ -1768,8 +1768,9 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}limit
 │${setv} ${prefix}tagme
 │${setv} ${prefix}donasi
-│${setv} ${prefix}jadibot
+│${setv} ${prefix}version
 │${setv} ${prefix}runtime
+│${setv} ${prefix}jadibot
 │${setv} ${prefix}buylimit
 │${setv} ${prefix}speedtest
 │${setv} ${prefix}totalfitur
@@ -1787,9 +1788,18 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *OWNER*
+│${setv} ${prefix}backup
+│${setv} ${prefix}session
 │${setv} ${prefix}anticall
 │${setv} ${prefix}shutdown
+│${setv} ${prefix}getsession
+│${setv} ${prefix}autobackup
+│${setv} ${prefix}setsavenow
+│${setv} ${prefix}updateytdlp
 │${setv} ${prefix}delanticall
+│${setv} ${prefix}setytcookies
+│${setv} ${prefix}deletesampah
+│${setv} ${prefix}deletesession
 │${setv} ${prefix}setapikeygemini
 ╰────❍`)
       }
@@ -1816,8 +1826,11 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *TOOLS*
 │${setv} ${prefix}brat
+│${setv} ${prefix}togif
+│${setv} ${prefix}tomp3
 │${setv} ${prefix}bratvid
 │${setv} ${prefix}toaudio
+│${setv} ${prefix}removebg
 │${setv} ${prefix}ssweb (url)
 │${setv} ${prefix}draw (prompt)
 │${setv} ${prefix}rvo (reply pesan viewone)
