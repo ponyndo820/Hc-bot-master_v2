@@ -1,62 +1,73 @@
 Fitur publik
-   sc
-   ai
-   ig
-   tt
-   afk
-   rvo
-   ping
-   tovn
-   brat
-   draw
-   toptv
-   ytmp4
-   limit
-   ytmp3
-   limit
-   tagme
-   ssweb
-   autoai
-   donasi
-   quotes
-   sticker
-   request
-   sticker
-   jadibot
-   toaudio
-   buylimit
-   tebakbom
-   speedtes
-   shutdown
-   ytsearch
-   cariwaifu
-   doatahlil
-   doaharian
-   totalfitur
-   randompony
-   delanticall
-   randomwaifu
-   randomimage
-   quotesislami
-   setapikeygemini
-
+   sc                  1
+   ai                  2
+   ig                  3
+   tt                  4
+   afk                 5
+   rvo                 6
+   ping                7
+   tovn                8
+   brat                9
+   draw                10
+   toptv               11
+   ytmp4               12
+   limit               13
+   ytmp3               14
+   limit               15
+   tagme               16
+   ssweb               17
+   autoai              18
+   donasi              19
+   quotes              20
+   sticker             21
+   request             22
+   sticker             23
+   jadibot             24
+   toaudio             25
+   buylimit            26
+   tebakbom            27
+   speedtes            28
+   shutdown            29
+   ytsearch            30
+   cariwaifu           31
+   doatahlil           32
+   doaharian           33
+   totalfitur          34
+   randompony          35
+   delanticall         36
+   randomwaifu         37
+   randomimage         38
+   quotesislami        39
+   setapikeygemini     40
+   
 Fitur tidak publik
-   spotify
-   alyabrat
-   tomp3
-   togif
-   removebg
-   setytcookies
+   spotify             1
+   alyabrat            2
+   tomp3               3
+   togif               4
+   removebg            5
+   
+Fitur owner tidak publik 
+   backup              1
+   session             2
+   getsession          3
+   autobackup          4
+   setsavenow          5
+   updateytdlp         6
+   deletesampah        7
+   setytcookies        8
+   delautobackup       9
+   deletesession       10
 
-
-logo : Hc
-Version : 2.0.7
-Creator : Heart candy
-Author : Muhamad Febrian
-Branding name : ponyndo
-Total fitur publik : 40
-Total fitur tidak publik : 6
-Bot name : Hc-bot-master_v2
+logo: Hc
+Version: 2.0.7
+Creator: Heart candy
+Author: Muhamad Febrian
+Branding name: ponyndo
+Total fitur publik: 40
+Total fitur tidak publik: 5
+Total fitur owner tidak publik: 10
+Bot name: Hc-bot-master_v2
 
 
 Pesan Dari Creator
@@ -68,4 +79,4 @@ Bot ini di buat secara ke tidak sengajaan bot ini terinspirasi dari bot naze, ja
 
 Subscribe channel ku @ponyndo
 
-Copyright ©️ 2026 Heart candy
+Copyright ©️ 2026 Heart candy 

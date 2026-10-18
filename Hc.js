@@ -16,8 +16,6 @@ import speed from 'performance-now';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import youtubedl from 'youtube-dl-exec';
-import { ytdlpBaseOptions, youtubeErrorMessage, saveYoutubeCookies, updateYtdlp, isYoutubeBotBlock } from './lib/ytdlp-opts.js';
-import { getSavenowKey, setSavenowKey, savenowToFile } from './lib/savenow.js';
 import { performance } from 'perf_hooks';
 import { exec, spawn, execSync } from 'child_process';
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -29,7 +27,10 @@ import settings from './settings.js';
 import { igdl } from './lib/igdl.js';
 import { ytMp4 } from './lib/ytmp4.js';
 import { removeBg, setRemoveBgKey } from './lib/removebg.js';
-import { startJadibot, isJadibotActive } from './lib/jadibot.js';
+import { startJadibot, isJadibotActive, stopJadibot } from './lib/jadibot.js';
+import { getSavenowKey, setSavenowKey, savenowToFile } from './lib/savenow.js';
+import { ytdlpBaseOptions, youtubeErrorMessage, saveYoutubeCookies, updateYtdlp, isYoutubeBotBlock } from './lib/ytdlp-opts.js';
+import { getDatabaseInfo, sendBackup, getAutoBackupState, setAutoBackup, disableAutoBackup, getSessionInfo, archiveSession, deleteMainSession, deleteJadibotFolder, cleanJunk, fmtBytes, JADIBOT_DIR } from './lib/maintenance.js';
 import { webp2mp4File } from './lib/uploader.js';
 import { GroupUpdate, LoadDataBase } from './src/message.js';
 import { writeExif, toAudio, toPTT, toPTV, toVideo } from './lib/converter.js';
@@ -364,6 +365,189 @@ async function Hc(hc, m, db) {
           await reply('❌ Gagal menyimpan API Key.');
           await react('❌');
         }
+      }
+      break
+      case 'setsavenow': case 'setsavenowkey': {
+        if (!isCreator) return reply(settings.mess.owr);
+        const keySn = (text || '').trim();
+        if (!keySn) return reply(`Masukkan API key SaveNow-nya!\nContoh: *${prefix}setsavenow KEY_ANDA*`);
+        try {
+          setSavenowKey(keySn);
+          await reply('✅ API key SaveNow tersimpan. Dipakai sebagai cadangan bila YouTube memblokir server.\nPesan berisi key akan dihapus otomatis.');
+          await react('✅');
+        } catch (err) {
+          await reply('❌ Gagal menyimpan API key: ' + err.message);
+          await react('❌');
+        }
+        try { await hc.sendMessage(from, { delete: m.key }); } catch (e) {}
+      }
+      break
+      case 'backup': {
+        if (!isCreator) return reply(settings.mess.owr);
+        if (hc.isJadibot) return reply('Fitur ini hanya bisa digunakan di Bot Utama!');
+        await react('⏳');
+        try {
+          const r = await sendBackup(hc, from, db, `📂 *BACKUP DATABASE*\nBackup manual, dibuat ${new Date().toLocaleString('id-ID')}.`, { quoted: m });
+          await react('✅');
+        } catch (err) {
+          console.error('Error backup:', err);
+          await reply('❌ Gagal membuat backup: ' + err.message);
+          await react('❌');
+        }
+      }
+      break
+      case 'database': {
+        if (!isCreator) return reply(settings.mess.owr);
+        if (hc.isJadibot) return reply('Fitur ini hanya bisa digunakan di Bot Utama!');
+        const info = getDatabaseInfo(db, settings.tempatDB);
+        const ab = getAutoBackupState(db);
+        let teks = `*📊 INFO DATABASE*\n\n`;
+        teks += `Penyimpanan : ${info.backend}\n`;
+        teks += `User : ${info.users}\n`;
+        teks += `Grup : ${info.groups}\n`;
+        teks += `Jumlah kunci data : ${info.keys}\n`;
+        teks += `Ukuran di memori : ${fmtBytes(info.memoryBytes)}\n`;
+        if (info.file) {
+          teks += `File : ${fmtBytes(info.fileBytes)}, disimpan ${info.fileMtime.toLocaleString('id-ID')}\n`;
+        }
+        teks += `Reset limit terakhir : ${info.lastLimitReset}\n`;
+        teks += `Auto backup : ${ab.enabled ? `aktif, setiap ${ab.hours} jam` : 'nonaktif'}`;
+        await reply(teks);
+      }
+      break
+      case 'autobackup': {
+        if (!isCreator) return reply(settings.mess.owr);
+        if (hc.isJadibot) return reply('Fitur ini hanya bisa digunakan di Bot Utama!');
+        const st = getAutoBackupState(db);
+        if (!text) {
+          return reply(`*⏱️ AUTO BACKUP*\nStatus : ${st.enabled ? `aktif, setiap ${st.hours} jam` : 'nonaktif'}\n\nCara pakai:\n*${prefix}autobackup 6* → kirim backup setiap 6 jam\n*${prefix}delautobackup* → matikan`);
+        }
+        const jam = parseInt(text, 10);
+        if (!(jam >= 1 && jam <= 168)) return reply('❌ Interval harus berupa angka 1 sampai 168 (jam).\nContoh: *' + prefix + 'autobackup 6*');
+        setAutoBackup(db, jam);
+        await reply(`✅ Auto backup aktif. Database dikirim ke owner setiap *${jam} jam*.`);
+        await react('✅');
+      }
+      break
+      case 'delautobackup': {
+        if (!isCreator) return reply(settings.mess.owr);
+        if (hc.isJadibot) return reply('Fitur ini hanya bisa digunakan di Bot Utama!');
+        const sebelumnya = disableAutoBackup(db);
+        await reply(sebelumnya ? '✅ Auto backup dimatikan.\nAktifkan lagi dengan *' + prefix + 'autobackup <jam>*.' : 'ℹ️ Auto backup memang sudah nonaktif.');
+      }
+      break
+      case 'session': {
+        if (!isCreator) return reply(settings.mess.owr);
+        if (hc.isJadibot) return reply('Fitur ini hanya bisa digunakan di Bot Utama!');
+        const si = getSessionInfo(isJadibotActive);
+        let teks = `*🔑 INFO SESI*\n\n*Bot utama*\n`;
+        teks += si.main.exists
+          ? `Nomor : ${si.main.number || '-'}\nStatus login : ${si.main.registered ? 'terdaftar' : 'belum terdaftar'}\nFile : ${si.main.files} (${fmtBytes(si.main.bytes)})\n`
+          : `Folder sessions/ tidak ditemukan\n`;
+        teks += `\n*Jadibot* (${si.jadibots.length})\n`;
+        if (!si.jadibots.length) teks += `Tidak ada\n`;
+        for (const j of si.jadibots) {
+          teks += `• ${j.number} - ${j.active ? 'aktif' : 'tidak aktif'}, ${j.files} file (${fmtBytes(j.bytes)})${j.registered ? '' : ', belum terdaftar'}\n`;
+        }
+        teks += `\n*${prefix}getsession* → kirim sesi bot utama\n*${prefix}getsession <nomor>* → kirim sesi jadibot\n*${prefix}deletesession* → hapus sesi`;
+        await reply(teks);
+      }
+      break
+      case 'getsession': {
+        if (!isCreator) return reply(settings.mess.owr);
+        if (hc.isJadibot) return reply('Fitur ini hanya bisa digunakan di Bot Utama!');
+        if (isGroup) return reply('⚠️ Demi keamanan, gunakan perintah ini di chat pribadi.');
+        const targetSesi = (text || '').replace(/[^0-9]/g, '') || 'main';
+        await react('⏳');
+        let arsip = null;
+        try {
+          arsip = await archiveSession(targetSesi);
+          if (arsip.bytes > 90 * 1024 * 1024) throw new Error('Arsip terlalu besar untuk dikirim lewat WhatsApp.');
+          await hc.sendMessage(from, {
+            document: fs.readFileSync(arsip.file),
+            mimetype: 'application/gzip',
+            fileName: arsip.fileName,
+            caption: '🔐 *ARSIP SESI*\nBerisi kunci login WhatsApp. Jangan dibagikan ke siapa pun, dan hapus pesan ini setelah disimpan.'
+          }, { quoted: m });
+          await react('✅');
+        } catch (err) {
+          console.error('Error getsession:', err);
+          await reply('❌ ' + err.message);
+          await react('❌');
+        } finally {
+          if (arsip) { try { fs.unlinkSync(arsip.file); } catch {} }
+        }
+      }
+      break
+      case 'deletesession': {
+        if (!isCreator) return reply(settings.mess.owr);
+        if (hc.isJadibot) return reply('Fitur ini hanya bisa digunakan di Bot Utama!');
+        const nomorSesi = (text || '').replace(/[^0-9]/g, '');
+        if (nomorSesi) {
+          if (!/^\d{6,20}$/.test(nomorSesi)) return reply('❌ Nomor tidak valid.');
+          const adaFolder = fs.existsSync(path.join(JADIBOT_DIR, nomorSesi));
+          const sedangAktif = stopJadibot(nomorSesi, true);
+          if (!adaFolder && !sedangAktif) return reply(`❌ Sesi jadibot *${nomorSesi}* tidak ditemukan.`);
+          try { deleteJadibotFolder(nomorSesi); } catch {}
+          await reply(`✅ Sesi jadibot *${nomorSesi}* dihapus${sedangAktif ? ' dan dihentikan' : ''}.\nPemilik nomor perlu menautkan ulang lewat *${prefix}jadibot*.`);
+          await react('✅');
+          break;
+        }
+        if ((text || '').trim().toLowerCase() !== 'ya') {
+          return reply(`⚠️ *HAPUS SESI BOT UTAMA*\nBot akan logout dari sesi ini dan *restart*, lalu meminta pairing ulang.\nPerangkat bot di WhatsApp juga perlu dikeluarkan manual lewat *Perangkat tertaut*.\n\nKetik *${prefix}deletesession ya* untuk melanjutkan.\nUntuk menghapus sesi satu jadibot: *${prefix}deletesession <nomor>*`);
+        }
+        await reply('🗑️ Menghapus sesi bot utama... bot akan restart dan meminta pairing ulang.');
+        try { hc.ev.removeAllListeners(); hc.ws.close(); } catch {}
+        deleteMainSession();
+        setTimeout(() => process.exit(1), 1500);
+      }
+      break
+      case 'deletesampah': {
+        if (!isCreator) return reply(settings.mess.owr);
+        if (hc.isJadibot) return reply('Fitur ini hanya bisa digunakan di Bot Utama!');
+        await react('⏳');
+        try {
+          const hasil = cleanJunk();
+          await reply(`🧹 *SAMPAH DIBERSIHKAN*\nFile dihapus : ${hasil.count}\nRuang dibebaskan : ${fmtBytes(hasil.bytes)}\nDilewati (masih baru) : ${hasil.skipped}\n\nYang dibersihkan: isi database/temp, file .tmp dan .corrupt di database. Sesi dan database tidak disentuh.`);
+          await react('✅');
+        } catch (err) {
+          await reply('❌ Gagal membersihkan sampah: ' + err.message);
+          await react('❌');
+        }
+      }
+      break
+      case 'updateytdlp': {
+        if (!isCreator) return reply(settings.mess.owr);
+        await react('⏳');
+        try {
+          const r = await updateYtdlp((text || '').trim().toLowerCase() === 'stable' ? 'stable' : 'nightly');
+          await reply(`*yt-dlp*\nSebelum: ${r.before}\nSesudah: ${r.after}\n${r.changed ? '✅ Berhasil diperbarui' : 'ℹ️ Sudah versi terbaru'}\n\n${r.output}`);
+          await react('✅');
+        } catch (err) {
+          await reply('❌ Gagal memperbarui yt-dlp: ' + err.message);
+          await react('❌');
+        }
+      }
+      break
+      case 'setytcookies': case 'setytcookie': {
+        if (!isCreator) return reply(settings.mess.owr);
+        let rawCookies = text || '';
+        if (!rawCookies.trim() && isQuoted) {
+          const q = contextInfo.quotedMessage;
+          rawCookies = q.conversation || q.extendedTextMessage?.text || '';
+        }
+        if (!rawCookies.trim()) {
+          return reply(`Kirim cookies YouTube (format Netscape / cookies.txt).\n\nCara: tempel isinya setelah perintah, atau reply pesan yang berisi cookies dengan *${prefix}setytcookies*.`);
+        }
+        try {
+          const hasil = saveYoutubeCookies(rawCookies);
+          await reply(`✅ Cookies YouTube tersimpan (${hasil.count} cookies).\nSilakan coba *${prefix}ytmp3*. Pesan berisi cookies akan dihapus otomatis.`);
+          await react('✅');
+        } catch (err) {
+          await reply('❌ ' + err.message);
+          await react('❌');
+        }
+        try { await hc.sendMessage(from, { delete: m.key }); } catch (e) {}
       }
       break
       
@@ -1070,55 +1254,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         }
       }
       break
-      case 'setsavenow': case 'setsavenowkey': {
-        if (!isCreator) return reply(settings.mess.owr);
-        const keySn = (text || '').trim();
-        if (!keySn) return reply(`Masukkan API key SaveNow-nya!\nContoh: *${prefix}setsavenow KEY_ANDA*`);
-        try {
-          setSavenowKey(keySn);
-          await reply('✅ API key SaveNow tersimpan. Dipakai sebagai cadangan bila YouTube memblokir server.\nPesan berisi key akan dihapus otomatis.');
-          await react('✅');
-        } catch (err) {
-          await reply('❌ Gagal menyimpan API key: ' + err.message);
-          await react('❌');
-        }
-        try { await hc.sendMessage(from, { delete: m.key }); } catch (e) {}
-      }
-      break
-      case 'updateytdlp': {
-        if (!isCreator) return reply(settings.mess.owr);
-        await react('⏳');
-        try {
-          const r = await updateYtdlp((text || '').trim().toLowerCase() === 'stable' ? 'stable' : 'nightly');
-          await reply(`*yt-dlp*\nSebelum: ${r.before}\nSesudah: ${r.after}\n${r.changed ? '✅ Berhasil diperbarui' : 'ℹ️ Sudah versi terbaru'}\n\n${r.output}`);
-          await react('✅');
-        } catch (err) {
-          await reply('❌ Gagal memperbarui yt-dlp: ' + err.message);
-          await react('❌');
-        }
-      }
-      break
-      case 'setytcookies': case 'setytcookie': {
-        if (!isCreator) return reply(settings.mess.owr);
-        let rawCookies = text || '';
-        if (!rawCookies.trim() && isQuoted) {
-          const q = contextInfo.quotedMessage;
-          rawCookies = q.conversation || q.extendedTextMessage?.text || '';
-        }
-        if (!rawCookies.trim()) {
-          return reply(`Kirim cookies YouTube (format Netscape / cookies.txt).\n\nCara: tempel isinya setelah perintah, atau reply pesan yang berisi cookies dengan *${prefix}setytcookies*.`);
-        }
-        try {
-          const hasil = saveYoutubeCookies(rawCookies);
-          await reply(`✅ Cookies YouTube tersimpan (${hasil.count} cookies).\nSilakan coba *${prefix}ytmp3*. Pesan berisi cookies akan dihapus otomatis.`);
-          await react('✅');
-        } catch (err) {
-          await reply('❌ ' + err.message);
-          await react('❌');
-        }
-        try { await hc.sendMessage(from, { delete: m.key }); } catch (e) {}
-      }
-      break
       case 'ytmp3': {
         let ytUrl = '';
         if (text) {
@@ -1228,6 +1363,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
           }, { quoted: m });
         } catch (e) {
           console.error("Error ytmp4:", e);
+
           const failMsg = youtubeErrorMessage(e, '❌ Gagal memproses video YouTube. Pastikan link valid!');
           if (isYoutubeBotBlock(e) && getSavenowKey()) {
             try {
