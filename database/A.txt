@@ -16,57 +16,57 @@ Fitur publik
    limit               15
    tagme               16
    ssweb               17
-   autoai              18
-   donasi              19
-   quotes              20
-   sticker             21
-   request             22
+   togif               18
+   tomp3               19
+   autoai              20
+   donasi              21
+   quotes              22
    sticker             23
-   jadibot             24
-   toaudio             25
-   buylimit            26
-   tebakbom            27
-   speedtes            28
-   shutdown            29
-   ytsearch            30
-   cariwaifu           31
-   doatahlil           32
-   doaharian           33
-   totalfitur          34
-   randompony          35
-   delanticall         36
-   randomwaifu         37
-   randomimage         38
-   quotesislami        39
-   setapikeygemini     40
+   version             24
+   session             25
+   request             26
+   sticker             27
+   jadibot             28
+   toaudio             29
+   buylimit            30
+   tebakbom            31
+   speedtes            32
+   shutdown            33
+   ytsearch            34
+   removebg            35
+   cariwaifu           36
+   doatahlil           37
+   doaharian           38
+   totalfitur          39
+   setsavenow          40
+   autobackup          41
+   getsession          42
+   randompony          43
+   delanticall         44
+   randomwaifu         45
+   updateytdlp         46
+   randomimage         47
+   deletesampah        48
+   setytcookies        49
+   quotesislami        50
+   deletesession       51
+   setapikeygemini     52
    
 Fitur tidak publik
    spotify             1
    alyabrat            2
-   tomp3               3
-   togif               4
-   removebg            5
    
 Fitur owner tidak publik 
-   backup              1
-   session             2
-   getsession          3
-   autobackup          4
-   setsavenow          5
-   updateytdlp         6
-   deletesampah        7
-   setytcookies        8
-   delautobackup       9
-   deletesession       10
+   _
 
 logo: Hc
-Version: 2.0.7
+Version: 2.0.8
 Creator: Heart candy
 Author: Muhamad Febrian
 Branding name: ponyndo
-Total fitur publik: 40
-Total fitur tidak publik: 5
-Total fitur owner tidak publik: 10
+Total fitur publik: 52
+Total fitur tidak publik: 2
+Total fitur owner tidak publik: -
 Bot name: Hc-bot-master_v2
 
 

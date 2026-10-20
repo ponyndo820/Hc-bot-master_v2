@@ -12,7 +12,12 @@ Bot WhatsApp berbasis Baileys (multi device) dengan tema MLP. Panduan ini merang
 - `ffmpeg` (konversi audio, video, stiker)
 - `python` (dibutuhkan yt-dlp untuk `.ytmp3` dan `.ytmp4`)
 - `git`, `ruby`, `imagemagick` (dipakai beberapa fitur di folder `lib/`)
-- Satu nomor WhatsApp untuk bot (login memakai **kode pairing**, bukan QR)
+- Satu nomor WhatsApp untuk bot (login memakai **pairing code dan qr code**)
+
+- di settings.js ubah kode ini untuk mengunakan pairing qr code 
+- pairing_code: true, ubah menjadi false
+- pairing_code: false,
+- jika pairing qr code mengalami error maka ganti mejadi true saja supaya bisa mengunakan pairing code saja
 
 ## 2. Struktur project
 

@@ -10,6 +10,7 @@ import path from 'path';
 import pino from 'pino';
 import chalk from 'chalk';
 import readline from 'readline';
+import qrcode from 'qrcode-terminal';
 import makeWaSocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
 
 import { Hc } from './Hc.js';
@@ -127,30 +128,28 @@ async function startHcbot() {
       console.log(chalk.yellowBright('[SYSTEM] Mode QR Code aktif. silahkan scan QR Code yang muncul di terminal.'));
     }
   }
-
-  
   hc.ev.on('creds.update', saveCreds);
   hc.ev.on('connection.update', (update) => {
-    const { connection } = update;
+    const { connection, qr } = update;
+    
+    if (qr) {
+      console.log(chalk.yellow('[SYSTEM] Memuat QR Code, silahkan scan...'));
+      qrcode.generate(qr, { small: true });
+    }
+    
     if (connection === 'close') {
       console.log(chalk.yellowBright('[SYSTEM] Terputus, sedang mencoba menghubungkan ulang...'));
       startHcbot();
     } else if (connection === 'open') {
       console.log(chalk.yellowBright(`[SYSTEM] ${settings.botName} Berhasil Terhubung!`));
-
-      // AUTO RESTORE JADIBOT (sekali saja per proses)
       if (!global._jadibotRestored) {
         global._jadibotRestored = true;
         restoreJadibots({ Hc, getDb: () => global.db }).catch(console.log);
       }
       
-      // [PERBAIKAN] Simpan referensi terbaru; interval di bawah memakai soket & database yang aktif
       global.hcMain = hc;
       global.dbConnector = dbConnector;
-
-      // AUTO BACKUP DATABASE (setiap 6 jam)
-      // [PERBAIKAN] Dibuat sekali saja (sebelumnya menumpuk setiap bot reconnect), mengirim isi global.db
-      // langsung (path file lama salah: database/ tidak ikut), dan dibungkus try/catch.
+      
       if (!global._backupInterval) {
         global._backupInterval = setInterval(async () => {
           try {
@@ -168,10 +167,7 @@ async function startHcbot() {
           }
         }, 6 * 60 * 60 * 1000);
       }
-
-      // AUTO RESET LIMIT (sekali per hari)
-      // [PERBAIKAN] Dulu mengecek detik tepat 00:00:00 (terlewat bila bot lag). Sekarang sekali per tanggal,
-      // tercatat di db.lastLimitReset, dan tetap jalan walau bot mati saat tengah malam.
+      
       if (!global._resetInterval) {
         const resetLimit = async () => {
           const today = new Date().toDateString();
@@ -199,7 +195,7 @@ async function startHcbot() {
               const ownerNumber = settings.ownerNumber[0]; 
               const ownerJid = ownerNumber + "@s.whatsapp.net";
               await hc.rejectCall(call.id, call.from).catch(() => {});
-              const teksPesan = `Saat tidak dapat menerima panggilan jika @${caller.split('@')[0]} membutuhkan bantuan hubungi owner @${ownerNumber}`;
+              const teksPesan = `Saat tidak dapat menerima panggilan jika @${caller.split('@')[0]} membutuhkan bantua, segera hubungi owner @${ownerNumber}`;
               
               await hc.sendMessage(caller, {
                   text: teksPesan,
