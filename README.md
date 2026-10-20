@@ -1,4 +1,4 @@
-![image alt](https://files.catbox.moe/9gxjhx.jpg)
+![image alt](https://files.catbox.moe/92iphz.jpg)
 <p align="center">
   <a href="https://wa.me/6285823709413">
     <img src="https://img.shields.io/badge/WhatsApp-25D366?logo=whatsapp&logoColor=white" alt="WhatsApp">
