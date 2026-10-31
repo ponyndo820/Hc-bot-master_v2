@@ -31,7 +31,7 @@ import { startJadibot, isJadibotActive, stopJadibot } from './lib/jadibot.js';
 import { getSavenowKey, setSavenowKey, savenowToFile } from './lib/savenow.js';
 import { ytdlpBaseOptions, youtubeErrorMessage, saveYoutubeCookies, updateYtdlp, isYoutubeBotBlock } from './lib/ytdlp-opts.js';
 import { getDatabaseInfo, sendBackup, getAutoBackupState, setAutoBackup, disableAutoBackup, getSessionInfo, archiveSession, deleteMainSession, deleteJadibotFolder, cleanJunk, fmtBytes, JADIBOT_DIR } from './lib/maintenance.js';
-import { webp2mp4File } from './lib/uploader.js';
+import { UguuSe, webp2mp4File } from './lib/uploader.js';
 import { GroupUpdate, LoadDataBase } from './src/message.js';
 import { writeExif, toAudio, toPTT, toPTV, toVideo } from './lib/converter.js';
 import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime, sleep, clockString } from './lib/function.js';
@@ -599,6 +599,46 @@ async function Hc(hc, m, db) {
         let stickerFile = await writeExif(mediaBuffer, { packname: teks1, author: teks2 });
         await hc.sendMessage(from, { sticker: { url: stickerFile } }, { quoted: m });
         if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
+      }
+      break
+      case 'smeme': case 'stickmeme': case 'stickermeme': {
+        if (!isLimit) return reply(settings.mess.lim);
+        const usage = `Isi command seperti ini:\n${prefix + command} atas | bawah\n\nContoh:\n${prefix + command} Halo | apa kabar`;
+        const parts = text.split('|').map(v => v.trim());
+        const atasRaw = parts[0] || '';
+        const bawahRaw = parts[1] || '';
+        if (!atasRaw && !bawahRaw) return reply(usage);
+        if (!/image|webp/.test(mime)) return reply(`Kirim/reply image/sticker dengan caption:\n${prefix + command} atas | bawah`);
+        await react('⏳'); 
+        const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
+        const teks1 = parts[2] || packname;
+        const teks2 = parts[3] || author;
+        const memeText = (t) => !t ? '_' : encodeURIComponent(
+          t.replace(/_/g, '__').replace(/-/g, '--').replace(/ /g, '_')
+           .replace(/\?/g, '~q').replace(/%/g, '~p').replace(/#/g, '~h')
+           .replace(/\//g, '~s').replace(/\\/g, '~b').replace(/"/g, "''")
+        );
+        const atas = memeText(atasRaw);
+        const bawah = memeText(bawahRaw);
+        fs.mkdirSync('./database/temp', { recursive: true });
+        const media = path.join('./database/temp', `smeme_${Date.now()}.jpg`);
+        let stickerFile;
+        try {
+          const mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+          fs.writeFileSync(media, mediaBuffer);
+          const mem = await UguuSe(media);
+          const smeme = `https://api.memegen.link/images/custom/${atas}/${bawah}.png?background=${encodeURIComponent(mem.url)}`;
+          const memeBuffer = await getBuffer(smeme);
+          stickerFile = await writeExif(memeBuffer, { packname: teks1, author: teks2 });
+          await hc.sendMessage(from, { sticker: { url: stickerFile } }, { quoted: m });
+        } catch (e) {
+          console.log(e);
+          await react('❌')
+          reply(settings.mess.fil);
+        } finally {
+          if (fs.existsSync(media)) fs.unlinkSync(media);
+          if (stickerFile && fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
+        }
       }
       break
       case 'readviewonce': case 'readviewone': case 'rvo': {

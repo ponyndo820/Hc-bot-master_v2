@@ -45,6 +45,7 @@ settings.my = {
 settings.mess = {
   don: "Selesai✅",
   fil: "Yah Gagal ☹️",
+  lim: "Yah limit kamu habis nih😔",
   owr: "Khusus Owner Ya Sayang 😔",
   adm: "Khusus Admin Ya Sayang 😔",
   qud: "Reply Pesannya ya Sayang ✉️",
