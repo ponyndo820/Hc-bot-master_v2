@@ -602,14 +602,13 @@ async function Hc(hc, m, db) {
       }
       break
       case 'smeme': case 'stickmeme': case 'stickermeme': {
-        if (!isLimit) return reply(settings.mess.lim);
         const usage = `Isi command seperti ini:\n${prefix + command} atas | bawah\n\nContoh:\n${prefix + command} Halo | apa kabar`;
         const parts = text.split('|').map(v => v.trim());
         const atasRaw = parts[0] || '';
         const bawahRaw = parts[1] || '';
         if (!atasRaw && !bawahRaw) return reply(usage);
         if (!/image|webp/.test(mime)) return reply(`Kirim/reply image/sticker dengan caption:\n${prefix + command} atas | bawah`);
-        await react('⏳'); 
+        await react('⏳');
         const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
         const teks1 = parts[2] || packname;
         const teks2 = parts[3] || author;
@@ -633,7 +632,6 @@ async function Hc(hc, m, db) {
           await hc.sendMessage(from, { sticker: { url: stickerFile } }, { quoted: m });
         } catch (e) {
           console.log(e);
-          await react('❌')
           reply(settings.mess.fil);
         } finally {
           if (fs.existsSync(media)) fs.unlinkSync(media);
