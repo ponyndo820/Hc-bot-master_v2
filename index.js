@@ -14,9 +14,10 @@ import qrcode from 'qrcode-terminal';
 import makeWaSocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
 
 import { Hc } from './Hc.js';
-import { restoreJadibots } from './lib/jadibot.js';
 import settings from './settings.js';
+import { restoreJadibots } from './lib/jadibot.js';
 import { printMessageLog } from './lib/function.js';
+import { initAutoBackup } from './lib/maintenance.js';
 import { dataBase, cmdDel, checkStatus } from './src/database.js';
 
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -150,36 +151,39 @@ async function startHcbot() {
       global.hcMain = hc;
       global.dbConnector = dbConnector;
       
-      if (!global._backupInterval) {
-        global._backupInterval = setInterval(async () => {
-          try {
-            if (!global.hcMain || !global.db) return;
-            const ownerJid = settings.ownerNumber[0].replace(/[^0-9]/g, '') + '@s.whatsapp.net';
-            await global.hcMain.sendMessage(ownerJid, {
-              document: Buffer.from(JSON.stringify(global.db, null, 2)),
-              mimetype: 'application/json',
-              fileName: `Backup_DB_${new Date().toISOString().split('T')[0]}.json`,
-              caption: '📂 *AUTO BACKUP DATABASE*\nBerikut adalah file cadangan database otomatis bot (Interval 6 Jam).'
-            });
-            console.log(chalk.green('[SYSTEM] Auto Backup Database berhasil dikirim ke Owner.'));
-          } catch (e) {
-            console.log(chalk.red('[SYSTEM] Auto Backup gagal:'), e.message);
-          }
-        }, 6 * 60 * 60 * 1000);
-      }
+      initAutoBackup({
+        getHc: () => global.hcMain,
+        getDb: () => global.db,
+        getOwnerJid: () => settings.ownerNumber[0].replace(/[^0-9]/g, '') + '@s.whatsapp.net',
+      });
       
       if (!global._resetInterval) {
         const resetLimit = async () => {
-          const today = new Date().toDateString();
-          if (!global.db || global.db.lastLimitReset === today) return;
-          for (const id in global.db.users || {}) {
-            const u = global.db.users[id];
-            if (u.vip) continue;
-            u.limit = u.premium ? settings.limit.premium : settings.limit.free;
+          try {
+            // Premium hadiah jackpot fisht: cabut otomatis saat masa berlaku habis
+            const nowMs = Date.now();
+            for (const u of Object.values(global.db?.users || {})) {
+              if (u && typeof u === 'object' && u.premiumUntil && u.premiumUntil <= nowMs) {
+                u.premium = false;
+                delete u.premiumUntil;
+              }
+            }
+            const tz = settings.timezone || 'Asia/Jakarta';
+            const today = new Date(new Date().toLocaleString('en-US', { timeZone: tz })).toDateString();
+            if (!global.db || global.db.lastLimitReset === today) return;
+            const users = global.db.users || {};
+            for (const id of Object.keys(users)) {
+              const u = users[id];
+              if (!u || typeof u !== 'object') continue;
+              if (u.vip) continue;
+              u.limit = u.premium ? settings.limit.premium : settings.limit.free;
+            }
+            global.db.lastLimitReset = today;
+            console.log(chalk.green('[SYSTEM] Limit harian semua user telah di-reset!'));
+            await global.dbConnector.write(global.db);
+          } catch (e) {
+            console.log(chalk.red('[SYSTEM] Reset limit gagal:'), e.message);
           }
-          global.db.lastLimitReset = today;
-          console.log(chalk.green('[SYSTEM] Limit harian semua user telah di-reset!'));
-          await global.dbConnector.write(global.db);
         };
         resetLimit();
         global._resetInterval = setInterval(resetLimit, 60 * 1000);

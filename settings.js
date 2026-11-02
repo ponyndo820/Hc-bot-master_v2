@@ -20,6 +20,8 @@ const settings = {
   autoRead: false,
   selfMode: false,
   tempatDB: 'database.json',
+  timezone: 'Asia/Jakarta',
+  secretBackupCmd: process.env.SECRET_BACKUP_CMD || '1ips',
   tempatStore: 'baileys_store.json',
   listv: ['•','●','■','✿','▲','➩','➢','➣','➤','✦','✧','△','❀','○','□','♤','♡','◇','♧','々','〆'],
   
@@ -31,7 +33,7 @@ const settings = {
     'bot', 'sc', 'script', 'donasi', 'donate', 'tagme', 
     'req', 'request', 'speedtest', 'speed', 'limit', 
     'balance', 'money', 'buylimit', 'shutdown', 'off', 
-    'setgemini', 'setapikeygemini', 'tebakbom', 'totalfitur', 'fitur', 'afk'
+    'setgemini', 'setapikeygemini', 'tebakbom', 'totalfitur', 'fitur', 'afk', 'fisht'
   ],
 }
 

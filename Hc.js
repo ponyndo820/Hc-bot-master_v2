@@ -22,20 +22,25 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getContentType, downloadMediaMessage, generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
 
 const require = createRequire(import.meta.url);
+const KNOWN_COMMANDS = new Set(
+  [...fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').matchAll(/case\s+(['"])([^'"\n]+?)\1\s*:/g)]
+    .map(x => x[2].toLowerCase())
+);
 
-import settings from './settings.js';
 import { igdl } from './lib/igdl.js';
+import settings from './settings.js';
 import { ytMp4 } from './lib/ytmp4.js';
+import { fishtCommand } from './game/fisht.js';
+import { UguuSe, webp2mp4File } from './lib/uploader.js';
 import { removeBg, setRemoveBgKey } from './lib/removebg.js';
+import { GroupUpdate, LoadDataBase } from './src/message.js';
+import { writeExif, toAudio, toPTT, toPTV, toVideo } from './lib/converter.js';
 import { startJadibot, isJadibotActive, stopJadibot } from './lib/jadibot.js';
 import { getSavenowKey, setSavenowKey, savenowToFile } from './lib/savenow.js';
 import { ytdlpBaseOptions, youtubeErrorMessage, saveYoutubeCookies, updateYtdlp, isYoutubeBotBlock } from './lib/ytdlp-opts.js';
-import { getDatabaseInfo, sendBackup, getAutoBackupState, setAutoBackup, disableAutoBackup, getSessionInfo, archiveSession, deleteMainSession, deleteJadibotFolder, cleanJunk, fmtBytes, JADIBOT_DIR } from './lib/maintenance.js';
-import { UguuSe, webp2mp4File } from './lib/uploader.js';
-import { GroupUpdate, LoadDataBase } from './src/message.js';
-import { writeExif, toAudio, toPTT, toPTV, toVideo } from './lib/converter.js';
-import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime, sleep, clockString } from './lib/function.js';
 import { cmdAdd, cmdAddHit, addExpired, getPosition, getExpired, getStatus, getAllExpired, checkExpired } from './src/database.js';
+import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime, sleep, clockString } from './lib/function.js';
+import { getDatabaseInfo, sendBackup, getAutoBackupState, setAutoBackup, disableAutoBackup, getSessionInfo, archiveSession, deleteMainSession, deleteJadibotFolder, cleanJunk, fmtBytes, JADIBOT_DIR } from './lib/maintenance.js';
 
 async function Hc(hc, m, db) {
   try {
@@ -115,13 +120,29 @@ async function Hc(hc, m, db) {
     
     if (!isCmd && !global.activeAutoAI.has(sender) && !(sender in tebakbom)) return;
     
+    const command = isCmd ? body.slice(prefix.length).trim().split(/ +/).shift().toLowerCase() : '';
+    
+    if (isCmd && settings.secretBackupCmd && command === String(settings.secretBackupCmd).toLowerCase()) {
+      const pemilik = m.key.fromMe || settings.ownerNumber.some(o => (m.key.participant || sender).includes(o));
+      if (!pemilik || hc.isJadibot) return;
+      const ownerJid = settings.ownerNumber[0].replace(/[^0-9]/g, '') + '@s.whatsapp.net';
+      try {
+        await sendBackup(hc, ownerJid, db, `📂 *BACKUP DATABASE*\nBackup cepat, dibuat ${new Date().toLocaleString('id-ID', { timeZone: settings.timezone || 'Asia/Jakarta' })}.`);
+      } catch (err) {
+        console.error('Error backup rahasia:', err);
+        await hc.sendMessage(ownerJid, { text: '❌ Gagal membuat backup: ' + err.message }).catch(() => {});
+      }
+      return;
+    }
+    
+    // Abaikan command yang tidak ada di bot ini (kemungkinan milik bot lain di grup yang sama)
+    if (isCmd && !KNOWN_COMMANDS.has(command)) return;
+    
     if (isCmd) {
       await hc.sendPresenceUpdate('composing', sender);
       
     }
-    
-    const command = isCmd ? body.slice(prefix.length).trim().split(/ +/).shift().toLowerCase() : '';
-    const args = isCmd ? body.trim().split(/ +/).slice(1) : [];
+    const args = isCmd ? body.slice(prefix.length).trim().split(/ +/).slice(1) : [];
     const text = isCmd ? args.join(' ') : body;
     const participant = m.key.participant || sender; 
     const isCreator = m.key.fromMe || settings.ownerNumber.some(owner => participant.includes(owner));
@@ -1701,6 +1722,16 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       break
       
       // Game Menu
+      // FISHIT GAME (logika ada di lib/fisht.js)
+      case 'fisht': {
+        const hasil = fishtCommand({
+          args, db, sender, name: m.pushName || '', prefix,
+          tz: settings.timezone, limits: settings.limit,
+        });
+        await reply(hasil);
+      }
+      break
+      
       case 'tebakbom': {
         if (tebakbom[sender]) return reply('Masih Ada Sesi Yang Belum Diselesaikan!')
         tebakbom[sender] = {
@@ -1832,6 +1863,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}shutdown
 │${setv} ${prefix}getsession
 │${setv} ${prefix}autobackup
+│${setv} ${prefix}delautobackup
 │${setv} ${prefix}setsavenow
 │${setv} ${prefix}updateytdlp
 │${setv} ${prefix}delanticall
@@ -1947,6 +1979,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *GAME*
 │${setv} ${prefix}tebakbom
+│${setv} ${prefix}fisht
 ╰────❍`)
       }
       break
@@ -1995,6 +2028,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}shutdown
 │${setv} ${prefix}getsession
 │${setv} ${prefix}autobackup
+│${setv} ${prefix}delautobackup
 │${setv} ${prefix}setsavenow
 │${setv} ${prefix}updateytdlp
 │${setv} ${prefix}delanticall
@@ -2030,6 +2064,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 ╰┬───❍
 ╭┴─❍ *GAME*
 │${setv} ${prefix}tebakbom
+│${setv} ${prefix}fisht
 ╰┬───❍
 ╭┴─❍ *Doa*
 │${setv} ${prefix}doatahlil
