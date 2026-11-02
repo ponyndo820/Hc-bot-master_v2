@@ -12,8 +12,8 @@ import pino from 'pino';
 import chalk from 'chalk'; 
 import yts from 'yt-search';
 import { promisify } from 'util';
-import speed from 'performance-now';
 import { fileURLToPath } from 'url';
+import speed from 'performance-now';
 import { createRequire } from 'module';
 import youtubedl from 'youtube-dl-exec';
 import { performance } from 'perf_hooks';
@@ -30,12 +30,13 @@ const KNOWN_COMMANDS = new Set(
 import { igdl } from './lib/igdl.js';
 import settings from './settings.js';
 import { ytMp4 } from './lib/ytmp4.js';
-import { fishtCommand } from './game/fisht.js';
+import { fishtCommand } from './lib/fisht.js';
 import { UguuSe, webp2mp4File } from './lib/uploader.js';
-import { removeBg, setRemoveBgKey } from './lib/removebg.js';
 import { GroupUpdate, LoadDataBase } from './src/message.js';
-import { writeExif, toAudio, toPTT, toPTV, toVideo } from './lib/converter.js';
+import { removeBg, setRemoveBgKey } from './lib/removebg.js';
+import { antibotGuard, antibotCommand } from './lib/antibot.js';
 import { startJadibot, isJadibotActive, stopJadibot } from './lib/jadibot.js';
+import { writeExif, toAudio, toPTT, toPTV, toVideo } from './lib/converter.js';
 import { getSavenowKey, setSavenowKey, savenowToFile } from './lib/savenow.js';
 import { ytdlpBaseOptions, youtubeErrorMessage, saveYoutubeCookies, updateYtdlp, isYoutubeBotBlock } from './lib/ytdlp-opts.js';
 import { cmdAdd, cmdAddHit, addExpired, getPosition, getExpired, getStatus, getAllExpired, checkExpired } from './src/database.js';
@@ -47,6 +48,8 @@ async function Hc(hc, m, db) {
     if (!m.message) return;
     
     await LoadDataBase(hc, m);
+    
+    if (await antibotGuard(hc, m, db, { ownerNumbers: settings.ownerNumber, isOwn: isJadibotActive, hcMain: global.hcMain })) return;
     
     let msg = m.message;
     if (msg.ephemeralMessage) msg = msg.ephemeralMessage.message;
@@ -135,7 +138,6 @@ async function Hc(hc, m, db) {
       return;
     }
     
-    // Abaikan command yang tidak ada di bot ini (kemungkinan milik bot lain di grup yang sama)
     if (isCmd && !KNOWN_COMMANDS.has(command)) return;
     
     if (isCmd) {
@@ -194,7 +196,7 @@ async function Hc(hc, m, db) {
    const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;*/
    
    
-    const freeCmd = settings.bypasslimit || [];
+    const freeCmd = [...(settings.bypasslimit || []), 'antibot'];
     
     // Sistem Limit
     global.tebakbom = global.tebakbom || {};
@@ -993,7 +995,13 @@ async function Hc(hc, m, db) {
           mentions: [userTag] 
         }, { quoted: m });
       }
-      break      
+      break
+      case 'antibot': {
+        const hasil = await antibotCommand({ hc, m, db, args, prefix,
+        isCreator, contextInfo });
+        await reply(hasil.text);
+      }
+      break
       case 'req': case 'request': {
         if (!text) return reply('Mau Request apa ke Owner?');
         await reply(`*Request Telah Terkirim Ke Owner*\n_Terima Kasih🙏_ Telah Menyusahkan Owner`);
@@ -1721,8 +1729,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       }
       break
       
-      // Game Menu
-      // FISHIT GAME (logika ada di lib/fisht.js)
+      // Game menu
       case 'fisht': {
         const hasil = fishtCommand({
           args, db, sender, name: m.pushName || '', prefix,
@@ -1731,7 +1738,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         await reply(hasil);
       }
       break
-      
       case 'tebakbom': {
         if (tebakbom[sender]) return reply('Masih Ada Sesi Yang Belum Diselesaikan!')
         tebakbom[sender] = {
@@ -1979,7 +1985,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *GAME*
 │${setv} ${prefix}tebakbom
-│${setv} ${prefix}fisht
 ╰────❍`)
       }
       break
@@ -2013,7 +2018,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}donasi
 │${setv} ${prefix}version
 │${setv} ${prefix}runtime
-│${setv} ${prefix}jadibot
+│${setv} ${prefix}antibot
 │${setv} ${prefix}buylimit
 │${setv} ${prefix}speedtest
 │${setv} ${prefix}totalfitur
@@ -2064,7 +2069,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 ╰┬───❍
 ╭┴─❍ *GAME*
 │${setv} ${prefix}tebakbom
-│${setv} ${prefix}fisht
 ╰┬───❍
 ╭┴─❍ *Doa*
 │${setv} ${prefix}doatahlil
