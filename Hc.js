@@ -977,6 +977,22 @@ async function Hc(hc, m, db) {
         }
       }
       break
+      case 'toimage': case 'toimg': {
+        if (!/webp | video | image/.test(mime)) return reply(`Reply Video/Stiker dengan caption *${prefix + command}*`)
+        await reac('⏳')
+        let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+        let ran = `./database/temp/${getRandom('.png')}`;
+        exec(`ffmpeg -y -i "${media}" -vframes 1 "${ran}"`, async (err) => {
+          try {
+            if (err) return reply(settings.mess.fil);
+            await reply({ image: { url: ran }, caption: settings.mess.don})
+          } finally {
+            if (fs.existsSync(media)) fs.unlinkSync(media)
+            if (fs.existsSync(ran)) fs.unlinkSync(ran)
+          }
+        })
+      }
+      break
       
       //Bot Menu
       case 'sc': case 'script': {
@@ -1846,6 +1862,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}version
 │${setv} ${prefix}runtime
 │${setv} ${prefix}jadibot
+│${setv} ${prefix}antibot
 │${setv} ${prefix}buylimit
 │${setv} ${prefix}speedtest
 │${setv} ${prefix}totalfitur
@@ -1869,14 +1886,19 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}shutdown
 │${setv} ${prefix}getsession
 │${setv} ${prefix}autobackup
-│${setv} ${prefix}delautobackup
 │${setv} ${prefix}setsavenow
+│${setv} ${prefix}antibot del
+│${setv} ${prefix}antibot add
+│${setv} ${prefix}antibot cek
 │${setv} ${prefix}updateytdlp
 │${setv} ${prefix}delanticall
+│${setv} ${prefix}antibot list
 │${setv} ${prefix}setytcookies
 │${setv} ${prefix}deletesampah
+│${setv} ${prefix}delautobackup
 │${setv} ${prefix}deletesession
 │${setv} ${prefix}setapikeygemini
+│${setv} ${prefix}antibot strict on
 ╰────❍`)
       }
       break
@@ -1909,7 +1931,9 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}removebg
 │${setv} ${prefix}ssweb (url)
 │${setv} ${prefix}draw (prompt)
+│${setv} ${prefix}toimage (reply pesan)
 │${setv} ${prefix}rvo (reply pesan viewone)
+│${setv} ${prefix}smeme (send/reply img/vid)
 │${setv} ${prefix}sticker (send/reply img/vid)
 ╰────❍`)
       }
@@ -1984,6 +2008,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
                *By Heart candy*
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *GAME*
+│${setv} ${prefix}fisht
 │${setv} ${prefix}tebakbom
 ╰────❍`)
       }
@@ -2018,6 +2043,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}donasi
 │${setv} ${prefix}version
 │${setv} ${prefix}runtime
+│${setv} ${prefix}jadibot
 │${setv} ${prefix}antibot
 │${setv} ${prefix}buylimit
 │${setv} ${prefix}speedtest
@@ -2033,14 +2059,18 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}shutdown
 │${setv} ${prefix}getsession
 │${setv} ${prefix}autobackup
-│${setv} ${prefix}delautobackup
 │${setv} ${prefix}setsavenow
+│${setv} ${prefix}antibot del
+│${setv} ${prefix}antibot add
+│${setv} ${prefix}antibot cek
 │${setv} ${prefix}updateytdlp
 │${setv} ${prefix}delanticall
+│${setv} ${prefix}antibot list
 │${setv} ${prefix}setytcookies
 │${setv} ${prefix}deletesampah
 │${setv} ${prefix}deletesession
 │${setv} ${prefix}setapikeygemini
+│${setv} ${prefix}antibot strict on
 ╰┬──❍
 ╭┴─❍ *QUOTES*
 │${setv} ${prefix}quotes
@@ -2068,6 +2098,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}ytmp3 (url)
 ╰┬───❍
 ╭┴─❍ *GAME*
+│${setv} ${prefix}fisht
 │${setv} ${prefix}tebakbom
 ╰┬───❍
 ╭┴─❍ *Doa*
@@ -2083,7 +2114,9 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}removebg
 │${setv} ${prefix}ssweb (url)
 │${setv} ${prefix}draw (prompt)
+│${setv} ${prefix}toimage (reply pesan)
 │${setv} ${prefix}rvo (reply pesan viewone)
+│${setv} ${prefix}smeme (send/reply img/vid)
 │${setv} ${prefix}sticker (send/reply img/vid)
 ╰────❍`;
        
