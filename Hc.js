@@ -978,19 +978,63 @@ async function Hc(hc, m, db) {
       }
       break
       case 'toimage': case 'toimg': {
-        if (!/webp | video | image/.test(mime)) return reply(`Reply Video/Stiker dengan caption *${prefix + command}*`)
-        await reac('⏳')
-        let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
-        let ran = `./database/temp/${getRandom('.png')}`;
-        exec(`ffmpeg -y -i "${media}" -vframes 1 "${ran}"`, async (err) => {
-          try {
-            if (err) return reply(settings.mess.fil);
-            await reply({ image: { url: ran }, caption: settings.mess.don})
-          } finally {
-            if (fs.existsSync(media)) fs.unlinkSync(media)
-            if (fs.existsSync(ran)) fs.unlinkSync(ran)
+        if (!/webp|video|image/.test(mime)) return reply(`Reply Video/Stiker dengan caption *${prefix + command}*`);
+        await react('⏳');
+        const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
+        const id = `${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
+        const ext = (mime.split('/')[1] || 'bin').split(';')[0].replace(/[^a-z0-9]/gi, '') || 'bin';
+        const input = `./database/temp/toimg_${id}.${ext}`;
+        const output = `./database/temp/toimg_${id}.png`;
+        const firstFrameOfWebp = (buf) => {
+          if (buf.length < 12 || buf.toString('ascii', 0, 4) !== 'RIFF' || buf.toString('ascii', 8, 12) !== 'WEBP') return null;
+          let off = 12;
+          while (off + 8 <= buf.length) {
+            const tag = buf.toString('ascii', off, off + 4);
+            const size = buf.readUInt32LE(off + 4);
+            if (tag === 'ANMF') {
+              const p = off + 8;
+              const w = 1 + buf.readUIntLE(p + 6, 3);
+              const h = 1 + buf.readUIntLE(p + 9, 3);
+              const frame = buf.subarray(p + 16, p + size);
+              let q = 0, alpha = false;
+              while (q + 8 <= frame.length) {
+                const t = frame.toString('ascii', q, q + 4);
+                const s = frame.readUInt32LE(q + 4);
+                if (t === 'ALPH' || t === 'VP8L') alpha = true;
+                q += 8 + s + (s & 1);
+              }
+              const vp8x = Buffer.alloc(18);
+              vp8x.write('VP8X', 0, 'ascii');
+              vp8x.writeUInt32LE(10, 4);
+              vp8x[8] = alpha ? 0x10 : 0;
+              vp8x.writeUIntLE(w - 1, 12, 3);
+              vp8x.writeUIntLE(h - 1, 15, 3);
+              const body = Buffer.concat([Buffer.from('WEBP'), vp8x, frame]);
+              const head = Buffer.alloc(8);
+              head.write('RIFF', 0, 'ascii');
+              head.writeUInt32LE(body.length, 4);
+              return Buffer.concat([head, body]);
+            }
+            off += 8 + size + (size & 1);
           }
-        })
+          return null;
+        };
+        try {
+          fs.mkdirSync('./database/temp', { recursive: true });
+          let mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+          if (/webp/.test(mime) && mediaBuffer.includes('ANMF')) {
+            mediaBuffer = firstFrameOfWebp(mediaBuffer) || mediaBuffer;
+          }
+          fs.writeFileSync(input, mediaBuffer);
+          await promisify(exec)(`ffmpeg -y -i "${input}" -vframes 1 "${output}"`, { timeout: 60000 });
+          await hc.sendMessage(from, { image: fs.readFileSync(output), caption: settings.mess.don }, { quoted: m });
+        } catch (e) {
+          console.error('Error toimage:', e.message);
+          await react('❌');
+          await reply(settings.mess.fil);
+        } finally {
+          for (const f of [input, output]) if (fs.existsSync(f)) fs.unlinkSync(f);
+        }
       }
       break
       
