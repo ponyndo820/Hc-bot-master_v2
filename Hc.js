@@ -30,7 +30,7 @@ const KNOWN_COMMANDS = new Set(
 import { igdl } from './lib/igdl.js';
 import settings from './settings.js';
 import { ytMp4 } from './lib/ytmp4.js';
-import { fishtCommand } from './lib/fisht.js';
+import { fishtCommand } from './game/fisht.js';
 import { UguuSe, webp2mp4File } from './lib/uploader.js';
 import { GroupUpdate, LoadDataBase } from './src/message.js';
 import { removeBg, setRemoveBgKey } from './lib/removebg.js';
