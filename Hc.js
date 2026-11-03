@@ -31,6 +31,7 @@ import { igdl } from './lib/igdl.js';
 import settings from './settings.js';
 import { ytMp4 } from './lib/ytmp4.js';
 import { fishtCommand } from './game/fisht.js';
+import { tictactoeCommand, tictactoeMove, isTictactoeMove } from './game/tictactoe-bot.js';
 import { UguuSe, webp2mp4File } from './lib/uploader.js';
 import { GroupUpdate, LoadDataBase } from './src/message.js';
 import { removeBg, setRemoveBgKey } from './lib/removebg.js';
@@ -121,7 +122,7 @@ async function Hc(hc, m, db) {
     }
     
     
-    if (!isCmd && !global.activeAutoAI.has(sender) && !(sender in tebakbom)) return;
+    if (!isCmd && !global.activeAutoAI.has(sender) && !(sender in tebakbom) && !isTictactoeMove(from, sender, body)) return;
     
     const command = isCmd ? body.slice(prefix.length).trim().split(/ +/).shift().toLowerCase() : '';
     
@@ -196,7 +197,7 @@ async function Hc(hc, m, db) {
    const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;*/
    
    
-    const freeCmd = [...(settings.bypasslimit || []), 'antibot'];
+    const freeCmd = [...(settings.bypasslimit || []), 'antibot', 'tictactoe', 'ttt'];
     
     // Sistem Limit
     global.tebakbom = global.tebakbom || {};
@@ -213,6 +214,12 @@ async function Hc(hc, m, db) {
         return reply(`⚠️ Limit harian kamu sudah habis! Silakan beli limit dengan *${prefix}buylimit* atau mainkan *${prefix}tebakbom* untuk mendapatkan bonus money/limit.`);
       }
       user.limit -= 1;
+    }
+    
+    // TicTacToe: langkah pemain (angka 1-9 tanpa prefix)
+    if (!isCmd && !(sender in global.tebakbom) && isTictactoeMove(from, sender, body)) {
+      await tictactoeMove({ hc, m, db, from, sender, body, settings });
+      return;
     }
     
     // Tebak bom
@@ -1790,6 +1797,11 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       break
       
       // Game menu
+      case 'tictactoe': case 'ttt': {
+        await tictactoeCommand({ hc, m, from, sender, args, prefix, isGroup, contextInfo, reply });
+      }
+      break
+      
       case 'fisht': {
         const hasil = fishtCommand({
           args, db, sender, name: m.pushName || '', prefix,
@@ -2053,6 +2065,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *GAME*
 │${setv} ${prefix}fisht
+│${setv} ${prefix}tictactoe
 │${setv} ${prefix}tebakbom
 ╰────❍`)
       }
@@ -2143,6 +2156,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 ╰┬───❍
 ╭┴─❍ *GAME*
 │${setv} ${prefix}fisht
+│${setv} ${prefix}tictactoe
 │${setv} ${prefix}tebakbom
 ╰┬───❍
 ╭┴─❍ *Doa*
