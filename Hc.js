@@ -32,6 +32,7 @@ import settings from './settings.js';
 import { ytMp4 } from './lib/ytmp4.js';
 import { fishtCommand } from './game/fisht.js';
 import { tictactoeCommand, tictactoeMove, isTictactoeMove } from './game/tictactoe-bot.js';
+import { antilinkGuard, antilinkCommand } from './lib/antilink.js';
 import { UguuSe, webp2mp4File } from './lib/uploader.js';
 import { GroupUpdate, LoadDataBase } from './src/message.js';
 import { removeBg, setRemoveBgKey } from './lib/removebg.js';
@@ -51,6 +52,15 @@ async function Hc(hc, m, db) {
     await LoadDataBase(hc, m);
     
     if (await antibotGuard(hc, m, db, { ownerNumbers: settings.ownerNumber, isOwn: isJadibotActive, hcMain: global.hcMain })) return;
+    
+    // ANTILINK: link dari anggota biasa di grup yang antilink-nya aktif ditangani di sini
+    if (await antilinkGuard(hc, m, db, {
+      ownerNumbers: settings.ownerNumber, isOwn: isJadibotActive, hcMain: global.hcMain,
+      isCommand: (t) => {
+        const p = settings.prefix.find((x) => t.startsWith(x));
+        return !!p && KNOWN_COMMANDS.has(t.slice(p.length).trim().split(/ +/).shift().toLowerCase());
+      },
+    })) return;
     
     let msg = m.message;
     if (msg.ephemeralMessage) msg = msg.ephemeralMessage.message;
@@ -197,7 +207,7 @@ async function Hc(hc, m, db) {
    const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;*/
    
    
-    const freeCmd = [...(settings.bypasslimit || []), 'antibot', 'tictactoe', 'ttt'];
+    const freeCmd = [...(settings.bypasslimit || []), 'antibot', 'antilink', 'tictactoe', 'ttt'];
     
     // Sistem Limit
     global.tebakbom = global.tebakbom || {};
@@ -1063,12 +1073,6 @@ async function Hc(hc, m, db) {
         }, { quoted: m });
       }
       break
-      case 'antibot': {
-        const hasil = await antibotCommand({ hc, m, db, args, prefix,
-        isCreator, contextInfo });
-        await reply(hasil.text);
-      }
-      break
       case 'req': case 'request': {
         if (!text) return reply('Mau Request apa ke Owner?');
         await reply(`*Request Telah Terkirim Ke Owner*\n_Terima Kasih🙏_ Telah Menyusahkan Owner`);
@@ -1867,6 +1871,19 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       }
       break
       
+      // Grup Menu
+      case 'antilink': {
+        const hasil = await antilinkCommand({ hc, m, db, args, prefix, isCreator });
+        await reply(hasil.text);
+      }
+      break
+      case 'antibot': {
+        const hasil = await antibotCommand({ hc, m, db, args, prefix,
+        isCreator, contextInfo });
+        await reply(hasil.text);
+      }
+      break
+      
       // Menu
       case 'menu': {
         await react('✨');
@@ -1919,6 +1936,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}runtime
 │${setv} ${prefix}jadibot
 │${setv} ${prefix}antibot
+│${setv} ${prefix}antilink
 │${setv} ${prefix}buylimit
 │${setv} ${prefix}speedtest
 │${setv} ${prefix}totalfitur
@@ -1943,9 +1961,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}getsession
 │${setv} ${prefix}autobackup
 │${setv} ${prefix}setsavenow
-│${setv} ${prefix}antibot del
-│${setv} ${prefix}antibot add
-│${setv} ${prefix}antibot cek
 │${setv} ${prefix}updateytdlp
 │${setv} ${prefix}delanticall
 │${setv} ${prefix}antibot list
@@ -1954,7 +1969,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}delautobackup
 │${setv} ${prefix}deletesession
 │${setv} ${prefix}setapikeygemini
-│${setv} ${prefix}antibot strict on
 ╰────❍`)
       }
       break
@@ -1968,6 +1982,21 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 ╭──❍ *QUOTES*
 │${setv} ${prefix}quotes
 │${setv} ${prefix}quotesislami
+╰────❍`)
+      }
+      break
+      
+       case 'grupmenu': {
+       await reply(` *━━━━━━━━━━━━━━━━━━━━*
+              🌈 *Hc-bot* 🌈
+               *By Heart candy*
+*━━━━━━━━━━━━━━━━━━━━*
+╭──❍ *GRUP*
+│${setv} ${prefix}antibot
+│${setv} ${prefix}antibot del
+│${setv} ${prefix}antibot add
+│${setv} ${prefix}antibot cek
+│${setv} ${prefix}antibot strict on
 ╰────❍`)
       }
       break
@@ -2102,6 +2131,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}runtime
 │${setv} ${prefix}jadibot
 │${setv} ${prefix}antibot
+│${setv} ${prefix}antilink
 │${setv} ${prefix}buylimit
 │${setv} ${prefix}speedtest
 │${setv} ${prefix}totalfitur
@@ -2117,9 +2147,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}getsession
 │${setv} ${prefix}autobackup
 │${setv} ${prefix}setsavenow
-│${setv} ${prefix}antibot del
-│${setv} ${prefix}antibot add
-│${setv} ${prefix}antibot cek
 │${setv} ${prefix}updateytdlp
 │${setv} ${prefix}delanticall
 │${setv} ${prefix}antibot list
@@ -2127,8 +2154,15 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}deletesampah
 │${setv} ${prefix}deletesession
 │${setv} ${prefix}setapikeygemini
-│${setv} ${prefix}antibot strict on
 ╰┬──❍
+╭┴─❍ *GRUP*
+│${setv} ${prefix}antibot
+│${setv} ${prefix}antibot del
+│${setv} ${prefix}antibot add
+│${setv} ${prefix}antibot cek
+│${setv} ${prefix}antibot strict on
+╰┬───❍
+
 ╭┴─❍ *QUOTES*
 │${setv} ${prefix}quotes
 │${setv} ${prefix}quotesislami
@@ -2156,7 +2190,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 ╰┬───❍
 ╭┴─❍ *GAME*
 │${setv} ${prefix}fisht
-│${setv} ${prefix}tictactoe
 │${setv} ${prefix}tebakbom
 ╰┬───❍
 ╭┴─❍ *Doa*
