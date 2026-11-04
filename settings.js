@@ -37,6 +37,15 @@ const settings = {
   ],
 }
 
+settings.thumbnailUrl = {
+  url: [
+    'https://cdn.imagetourls.com/uploads/tyImg/hwkB3rmL.jpg',
+    'https://cdn.imagetourls.com/uploads/tyImg/lIRLi7Zb.jpg',
+    'https://cdn.imagetourls.com/uploads/tyImg/thKfH1R5.jpg',
+    'https://cdn.imagetourls.com/uploads/tyImg/OgW4nTlP.jpg',
+  ],
+}
+
 settings.my = {
 	yt: 'https://youtube.com/@ponyndo?si=k9PQEkINzEREkE6p',
 	gh: 'https://github.com/ponyndo820/Hc-bot',

@@ -18,6 +18,7 @@ import settings from './settings.js';
 import { restoreJadibots } from './lib/jadibot.js';
 import { printMessageLog } from './lib/function.js';
 import { initAutoBackup } from './lib/maintenance.js';
+import { handleGroupParticipants } from './lib/welcome.js';
 import { dataBase, cmdDel, checkStatus } from './src/database.js';
 
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -226,6 +227,12 @@ async function startHcbot() {
     } catch (err) {
       console.log(chalk.red("[SYSTEM ERROR]", err));
     }
+  });
+
+  // Sambutan anggota baru / anggota keluar grup
+  hc.ev.on('group-participants.update', (update) => {
+    handleGroupParticipants(hc, update, global.db, settings)
+      .catch((e) => console.log(chalk.red('[WELCOME ERROR]'), e.message));
   });
 }
 

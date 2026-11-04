@@ -33,6 +33,7 @@ import { ytMp4 } from './lib/ytmp4.js';
 import { fishtCommand } from './game/fisht.js';
 import { tictactoeCommand, tictactoeMove, isTictactoeMove } from './game/tictactoe-bot.js';
 import { antilinkGuard, antilinkCommand } from './lib/antilink.js';
+import { welcomeCommand } from './lib/welcome.js';
 import { UguuSe, webp2mp4File } from './lib/uploader.js';
 import { GroupUpdate, LoadDataBase } from './src/message.js';
 import { removeBg, setRemoveBgKey } from './lib/removebg.js';
@@ -207,7 +208,7 @@ async function Hc(hc, m, db) {
    const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;*/
    
    
-    const freeCmd = [...(settings.bypasslimit || []), 'antibot', 'antilink', 'tictactoe', 'ttt'];
+    const freeCmd = [...(settings.bypasslimit || []), 'antibot', 'antilink', 'tictactoe', 'ttt', 'welcome', 'goodbye', 'leave', 'setwelcome', 'setgoodbye', 'setleave'];
     
     // Sistem Limit
     global.tebakbom = global.tebakbom || {};
@@ -1872,6 +1873,12 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       break
       
       // Grup Menu
+      case 'welcome': case 'goodbye': case 'leave': case 'setwelcome': case 'setgoodbye': case 'setleave': {
+        const hasil = await welcomeCommand({ hc, m, db, command, args, prefix, isCreator, settings });
+        if (hasil?.text) await reply(hasil.text);
+      }
+      break
+      
       case 'antilink': {
         const hasil = await antilinkCommand({ hc, m, db, args, prefix, isCreator });
         await reply(hasil.text);
@@ -1937,6 +1944,10 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}jadibot
 │${setv} ${prefix}antibot
 │${setv} ${prefix}antilink
+│${setv} ${prefix}welcome
+│${setv} ${prefix}goodbye
+│${setv} ${prefix}setwelcome
+│${setv} ${prefix}setgoodbye
 │${setv} ${prefix}buylimit
 │${setv} ${prefix}speedtest
 │${setv} ${prefix}totalfitur
@@ -2132,6 +2143,10 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}jadibot
 │${setv} ${prefix}antibot
 │${setv} ${prefix}antilink
+│${setv} ${prefix}welcome
+│${setv} ${prefix}goodbye
+│${setv} ${prefix}setwelcome
+│${setv} ${prefix}setgoodbye
 │${setv} ${prefix}buylimit
 │${setv} ${prefix}speedtest
 │${setv} ${prefix}totalfitur
