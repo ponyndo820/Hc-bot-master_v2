@@ -7,7 +7,7 @@
 
 const TZ_DEFAULT = 'Asia/Jakarta';
 
-// ============================== DATA ==============================
+// DATA
 
 export const CFG = {
   energyMax: 10,                 // energi maksimum awal
@@ -147,7 +147,7 @@ const GACHA_PRIZES = [
   [10, 'energy', 5], [4, 'energy', 99], [4, 'ticket', 1], [1.5, 'rod'], [1, 'token', 1],
 ];
 
-// ============================== UTIL ==============================
+// UTI
 
 const FISH = {}; // id -> { name, ri, price, isl }
 for (const [key, isl] of Object.entries(ISLANDS)) {
@@ -274,8 +274,7 @@ const addEnergy = (f, v) => { f.energy = v >= 99 ? Math.max(f.energy, emax(f)) :
 const spend = (f, n) => { f.coins -= n; };
 const earn = (f, n) => { f.coins += n; f.stats.earned += n; };
 
-// ============================== PERINTAH ==============================
-
+// PERINTAH
 function help(p) {
   return `*FISHIT GAME*
 _Sistem permainan memancing terlengkap_
