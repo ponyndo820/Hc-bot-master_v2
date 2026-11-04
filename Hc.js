@@ -1898,8 +1898,8 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
             forwardingScore: 10,
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
-              newsletterjid: settings.my.ch,
-              serverMessageId: null,
+              newsletterJid: settings.my.ch,
+              serverMessageId: 100,
               newsletterName: 'Join For More Info'
             },
             externalAdReply: {
