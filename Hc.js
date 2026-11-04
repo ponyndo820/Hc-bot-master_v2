@@ -1905,7 +1905,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
             externalAdReply: {
               title: author,
               body: 'Subsscribe My YouTube',
-              thumbnail: pickRandom(settings.thumbnailUrl),
+              thumbnail: { url: pickRandom(settings.thumbnailUrl.url) },
               mediaType: 2,
               mediaUrl: settings.my.yt,
               sourceUrl: settings.my.yt,
