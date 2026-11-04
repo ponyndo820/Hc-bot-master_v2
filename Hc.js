@@ -1891,7 +1891,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       break
       
       
-      // Tes (INI HANYA CODE TES DAN CONTOH SAJA. jangan di utak-atik atau diubah atau di tambah kan)
+      // Tes (INI HANYA CODE TES DAN CONTOH SAJA. jangan di utak-atik atau diubah atau di tambah kan ke command dan menu)
       case 'id.1': {
         await reply(`Tes.id.1`, {
           contextInfo: {
@@ -1905,7 +1905,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
             externalAdReply: {
               title: author,
               body: 'Subsscribe My YouTube',
-              thumbnail: { url: pickRandom(settings.thumbnailUrl.url) },
+              thumbnail: await getBuffer(pickRandom(settings.thumbnailUrl.url)),
               mediaType: 2,
               mediaUrl: settings.my.yt,
               sourceUrl: settings.my.yt,
@@ -1923,7 +1923,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         
       }
       break
-
     // (CODE DI ATAS TIDAK MASUK MENU)
       
       // Menu
