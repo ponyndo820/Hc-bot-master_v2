@@ -67,6 +67,10 @@ Fitur tidak publik
    alyabrat            2
    tictactoe           3
    antilink            4
+   setgoodbye          5
+   setwelcome          6
+   goodbye             7
+   welcome             8
    
 Fitur owner tidak publik 
    -
@@ -79,7 +83,7 @@ Creator: Heart candy
 Author: Muhamad Febrian
 Branding name: ponyndo
 Total fitur publik: 62
-Total fitur tidak publik: 4
+Total fitur tidak publik: 8
 Total fitur owner tidak publik: -
 Bot name: Hc-bot-master_v2
 

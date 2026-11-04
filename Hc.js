@@ -1943,11 +1943,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}runtime
 │${setv} ${prefix}jadibot
 │${setv} ${prefix}antibot
-│${setv} ${prefix}antilink
-│${setv} ${prefix}welcome
-│${setv} ${prefix}goodbye
-│${setv} ${prefix}setwelcome
-│${setv} ${prefix}setgoodbye
 │${setv} ${prefix}buylimit
 │${setv} ${prefix}speedtest
 │${setv} ${prefix}totalfitur
@@ -2142,11 +2137,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}runtime
 │${setv} ${prefix}jadibot
 │${setv} ${prefix}antibot
-│${setv} ${prefix}antilink
-│${setv} ${prefix}welcome
-│${setv} ${prefix}goodbye
-│${setv} ${prefix}setwelcome
-│${setv} ${prefix}setgoodbye
 │${setv} ${prefix}buylimit
 │${setv} ${prefix}speedtest
 │${setv} ${prefix}totalfitur
