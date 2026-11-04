@@ -1915,9 +1915,15 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       }
       break
       case 'id.2': {
-        await reply(`Tes.id.2`, pickRandom(settings.thumbnailUrl))
+        await hc.sendMessage(from, { 
+          image: { url: pickRandom(settings.thumbnailUrl) }, 
+          caption: 'Tes.id.2' 
+          
+        }, { quoted: m })
+        
       }
       break
+
     // (CODE DI ATAS TIDAK MASUK MENU)
       
       // Menu
