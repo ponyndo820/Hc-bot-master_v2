@@ -1892,7 +1892,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       
       
       // Tes (INI HANYA CODE TES DAN CONTOH SAJA. jangan di utak-atik atau diubah atau di tambah kan)
-      case 'id.1'{
+      case 'id.1': {
         await reply(`Tes.id.1`, {
           contextInfo: {
             forwardingScore: 10,
