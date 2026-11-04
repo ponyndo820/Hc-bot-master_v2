@@ -1878,7 +1878,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         if (hasil?.text) await reply(hasil.text);
       }
       break
-      
       case 'antilink': {
         const hasil = await antilinkCommand({ hc, m, db, args, prefix, isCreator });
         await reply(hasil.text);
@@ -1890,6 +1889,33 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         await reply(hasil.text);
       }
       break
+      
+      
+      // Tes (INI HANYA CODE TES DAN CONTOH SAJA. jangan di utak-atik atau diubah atau di tambah kan)
+      case 'id.1'{
+        await reply(`Tes.id.1`, {
+          contextInfo: {
+            forwardingScore: 10,
+            isForwarded: true,
+            forwardedNewsletterMessageInfo: {
+              newsletterjid: settings.my.ch,
+              serverMessageId: null,
+              newsletterName: 'Join For More Info'
+            },
+            externalAdReply: {
+              title: author,
+              body: 'Subsscribe My YouTube',
+              thumbnail: pickRandom(settings.thumbnailUrl.url)
+              mediaType: 2,
+              mediaUrl: settings.my.yt,
+              sourceUrl: settings.my.yt,
+            }
+          }
+        })
+      }
+      break
+      
+    // (CODE DI ATAS TIDAK MASUK MENU)
       
       // Menu
       case 'menu': {
