@@ -1914,7 +1914,10 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         })
       }
       break
-      
+      case 'id.2': {
+        await reply(pickRandom(settings.thumbnailUr.url))
+      }
+      break
     // (CODE DI ATAS TIDAK MASUK MENU)
       
       // Menu
