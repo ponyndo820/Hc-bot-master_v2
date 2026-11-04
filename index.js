@@ -134,7 +134,7 @@ async function startHcbot() {
   hc.ev.on('connection.update', (update) => {
     const { connection, qr } = update;
     
-    if (qr) {
+    if (qr && !settings.pairing_code) {
       console.log(chalk.yellow('[SYSTEM] Memuat QR Code, silahkan scan...'));
       qrcode.generate(qr, { small: true });
     }
