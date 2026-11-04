@@ -1916,7 +1916,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       break
       case 'id.2': {
         await hc.sendMessage(from, { 
-          image: { url: pickRandom(settings.thumbnailUrl) }, 
+          image: { url: pickRandom(settings.thumbnailUrl.url) },
           caption: 'Tes.id.2' 
           
         }, { quoted: m })
