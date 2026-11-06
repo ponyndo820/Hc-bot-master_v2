@@ -34,6 +34,7 @@ import { fishtCommand } from './game/fisht.js';
 import { tictactoeCommand, tictactoeMove, isTictactoeMove } from './game/tictactoe-bot.js';
 import { antilinkGuard, antilinkCommand } from './lib/antilink.js';
 import { welcomeCommand } from './lib/welcome.js';
+import { banchatGuard, banchatCommand } from './lib/banchat.js';
 import { UguuSe, webp2mp4File } from './lib/uploader.js';
 import { GroupUpdate, LoadDataBase } from './src/message.js';
 import { removeBg, setRemoveBgKey } from './lib/removebg.js';
@@ -51,6 +52,9 @@ async function Hc(hc, m, db) {
     if (!m.message) return;
     
     await LoadDataBase(hc, m);
+    
+    // BANCHAT: grup yang di-ban diabaikan total, kecuali .unbanchat dari admin/owner
+    if (await banchatGuard(hc, m, db, { prefixes: settings.prefix, ownerNumbers: settings.ownerNumber })) return;
     
     if (await antibotGuard(hc, m, db, { ownerNumbers: settings.ownerNumber, isOwn: isJadibotActive, hcMain: global.hcMain })) return;
     
@@ -208,7 +212,7 @@ async function Hc(hc, m, db) {
    const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;*/
    
    
-    const freeCmd = [...(settings.bypasslimit || []), 'antibot', 'antilink', 'tictactoe', 'ttt', 'welcome', 'goodbye', 'leave', 'setwelcome', 'setgoodbye', 'setleave'];
+    const freeCmd = [...(settings.bypasslimit || []), 'antibot', 'antilink', 'tictactoe', 'ttt', 'welcome', 'goodbye', 'leave', 'setwelcome', 'setgoodbye', 'setleave', 'banchat', 'unbanchat'];
     
     // Sistem Limit
     global.tebakbom = global.tebakbom || {};
@@ -344,9 +348,11 @@ async function Hc(hc, m, db) {
     // Add case command di sini
     switch (command) {
       case 'runtime': case 'tes': case 'bot': {
-        if (!args[0] && !args[1]) return reply(`*Bot Telah Aktif Selama*\n*${runtime(process.uptime())}*`);
+        if (!args[0] && !args[1]) return reply(`*Bot Telah Aktif Selama*\n*${runtime(process.uptime())}*`,);
       }
       break
+      
+      
       
       // Owner Menu
       case 'shutdown': case 'off': {
@@ -1873,6 +1879,11 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       break
       
       // Grup Menu
+      case 'banchat': case 'unbanchat': {
+        const hasil = await banchatCommand({ hc, m, db, command, args, prefix, isCreator });
+        await reply(hasil.text);
+      }
+      break
       case 'welcome': case 'goodbye': case 'leave': case 'setwelcome': case 'setgoodbye': case 'setleave': {
         const hasil = await welcomeCommand({ hc, m, db, command, args, prefix, isCreator, settings });
         if (hasil?.text) await reply(hasil.text);
@@ -1923,6 +1934,30 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         
       }
       break
+      
+      case 'id.3': {
+        if (!args[0] && !args[1]) return reply(`*Bot Telah Aktif Selama*\n*${runtime(process.uptime())}*`, {
+          contextInfo: {
+            forwardingScore: 10,
+            isForwarded: true,
+            forwardedNewsletterMessageInfo: {
+              newsletterJid: settings.my.ch,
+              serverMessageId: 100,
+              newsletterName: 'Join For More Info'
+            },
+            externalAdReply: {
+              title: author,
+              body: 'Subsscribe My YouTube',
+              thumbnail: await getBuffer(pickRandom(settings.thumbnailUrl.url)),
+              mediaType: 2,
+              mediaUrl: settings.my.yt,
+              sourceUrl: settings.my.yt,
+            }
+          }
+        });
+      }
+      break
+      
     // (CODE DI ATAS TIDAK MASUK MENU)
       
       // Menu
@@ -2134,7 +2169,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *GAME*
 │${setv} ${prefix}fisht
-│${setv} ${prefix}tictactoe
 │${setv} ${prefix}tebakbom
 ╰────❍`)
       }
