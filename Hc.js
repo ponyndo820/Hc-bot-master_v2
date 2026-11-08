@@ -637,7 +637,7 @@ async function Hc(hc, m, db) {
       break
       case 'quotesislami': {
         try {
-          const rawData = fs.readFileSync('.//quotesislami.json', 'utf-8');
+          const rawData = fs.readFileSync('./scrape/quotesislami.json', 'utf-8');
           const data = JSON.parse(rawData);
           if (!data || !Array.isArray(data) || data.length === 0){
             return reply('Maaf ada masalah teknis atau data kosong❗');
