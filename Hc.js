@@ -348,7 +348,25 @@ async function Hc(hc, m, db) {
     // Add case command di sini
     switch (command) {
       case 'runtime': case 'tes': case 'bot': {
-        if (!args[0] && !args[1]) return reply(`*Bot Telah Aktif Selama*\n*${runtime(process.uptime())}*`,);
+        if (!args[0] && !args[1]) return reply(`*Bot Telah Aktif Selama*\n*${runtime(process.uptime())}*`,{
+          contextInfo: {
+            forwardingScore: 10,
+            isForwarded: true,
+            forwardedNewsletterMessageInfo: {
+              newsletterJid: settings.my.ch,
+              serverMessageId: 100,
+              newsletterName: 'Join For More Info'
+            },
+            externalAdReply: {
+              title: author,
+              body: 'Subsscribe My YouTube',
+              thumbnail: await getBuffer(pickRandom(settings.thumbnailUrl.url)),
+              mediaType: 2,
+              mediaUrl: settings.my.yt,
+              sourceUrl: settings.my.yt,
+            }
+          }
+        });
       }
       break
       
@@ -609,7 +627,7 @@ async function Hc(hc, m, db) {
           }
           const randomItem = quotesList[Math.floor(Math.random() * quotesList.length)];
           const textQuote = randomItem.quotes || 'Tidak ada quotes';
-          const caption = `*By: Heart candy*\n${textQuote}`;
+          const caption = `*By: Heart candy*\n> ${textQuote}`;
           await reply(caption);
         } catch (err) {
           console.error(err);
@@ -626,7 +644,7 @@ async function Hc(hc, m, db) {
           }
           const randomQuote = data[Math.floor(Math.random() * data.length)];
           const { arabic = 'Tidak ada huruf Arab', arti = 'Tidak ada arti', title = 'Quotes Islami' } = randomQuote;
-          const caption = `*By: Heart candy*\n*${arabic}*\n\n_Artinya: ${arti}_`;
+          const caption = `*By: Heart candy*\n>*${arabic}*\n\n_Artinya: ${arti}_`;
           reply(caption);
         } catch (err) {
           console.error(err);
@@ -1064,11 +1082,47 @@ async function Hc(hc, m, db) {
       
       //Bot Menu
       case 'sc': case 'script': {
-        reply(`Follow: https://github.com/ponyndo820\nDan jangan lupa beri bintang ya sayang`)
+        reply(`Follow: https://github.com/ponyndo820\nDan jangan lupa beri bintang ya sayang`, {
+          contextInfo: {
+            forwardingScore: 10,
+            isForwarded: true,
+            forwardedNewsletterMessageInfo: {
+              newsletterJid: settings.my.ch,
+              serverMessageId: 100,
+              newsletterName: 'Join For More Info'
+            },
+            externalAdReply: {
+              title: author,
+              body: 'Subsscribe My YouTube',
+              thumbnail: await getBuffer(pickRandom(settings.thumbnailUrl.url)),
+              mediaType: 2,
+              mediaUrl: settings.my.yt,
+              sourceUrl: settings.my.yt,
+            }
+          }
+        })
       }
       break
       case 'donasi': case 'donate': {
-        reply('Donasi Dapat Melalui Url Dibawah ini :\nhttps://saweria.co/Ponyndo')
+        reply('Donasi Dapat Melalui Url Dibawah ini :\nhttps://saweria.co/Ponyndo', {
+          contextInfo: {
+            forwardingScore: 10,
+            isForwarded: true,
+            forwardedNewsletterMessageInfo: {
+              newsletterJid: settings.my.ch,
+              serverMessageId: 100,
+              newsletterName: 'Join For More Info'
+            },
+            externalAdReply: {
+              title: author,
+              body: 'Subsscribe My YouTube',
+              thumbnail: await getBuffer(pickRandom(settings.thumbnailUrl.url)),
+              mediaType: 2,
+              mediaUrl: settings.my.yt,
+              sourceUrl: settings.my.yt,
+            }
+          }
+        })
       }
       break
       case 'tagme': {
