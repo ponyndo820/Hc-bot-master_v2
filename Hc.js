@@ -1990,25 +1990,13 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       break
       
       case 'id.3': {
-        if (!args[0] && !args[1]) return reply(`*Bot Telah Aktif Selama*\n*${runtime(process.uptime())}*`, {
-          contextInfo: {
-            forwardingScore: 10,
-            isForwarded: true,
-            forwardedNewsletterMessageInfo: {
-              newsletterJid: settings.my.ch,
-              serverMessageId: 100,
-              newsletterName: 'Join For More Info'
-            },
-            externalAdReply: {
-              title: author,
-              body: 'Subsscribe My YouTube',
-              thumbnail: await getBuffer(pickRandom(settings.thumbnailUrl.url)),
-              mediaType: 2,
-              mediaUrl: settings.my.yt,
-              sourceUrl: settings.my.yt,
-            }
-          }
-        });
+        const tesText = 'tes';
+        try {
+          const animasiMenu = fs.readFileSync('./src/media/menu.gif');
+        } catch (err) {
+          console.error("error bro", err);
+          await reply(tesText)
+        }
       }
       break
       
