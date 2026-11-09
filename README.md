@@ -48,33 +48,77 @@
 	pkg install imagemagick
 	pkg install python ffmpeg
 	
+# Install via npm 📦
+
+Bot ini juga tersedia di npm:
+
+	npm install @heart867n/hc-bot
+
+Setelah terpasang, masuk ke folder paketnya, isi `settings.js`, lalu jalankan:
+
+	cd node_modules/@heart867n/hc-bot
+	nano settings.js
+	npm start
+
+Ganti `Gemini` dan `APIKeys` di `settings.js` dengan API key milikmu sendiri. Pastikan juga paket sistem di atas (`ffmpeg`, `imagemagick`, `ruby`, `python`) sudah terpasang.
+
 ## 🗂 Structure Project
 ```
+├── Panduan penggunaan
+│   └── Panduanrun.md
 ├── database
-│       └── temp
+│   ├── A
+│   └── A.txt
+├── game
+│   ├── fisht.js
+│   ├── tictactoe-bot.js
+│   └── tictactoe.js
 ├── lib
-│   ├── ytmp4
-│   ├── ssweb.rb
-│   ├── function.js
-│   ├── converter.js
-│   ├── randompony.rb
-├── src
-│   └── database.js
+│   ├── antibot.js
+│   ├── antilink.js
+│   ├── banchat.js
+│   ├── converter.js
+│   ├── function.js
+│   ├── igdl.js
+│   ├── jadibot.js
+│   ├── maintenance.js
+│   ├── randompony.rb
+│   ├── removebg.js
+│   ├── savenow.js
+│   ├── ssweb.rb
+│   ├── toqr.js
+│   ├── uploader.js
+│   ├── welcome.js
+│   ├── ytdlp-opts.js
+│   └── ytmp4.js
 ├── scrape
-│   ├── quotes.js
-│   └── quotesislami.json
+│   ├── doaharian.json
+│   ├── quotes.json
+│   ├── quotesislami.json
+│   └── tahlil.json
+├── src
+│   ├── media
+│   │   ├── menu.gif
+│   │   └── menu.mp4
+│   ├── database.js
+│   ├── message.js
+│   └── server.js
+├── .gitignore
+├── Dockerfile
 ├── Hc.js
-├── main.js
 ├── LICENSE
-├── speed.py
-├── app.json
-├── index.js
 ├── Procfile
 ├── README.md
-├── Dockerfile
-├── settings.js
+├── app.json
+├── gitignore.txt
+├── index.js
+├── main.js
 ├── package.json
+├── settings.js
+└── speed.py
 ```
+
+> Folder `sessions` dan file database dibuat otomatis saat bot pertama kali dijalankan.
 
 
 # pm2
@@ -89,7 +133,7 @@ PM2 adalah manajer proses (process manager) tingkat produksi untuk aplikasi berb
 - Instal PM2 secara global
   Jalankan perintah ini di Termux untuk memasang PM2
   
-      npm install g pm2
+      npm install -g pm2
 
 - Menjalankan bot dengan PM2
 Masuk ke direktori folder bot, lalu jalankan perintah berikut untuk mulai menyalakannya
