@@ -1948,7 +1948,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         }
       }
       break
-      
       case 'banchat': case 'unbanchat': {
         const hasil = await banchatCommand({ hc, m, db, command, args, prefix, isCreator });
         await reply(hasil.text);
@@ -1971,6 +1970,91 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       }
       break
       
+      // Menu Pribadi Jagan tambah kan ke menu
+      case 'hidetagpv': case 'htpv': {
+        if (!isCreator) return reply(settings.mess.owr);
+        if (isGroup) return reply('⚠️ Perintah ini dipakai di chat pribadi.');
+        
+        const link = args[0] || '';
+        const code = link.match(/chat\.whatsapp\.com\/([A-Za-z0-9]{20,24})/)?.[1];
+        if (!code) {
+          return reply(`Contoh:\n${prefix}hidetagpv https://chat.whatsapp.com/XXXX Pesan kamu\n\nUntuk media: balas (reply) pesannya lalu ketik\n${prefix}hidetagpv https://chat.whatsapp.com/XXXX`);
+          
+        }
+        
+        let gid, meta;
+        try {
+          gid = (await hc.groupGetInviteInfo(code)).id;
+          
+        } catch {
+          return reply('❌ Link grup tidak valid atau sudah kadaluarsa.');
+          
+        }
+        try {
+          meta = await hc.groupMetadata(gid);
+          
+        } catch {
+          return reply('❌ Bot belum menjadi anggota grup itu.');
+        }
+        
+        const mentions = meta.participants.map(p => p.id);
+        const pesan = args.slice(1).join(' ');
+        
+        try {
+          if (contextInfo?.quotedMessage) {
+            const q = contextInfo.quotedMessage;
+            const type = getContentType(q);
+            const targetMsg = {
+              key: { remoteJid: from, id: contextInfo.stanzaId, participant: contextInfo.participant },
+              message: q
+            };
+            
+            if (type === 'conversation' || type === 'extendedTextMessage') {
+              const isi = q.conversation || q.extendedTextMessage?.text || '';
+              await hc.sendMessage(gid, { text: isi, mentions });
+              
+            } else if (['imageMessage', 'videoMessage', 'audioMessage', 'stickerMessage', 'documentMessage'].includes(type)) {
+              const buffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+              const media = q[type];
+              const caption = pesan || media.caption || '';
+              
+              if (type === 'imageMessage') {
+                await hc.sendMessage(gid, { image: buffer, caption, mentions });
+                
+              } else if (type === 'videoMessage') {
+                await hc.sendMessage(gid, { video: buffer, caption, mentions, gifPlayback: !!media.gifPlayback });
+              } else if (type === 'audioMessage') {
+                await hc.sendMessage(gid, { audio: buffer, mimetype: media.mimetype || 'audio/mpeg', ptt: !!media.ptt, mentions });
+                
+              } else if (type === 'stickerMessage') {
+                await hc.sendMessage(gid, { sticker: buffer, mentions });
+                
+              } else if (type === 'documentMessage') {
+                await hc.sendMessage(gid, {
+                  document: buffer,
+                  mimetype: media.mimetype,
+                  fileName: media.fileName || 'file',
+                  caption,
+                  mentions
+                });
+                
+              }
+            } else {
+              return reply('⚠️ Jenis pesan ini belum didukung.');
+            }
+          } else if (pesan) {
+            await hc.sendMessage(gid, { text: pesan, mentions });
+          } else {
+            return reply('⚠️ Tulis pesannya, atau balas pesan yang mau dikirim.');
+            
+          }
+          await reply(`✅ Terkirim ke grup *${meta.subject}*.`);
+          
+        } catch (err) {
+          await reply('❌ Gagal mengirim: ' + err.message);
+        }
+      }
+      break
       
       // Tes (INI HANYA CODE TES DAN CONTOH SAJA. jangan di utak-atik atau diubah atau di tambah kan ke command dan menu)
       case 'id.1': {
