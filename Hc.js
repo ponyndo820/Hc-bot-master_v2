@@ -638,7 +638,7 @@ async function Hc(hc, m, db) {
       break
       case 'quotesislami': {
         try {
-          const rawData = fs.readFileSync('.//quotesislami.json', 'utf-8');
+          const rawData = fs.readFileSync('./scrape/quotesislami.json', 'utf-8');
           const data = JSON.parse(rawData);
           if (!data || !Array.isArray(data) || data.length === 0){
             return reply('Maaf ada masalah teknis atau data kosong❗');
@@ -1170,7 +1170,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
-      case 'speedtest': case 'speed': {
+      case 'speedtes': case 'speed': {
         reply('Testing Speed...');
         let o;
         try {
@@ -2165,9 +2165,8 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}version
 │${setv} ${prefix}runtime
 │${setv} ${prefix}jadibot
-│${setv} ${prefix}antibot
 │${setv} ${prefix}buylimit
-│${setv} ${prefix}speedtest
+│${setv} ${prefix}speedtes
 │${setv} ${prefix}totalfitur
 │${setv} ${prefix}request (text)
 │${setv} ${prefix}tovn (reply pesan)
@@ -2367,9 +2366,8 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}version
 │${setv} ${prefix}runtime
 │${setv} ${prefix}jadibot
-│${setv} ${prefix}antibot
 │${setv} ${prefix}buylimit
-│${setv} ${prefix}speedtest
+│${setv} ${prefix}speedtes
 │${setv} ${prefix}totalfitur
 │${setv} ${prefix}request (text)
 │${setv} ${prefix}tovn (reply pesan)
