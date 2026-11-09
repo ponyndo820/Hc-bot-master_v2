@@ -35,6 +35,7 @@ import { tictactoeCommand, tictactoeMove, isTictactoeMove } from './game/tictact
 import { antilinkGuard, antilinkCommand } from './lib/antilink.js';
 import { welcomeCommand } from './lib/welcome.js';
 import { banchatGuard, banchatCommand } from './lib/banchat.js';
+import { makeQrPng, MAX_BYTES as QR_MAX_BYTES } from './lib/toqr.js';
 import { UguuSe, webp2mp4File } from './lib/uploader.js';
 import { GroupUpdate, LoadDataBase } from './src/message.js';
 import { removeBg, setRemoveBgKey } from './lib/removebg.js';
@@ -637,7 +638,7 @@ async function Hc(hc, m, db) {
       break
       case 'quotesislami': {
         try {
-          const rawData = fs.readFileSync('./scrape/quotesislami.json', 'utf-8');
+          const rawData = fs.readFileSync('.//quotesislami.json', 'utf-8');
           const data = JSON.parse(rawData);
           if (!data || !Array.isArray(data) || data.length === 0){
             return reply('Maaf ada masalah teknis atau data kosong❗');
@@ -1933,6 +1934,21 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       break
       
       // Grup Menu
+      case 'toqr': {
+        const teksQr = (text || (isQuoted ? (quoted.conversation || quoted.extendedTextMessage?.text || quoted.imageMessage?.caption || quoted.videoMessage?.caption || '') : '')).trim();
+        if (!teksQr) return reply(`Teksnya mana?\nContoh: *${prefix}toqr https://google.com*\nAtau balas pesan teks dengan *${prefix}toqr*`);
+        try {
+          const png = makeQrPng(teksQr);
+          const cuplikan = teksQr.length > 80 ? teksQr.slice(0, 80) + '...' : teksQr;
+          await hc.sendMessage(from, { image: png, caption: `✅ QR Code berhasil dibuat!\n\n📝 ${cuplikan}` }, { quoted: m });
+        } catch (err) {
+          if (err.message === 'TOO_LONG') return reply(`Teks terlalu panjang! Maksimal ${QR_MAX_BYTES} karakter.`);
+          console.error(err);
+          await reply('Gagal membuat QR Code❗');
+        }
+      }
+      break
+      
       case 'banchat': case 'unbanchat': {
         const hasil = await banchatCommand({ hc, m, db, command, args, prefix, isCreator });
         await reply(hasil.text);
@@ -1990,13 +2006,25 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       break
       
       case 'id.3': {
-        const tesText = 'tes';
-        try {
-          const animasiMenu = fs.readFileSync('./src/media/menu.gif');
-        } catch (err) {
-          console.error("error bro", err);
-          await reply(tesText)
-        }
+        if (!args[0] && !args[1]) return reply(`*Bot Telah Aktif Selama*\n*${runtime(process.uptime())}*`, {
+          contextInfo: {
+            forwardingScore: 10,
+            isForwarded: true,
+            forwardedNewsletterMessageInfo: {
+              newsletterJid: settings.my.ch,
+              serverMessageId: 100,
+              newsletterName: 'Join For More Info'
+            },
+            externalAdReply: {
+              title: author,
+              body: 'Subsscribe My YouTube',
+              thumbnail: await getBuffer(pickRandom(settings.thumbnailUrl.url)),
+              mediaType: 2,
+              mediaUrl: settings.my.yt,
+              sourceUrl: settings.my.yt,
+            }
+          }
+        });
       }
       break
       
