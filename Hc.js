@@ -2101,10 +2101,15 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 ╭──❍ *OWNER*
 │${setv} ${prefix}backup
 │${setv} ${prefix}session
+│${setv} ${prefix}banchat
 │${setv} ${prefix}anticall
 │${setv} ${prefix}shutdown
+│${setv} ${prefix}antilink
+│${setv} ${prefix}unbanchat
 │${setv} ${prefix}getsession
 │${setv} ${prefix}autobackup
+│${setv} ${prefix}setwelcome
+│${setv} ${prefix}setgoodbye
 │${setv} ${prefix}setsavenow
 │${setv} ${prefix}updateytdlp
 │${setv} ${prefix}delanticall
@@ -2138,6 +2143,8 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *GRUP*
 │${setv} ${prefix}antibot
+│${setv} ${prefix}welcome
+│${setv} ${prefix}goodbye
 │${setv} ${prefix}antibot del
 │${setv} ${prefix}antibot add
 │${setv} ${prefix}antibot cek
@@ -2154,6 +2161,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 *━━━━━━━━━━━━━━━━━━━━*
 ╭──❍ *TOOLS*
 │${setv} ${prefix}brat
+│${setv} ${prefix}toqr
 │${setv} ${prefix}togif
 │${setv} ${prefix}tomp3
 │${setv} ${prefix}bratvid
@@ -2240,6 +2248,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 ╭──❍ *GAME*
 │${setv} ${prefix}fisht
 │${setv} ${prefix}tebakbom
+│${setv} ${prefix}tictactoe
 ╰────❍`)
       }
       break
@@ -2285,11 +2294,15 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 ╭┴─❍ *OWNER*
 │${setv} ${prefix}backup
 │${setv} ${prefix}session
+│${setv} ${prefix}banchat
 │${setv} ${prefix}anticall
 │${setv} ${prefix}shutdown
+│${setv} ${prefix}antilink
 │${setv} ${prefix}getsession
 │${setv} ${prefix}autobackup
 │${setv} ${prefix}setsavenow
+│${setv} ${prefix}setwelcome
+│${setv} ${prefix}setgoodbye
 │${setv} ${prefix}updateytdlp
 │${setv} ${prefix}delanticall
 │${setv} ${prefix}antibot list
@@ -2300,6 +2313,8 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 ╰┬──❍
 ╭┴─❍ *GRUP*
 │${setv} ${prefix}antibot
+│${setv} ${prefix}welcome
+│${setv} ${prefix}goodbye
 │${setv} ${prefix}antibot del
 │${setv} ${prefix}antibot add
 │${setv} ${prefix}antibot cek
@@ -2334,6 +2349,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 ╭┴─❍ *GAME*
 │${setv} ${prefix}fisht
 │${setv} ${prefix}tebakbom
+│${setv} ${prefix}tictactoe
 ╰┬───❍
 ╭┴─❍ *Doa*
 │${setv} ${prefix}doatahlil
@@ -2341,6 +2357,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 ╰┬──❍
 ╭┴─❍ *TOOLS*
 │${setv} ${prefix}brat
+│${setv} ${prefix}toqr
 │${setv} ${prefix}togif
 │${setv} ${prefix}tomp3
 │${setv} ${prefix}bratvid
