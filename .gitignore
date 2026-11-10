@@ -2,4 +2,3 @@ node_modules/
 sessions/
 .env
 *.log
-database/*
