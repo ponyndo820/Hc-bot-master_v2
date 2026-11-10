@@ -2408,13 +2408,14 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 ╭┴─❍ *RANDOM IMAGE*
 │${setv} ${prefix}randompony
 │${setv} ${prefix}randomimage
+│${setv} ${prefix}randomwaifu
 ╰┬──❍
 ╭┴─❍ *AI*
 │${setv} ${prefix}autoai
 │${setv} ${prefix}ai (query)
 ╰┬──❍
 ╭┴─❍ *ANIME*
-│${setv} ${prefix}randomwaifu
+│${setv} ${prefix}waifu
 │${setv} ${prefix}cariwaifu (query)
 ╰┬───❍
 ╭┴─❍ *SEARCH*

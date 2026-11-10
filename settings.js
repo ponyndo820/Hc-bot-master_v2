@@ -11,9 +11,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 
 const settings = {
-  ownerNumber: ['6285828708258'],
+  ownerNumber: ['6285828708258'], // Setting nomor owner di sini ☕🗿
   author: 'Heart candy',
-  botName: ['Hc-bot'],
+  botName: ['Hc-bot-master_v2'],
   packname: 'ponyndo',
   pairing_code: true,
   prefix: ['+', ',', '.', '!'],
@@ -25,8 +25,8 @@ const settings = {
   tempatStore: 'baileys_store.json',
   listv: ['•','●','■','✿','▲','➩','➢','➣','➤','✦','✧','△','❀','○','□','♤','♡','◇','♧','々','〆'],
   
-   // Daftar command yang bebas limit (tidak mengurangi limit)
-    bypasslimit: [
+  // Daftar command yang bebas limit (tidak mengurangi limit)
+   bypasslimit: [
     'menu', 'allmenu', 'botmenu', 'ownermenu', 'quotesmenu', 
     'toolsmenu', 'animemenu', 'downloadermenu', 'searchmenu', 
     'aimenu', 'randommenu', 'gamemenu', 'runtime', 'tes', 
@@ -45,14 +45,6 @@ settings.thumbnailUrl = {
     'https://cdn.imagetourls.com/uploads/tyImg/OgW4nTlP.jpg',
   ],
 }
-
-/*settings.thumbnailUrl = [
-  'https://cdn.imagetourls.com/uploads/tyImg/hwkB3rmL.jpg',
-  'https://cdn.imagetourls.com/uploads/tyImg/lIRLi7Zb.jpg',
-  'https://cdn.imagetourls.com/uploads/tyImg/thKfH1R5.jpg',
-  'https://cdn.imagetourls.com/uploads/tyImg/OgW4nTlP.jpg',
-];*/
-
 
 settings.my = {
 	yt: 'https://youtube.com/@ponyndo?si=k9PQEkINzEREkE6p',

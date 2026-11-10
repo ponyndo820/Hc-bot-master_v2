@@ -89,7 +89,7 @@ async function startHcbot() {
       if (!messages) return null;
       return messages.find(msg => msg?.key?.id === id) || null;
     };
-
+    
     if (!global._dbInterval) {
       global._dbInterval = setInterval(async () => {
         if (global.db) await dbConnector.write(global.db);
@@ -140,8 +140,6 @@ async function startHcbot() {
     }
     
     if (connection === 'close') {
-      
-      // Code baru
       const reason = lastDisconnect?.error?.output?.statusCode
       const hapusSesi = () => fs.rmSync('./sessions', { recursive: true, force: true })
       const sambungUlang = () => setTimeout(startHcbot, 3000)
@@ -177,10 +175,6 @@ async function startHcbot() {
         console.log(chalk.yellowBright(`[SYSTEM] Penyebab Pemutusan Koneksi Tidak Diketahui : ${reason} | ${connection}, Berusaha untuk Terhubung Kembali...`));
         sambungUlang();
       }
-      
-     /* code lama
-     console.log(chalk.yellowBright('[SYSTEM] Terputus, sedang mencoba menghubungkan ulang...'));
-      startHcbot();*/
     } else if (connection === 'open') {
       console.log(chalk.green.bold(`[SYSTEM] ${settings.botName} Berhasil Terhubung!`));
       if (!global._jadibotRestored) {

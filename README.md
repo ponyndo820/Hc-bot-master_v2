@@ -98,7 +98,6 @@ Ganti `Gemini` dan `APIKeys` di `settings.js` dengan API key milikmu sendiri. Pa
 │   └── tahlil.json
 ├── src
 │   ├── media
-│   │   ├── menu.gif
 │   │   └── menu.mp4
 │   ├── database.js
 │   ├── message.js

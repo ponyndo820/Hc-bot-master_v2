@@ -1,18 +1,9 @@
 /*
- * game/tictactoe-bot.js - TicTacToe untuk WhatsApp (memakai mesin game/tictactoe.js)
- *
- * Cara main (khusus grup):
- *   .tictactoe            buat room / gabung room yang menunggu
- *   .tictactoe @user      tantang orang tertentu (atau balas pesannya)
- *   .tictactoe nyerah     menyerah / batalkan room
- *   Saat giliranmu, ketik angka 1-9 (tanpa prefix).
- *
- * Hadiah: pemenang (menang dengan 3 berjajar) dapat LIMIT atau MONEY dengan jumlah acak.
- * Menang karena lawan menyerah/timeout tidak dapat hadiah, dan ada batas hadiah per hari
- * supaya tidak bisa diakali dengan dua akun yang saling mengalah.
- * Semua angka bisa diubah di CFG.
- */
-
+   * tictactoe-bot.js
+   * By Heart candy
+   * Sc ini open source
+   * ❗Peringatan Script ini tidak boleh di perjual belikan. Jika melanggar akan berurusan dengan hukum.
+*/
 import TicTacToe from './tictactoe.js';
 
 export const CFG = {

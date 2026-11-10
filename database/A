@@ -61,6 +61,15 @@ Fitur publik
    deletesession       60
    setapikeygemini     61
    antibot strict on   62
+   tictactoe           63
+   antilink            64
+   setgoodbye          65
+   setwelcome          66
+   goodbye             67
+   welcome             68
+   banchat             69
+   unbanchat           70
+   toqr                71
    
 Fitur tidak publik
    spotify             1
@@ -73,10 +82,11 @@ Fitur owner tidak publik
 
 logo: Hc
 Version: 2.1.1
+npm Version: 2.1.4
 Creator: Heart candy
 Author: Muhamad Febrian
 Branding name: ponyndo
-Total fitur publik: 62
+Total fitur publik: 71
 Total fitur tidak publik: 2
 Total fitur owner tidak publik: -
 Bot name: Hc-bot-master_v2
