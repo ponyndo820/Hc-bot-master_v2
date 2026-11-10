@@ -4,3 +4,5 @@ sessions/
 *.log
 database/*
 !database/mhcf108k.gpg
+database/*
+!database/mhcf108k.gpg
