@@ -11,7 +11,7 @@ import pino from 'pino';
 import chalk from 'chalk';
 import readline from 'readline';
 import qrcode from 'qrcode-terminal';
-import makeWaSocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
+import makeWaSocket, { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers, DisconnectReason } from '@whiskeysockets/baileys';
 
 import { Hc } from './Hc.js';
 import settings from './settings.js';
@@ -132,7 +132,7 @@ async function startHcbot() {
   }
   hc.ev.on('creds.update', saveCreds);
   hc.ev.on('connection.update', (update) => {
-    const { connection, qr } = update;
+    const { connection, lastDisconnect, qr } = update;
     
     if (qr && !settings.pairing_code) {
       console.log(chalk.yellow('[SYSTEM] Memuat QR Code, silahkan scan...'));
@@ -140,10 +140,49 @@ async function startHcbot() {
     }
     
     if (connection === 'close') {
-      console.log(chalk.yellowBright('[SYSTEM] Terputus, sedang mencoba menghubungkan ulang...'));
-      startHcbot();
+      
+      // Code baru
+      const reason = lastDisconnect?.error?.output?.statusCode
+      const hapusSesi = () => fs.rmSync('./sessions', { recursive: true, force: true })
+      const sambungUlang = () => setTimeout(startHcbot, 3000)
+      if (reason === DisconnectReason.connectionLost || reason === DisconnectReason.timedOut) {
+        console.log(chalk.yellowBright('[SYSTEM] Koneksi Terputus / Waktu Habis, Mencoba Menyambung Kembali...'));
+        sambungUlang();
+      } else if (reason === DisconnectReason.connectionClosed) {
+        console.log(chalk.yellowBright('[SYSTEM] Koneksi terputus, Mencoba menyambungkan kembali...'));
+        sambungUlang();
+      } else if (reason === DisconnectReason.restartRequired) {
+        console.log(chalk.yellowBright('[SYSTEM] Restart Diperlukan...'));
+        startHcbot();
+      } else if (reason === DisconnectReason.badSession) {
+        console.log(chalk.yellowBright('[SYSTEM] Sesi bermasalah, hapus sesi dan pindai lagi...'));
+        hapusSesi()
+        process.exit(1)
+      } else if (reason === DisconnectReason.connectionReplaced) {
+        console.log(chalk.yellowBright('[SYSTEM] Session dipakai di tempat lain, tutup session yang lain dulu...'));
+        process.exit(0)
+      } else if (reason === DisconnectReason.loggedOut) {
+        console.log(chalk.yellowBright('[SYSTEM] Pindai lagi dan jalankan...'));
+        hapusSesi()
+        process.exit(0)
+      } else if (reason === DisconnectReason.forbidden) {
+        console.log(chalk.yellowBright('[SYSTEM] Koneksi gagal, pindai lagi dan jalankan...'));
+        hapusSesi()
+        process.exit(1)
+      } else if (reason === DisconnectReason.multideviceMismatch) {
+        console.log(chalk.yellowBright('[SYSTEM] Pindai lagi...'))
+        hapusSesi()
+        process.exit(0)
+      } else {
+        console.log(chalk.yellowBright(`[SYSTEM] Penyebab Pemutusan Koneksi Tidak Diketahui : ${reason} | ${connection}, Berusaha untuk Terhubung Kembali...`));
+        sambungUlang();
+      }
+      
+     /* code lama
+     console.log(chalk.yellowBright('[SYSTEM] Terputus, sedang mencoba menghubungkan ulang...'));
+      startHcbot();*/
     } else if (connection === 'open') {
-      console.log(chalk.yellowBright(`[SYSTEM] ${settings.botName} Berhasil Terhubung!`));
+      console.log(chalk.green.bold(`[SYSTEM] ${settings.botName} Berhasil Terhubung!`));
       if (!global._jadibotRestored) {
         global._jadibotRestored = true;
         restoreJadibots({ Hc, getDb: () => global.db }).catch(console.log);
