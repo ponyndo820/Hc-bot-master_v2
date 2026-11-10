@@ -17,7 +17,7 @@ import speed from 'performance-now';
 import { createRequire } from 'module';
 import youtubedl from 'youtube-dl-exec';
 import { performance } from 'perf_hooks';
-import { exec, spawn, execSync } from 'child_process';
+import { exec, execFile, spawn, execSync } from 'child_process';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getContentType, downloadMediaMessage, generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
 
@@ -828,42 +828,40 @@ async function Hc(hc, m, db) {
       break
       case 'ssweb': case 'screenshotweb': {
         if (!text) return reply(`Contoh: ${prefix + command} https://google.com`);
-        await react('⏳');
         
         let targetUrl = text.trim();
+        if (!/^https?:\/\//i.test(targetUrl)) targetUrl = 'https://' + targetUrl;
+        try { targetUrl = new URL(targetUrl).href; }
+        catch { return reply('❌ URL tidak valid.'); }
         
-        if (!/^https?:\/\//i.test(targetUrl)) {
-          targetUrl = 'https://' + targetUrl;
-        }
+        await react('⏳');
+        const outputFileName = `./temp_${sender.replace(/[^0-9]/g, '')}${Date.now()}.png`;
+        const cleanup = () => fs.rmSync(outputFileName, { force: true });
         
-        const uniqueId = sender.replace(/[^0-9]/g, '') + Date.now();
-        const outputFileName = `./temp_${uniqueId}.png`;
+        execFile('ruby', ['./lib/ssweb.rb', targetUrl, outputFileName, 'desktop'],
+        { timeout: 60000 },
         
-        exec(`ruby ./lib/ssweb.rb "${targetUrl}" "${outputFileName}" desktop`, async (error, stdout, stderr) => {
+        async (error) => {
+          
           if (error) {
-            console.error("Gagal mengeksekusi script Ruby:", error);
+            cleanup();
             await react('❌');
             return reply('❌ Gagal memproses screenshot dari website tersebut.');
-          }
-          
-          try {
-            await hc.sendMessage(from, { 
-              image: { url: outputFileName }, 
-              caption: `*Screenshot Web Berhasil!*\n*URL:* ${targetUrl}\n*By: Heart candy*` 
-            }, { quoted: m });
             
+          }
+          try {
+            await hc.sendMessage(from, {
+              image: { url: outputFileName },
+              caption: `*Screenshot Web Berhasil!*\n*URL:* ${targetUrl}\n*By: Heart candy*`
+            }, { quoted: m });
             await react('✅');
             
-            setTimeout(() => {
-              if (fs.existsSync(outputFileName)) {
-                fs.unlinkSync(outputFileName);
-              }
-            }, 5000);
-            
-          } catch (sendErr) {
-            console.error("Gagal mengirim gambar ke WA:", sendErr);
+          } catch (e) {
             await react('❌');
             reply('❌ Terjadi kesalahan saat mengirim hasil screenshot.');
+            
+          } finally {
+            cleanup();
           }
         });
       }
