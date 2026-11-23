@@ -9,71 +9,72 @@ Fitur publik
    tovn                8
    brat                9
    draw                10
-   fisht               11
-   toptv               12
-   ytmp4               13
-   limit               14
-   ytmp3               15
-   limit               16
-   tagme               17
-   ssweb               18
-   togif               19
-   tomp3               20
-   autoai              21
-   smeme               22
-   donasi              23
-   quotes              24
-   sticker             25
-   version             26
-   session             27
-   request             28
-   sticker             29
-   jadibot             30
-   antibot             31
-   toimage             32
-   toaudio             33
-   buylimit            34
-   tebakbom            35
-   speedtes            36
-   shutdown            37
-   ytsearch            38
-   removebg            39
-   cariwaifu           40
-   doatahlil           41
-   doaharian           42
-   totalfitur          43
-   setsavenow          44
-   autobackup          45
-   getsession          46
-   randompony          47
-   delanticall         48
-   randomwaifu         49
-   antibot add         50
-   antibot del         51
-   antibot list        52
-   antibot cek         53
-   updateytdlp         54
-   randomimage         55
-   antibot add         56
-   deletesampah        57
-   setytcookies        58
-   quotesislami        59
-   deletesession       60
-   setapikeygemini     61
-   antibot strict on   62
-   tictactoe           63
-   antilink            64
-   setgoodbye          65
-   setwelcome          66
-   goodbye             67
-   welcome             68
-   banchat             69
-   unbanchat           70
-   toqr                71
+   toqr                11
+   fisht               12
+   toptv               13
+   ytmp4               14
+   limit               15
+   ytmp3               16
+   limit               17
+   tagme               18
+   ssweb               19
+   togif               20
+   tomp3               21
+   autoai              22
+   smeme               23
+   donasi              24
+   quotes              25
+   goodbye             26
+   welcome             27 
+   sticker             28
+   version             29
+   session             30
+   request             31
+   sticker             32
+   jadibot             33
+   antibot             34
+   toimage             35
+   toaudio             36
+   banchat             37
+   unbanchat           38
+   buylimit            39
+   tebakbom            40
+   speedtes            41
+   shutdown            42
+   ytsearch            43
+   antilink            44
+   removebg            45
+   cariwaifu           46
+   doatahlil           47
+   doaharian           48
+   tictactoe           49
+   totalfitur          50
+   setsavenow          51
+   autobackup          52
+   getsession          53
+   setgoodbye          54
+   setwelcome          55
+   randompony          56
+   delanticall         57
+   randomwaifu         58
+   antibot add         59
+   antibot del         60
+   antibot list        61
+   antibot cek         62
+   updateytdlp         63
+   randomimage         64
+   antibot add         65
+   deletesampah        66
+   setytcookies        67
+   quotesislami        68
+   deletesession       69
+   setapikeygemini     70
+   antibot strict on   71
    
 Fitur tidak publik
    spotify             1
    alyabrat            2
+   tourl               3
    
 Fitur owner tidak publik 
    -
@@ -87,7 +88,7 @@ Creator: Heart candy
 Author: Muhamad Febrian
 Branding name: ponyndo
 Total fitur publik: 71
-Total fitur tidak publik: 2
+Total fitur tidak publik: 3
 Total fitur owner tidak publik: -
 Bot name: Hc-bot-master_v2
 

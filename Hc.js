@@ -31,6 +31,7 @@ import { igdl } from './lib/igdl.js';
 import settings from './settings.js';
 import { ytMp4 } from './lib/ytmp4.js';
 import { fishtCommand } from './game/fisht.js';
+import { antiSpam, antispamCommand, getBotSet } from './src/antispam.js';
 import { tictactoeCommand, tictactoeMove, isTictactoeMove } from './game/tictactoe-bot.js';
 import { antilinkGuard, antilinkCommand } from './lib/antilink.js';
 import { welcomeCommand } from './lib/welcome.js';
@@ -54,12 +55,8 @@ async function Hc(hc, m, db) {
     
     await LoadDataBase(hc, m);
     
-    // BANCHAT: grup yang di-ban diabaikan total, kecuali .unbanchat dari admin/owner
     if (await banchatGuard(hc, m, db, { prefixes: settings.prefix, ownerNumbers: settings.ownerNumber })) return;
-    
     if (await antibotGuard(hc, m, db, { ownerNumbers: settings.ownerNumber, isOwn: isJadibotActive, hcMain: global.hcMain })) return;
-    
-    // ANTILINK: link dari anggota biasa di grup yang antilink-nya aktif ditangani di sini
     if (await antilinkGuard(hc, m, db, {
       ownerNumbers: settings.ownerNumber, isOwn: isJadibotActive, hcMain: global.hcMain,
       isCommand: (t) => {
@@ -212,7 +209,15 @@ async function Hc(hc, m, db) {
    const isPremium = isCreator || checkStatus(sender, premium) || false;
    const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;*/
    
-   
+    const set = getBotSet(db, hc.user.id);
+    if (set.antispam && isCmd && !isCreator) {
+      if (antiSpam.isFiltered(sender)) {
+        console.log(chalk.bgRed('[ SPAM ] :'), chalk.black(chalk.bgHex('#1CFFF7')(`From -> ${sender}`), chalk.bgHex('#E015FF')(` In ${isGroup ? m.key.remoteJid : 'Private Chat'}`)))
+        return
+      }
+      antiSpam.addFilter(sender)
+    }
+    
     const freeCmd = [...(settings.bypasslimit || []), 'antibot', 'antilink', 'tictactoe', 'ttt', 'welcome', 'goodbye', 'leave', 'setwelcome', 'setgoodbye', 'setleave', 'banchat', 'unbanchat'];
     
     // Sistem Limit
@@ -337,7 +342,7 @@ async function Hc(hc, m, db) {
             await new Promise(resolve => setTimeout(resolve, 1500));
         }
     }
-
+    
     if (isCreator) {
     db.users = db.users || {};
     db.users[sender] = db.users[sender] || {};
@@ -1076,6 +1081,40 @@ async function Hc(hc, m, db) {
         } finally {
           for (const f of [input, output]) if (fs.existsSync(f)) fs.unlinkSync(f);
         }
+      }
+      break
+      case 'toqr': {
+        const teksQr = (text || (isQuoted ? (quoted.conversation || quoted.extendedTextMessage?.text || quoted.imageMessage?.caption || quoted.videoMessage?.caption || '') : '')).trim();
+        if (!teksQr) return reply(`Teksnya mana?\nContoh: *${prefix}toqr https://google.com*\nAtau balas pesan teks dengan *${prefix}toqr*`);
+        try {
+          const png = makeQrPng(teksQr);
+          const cuplikan = teksQr.length > 80 ? teksQr.slice(0, 80) + '...' : teksQr;
+          await hc.sendMessage(from, { image: png, caption: `✅ QR Code berhasil dibuat!\n\n📝 ${cuplikan}` }, { quoted: m });
+        } catch (err) {
+          if (err.message === 'TOO_LONG') return reply(`Teks terlalu panjang! Maksimal ${QR_MAX_BYTES} karakter.`);
+          console.error(err);
+          await reply('Gagal membuat QR Code❗');
+        }
+      }
+      break
+      case 'tourl': {
+        if (/webp|video|sticker|audio|jpg|jpeg|png/.test(mime)) {
+          await react('⏳')
+          const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
+          fs.mkdirSync('./database/temp', { recursive: true });
+          const media = path.join('./database/temp', `tourl_${Date.now()}`);
+          try {
+            const mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+            fs.writeFileSync(media, mediaBuffer);
+            const anu = await UguuSe(media);
+            await reply('Url:' + anu.url)
+          } catch (e) {
+            console.log(e);
+            await reply(settings.mess.fil);
+          } finally {
+            if (fs.existsSync(media)) fs.unlinkSync(media)
+          }
+        } else reply(settings.mess.media)
       }
       break
       
@@ -1932,20 +1971,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       break
       
       // Grup Menu
-      case 'toqr': {
-        const teksQr = (text || (isQuoted ? (quoted.conversation || quoted.extendedTextMessage?.text || quoted.imageMessage?.caption || quoted.videoMessage?.caption || '') : '')).trim();
-        if (!teksQr) return reply(`Teksnya mana?\nContoh: *${prefix}toqr https://google.com*\nAtau balas pesan teks dengan *${prefix}toqr*`);
-        try {
-          const png = makeQrPng(teksQr);
-          const cuplikan = teksQr.length > 80 ? teksQr.slice(0, 80) + '...' : teksQr;
-          await hc.sendMessage(from, { image: png, caption: `✅ QR Code berhasil dibuat!\n\n📝 ${cuplikan}` }, { quoted: m });
-        } catch (err) {
-          if (err.message === 'TOO_LONG') return reply(`Teks terlalu panjang! Maksimal ${QR_MAX_BYTES} karakter.`);
-          console.error(err);
-          await reply('Gagal membuat QR Code❗');
-        }
-      }
-      break
       case 'banchat': case 'unbanchat': {
         const hasil = await banchatCommand({ hc, m, db, command, args, prefix, isCreator });
         await reply(hasil.text);
@@ -1964,6 +1989,13 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       case 'antibot': {
         const hasil = await antibotCommand({ hc, m, db, args, prefix,
         isCreator, contextInfo });
+        await reply(hasil.text);
+      }
+      break
+      
+      case 'antispam': {
+        if (!isCreator) return reply(settings.mess.owr);
+        const hasil = await antispamCommand({ db, botNumber, args, prefix });
         await reply(hasil.text);
       }
       break
@@ -2053,6 +2085,18 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         }
       }
       break
+      case 'rhsa': {
+          if (!isCreator) return reply(settings.mess.owr)
+       await reply(` *━━━━━━━━━━━━━━━━━━━━*
+              🌈 *Hc-bot* 🌈
+               *By Heart candy*
+*━━━━━━━━━━━━━━━━━━━━*
+╭──❍ *rhsa*
+│${setv} ${prefix}htpv
+╰────❍`)
+      }
+      break
+      
       
       // Tes (INI HANYA CODE TES DAN CONTOH SAJA. jangan di utak-atik atau diubah atau di tambah kan ke command dan menu)
       case 'id.1': {
@@ -2108,7 +2152,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
           }
         });
       }
-      break
+     break
       
     // (CODE DI ATAS TIDAK MASUK MENU)
       
@@ -2450,6 +2494,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}smeme (send/reply img/vid)
 │${setv} ${prefix}sticker (send/reply img/vid)
+│${setv}rhsa
 ╰────❍`;
        
         const channelContext = {

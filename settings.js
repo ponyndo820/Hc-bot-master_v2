@@ -60,6 +60,7 @@ settings.mess = {
   owr: "Khusus Owner Ya Sayang 😔",
   adm: "Khusus Admin Ya Sayang 😔",
   qud: "Reply Pesannya ya Sayang ✉️",
+  media: "Kirim medianya ya sayang 📂",
   priv: "kuhusus Privat Chat Ya Sayang 🔏",
   fit: "Fitur Ini Belum Tersedia  Untuk publik Ya Sayang 🤔",
 }
