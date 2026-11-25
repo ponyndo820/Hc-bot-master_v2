@@ -10,6 +10,7 @@ Fitur publik
    brat                9
    draw                10
    toqr                11
+   tourl               3 ,,
    fisht               12
    toptv               13
    ytmp4               14
@@ -24,6 +25,7 @@ Fitur publik
    smeme               23
    donasi              24
    quotes              25
+   saudio              4 ,,
    goodbye             26
    welcome             27 
    sticker             28
@@ -82,13 +84,13 @@ Fitur owner tidak publik
    
 
 logo: Hc
-Version: 2.1.1
+Version: 2.1.2
 npm Version: 2.1.4
 Creator: Heart candy
 Author: Muhamad Febrian
 Branding name: ponyndo
 Total fitur publik: 71
-Total fitur tidak publik: 3
+Total fitur tidak publik: 2
 Total fitur owner tidak publik: -
 Bot name: Hc-bot-master_v2
 

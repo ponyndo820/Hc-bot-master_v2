@@ -1118,6 +1118,22 @@ async function Hc(hc, m, db) {
         } else reply(settings.mess.media)
       }
       break
+      case 'saudio': case 'stickeraudio': case 'stikeraudio': case 'sa': {
+        if (!/video/.test(quotedType)) return reply(`Kirim/reply video BERSUARA dengan caption ${prefix + command}\nDurasi maks 5 detik`);
+        await react('⏳');
+        const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
+        try {
+          const videoBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+          await sendAudioSticker(hc, from, videoBuffer, {
+            packname: text.split('|')[0] || packname,
+            author: text.split('|')[1] || author,
+          });
+        } catch (e) {
+          console.error(e);
+          reply(`Gagal membuat stiker audio: ${e.message}`);
+        }
+      }
+      break
       
       //Bot Menu
       case 'sc': case 'script': {
@@ -2154,22 +2170,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         });
       }
      break
-     case 'saudio': case 'stickeraudio': case 'stikeraudio': {
-        if (!/video/.test(quotedType)) return reply(`Kirim/reply video BERSUARA dengan caption ${prefix + command}\nDurasi maks 5 detik`);
-        await react('⏳');
-        const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
-        try {
-          const videoBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
-          await sendAudioSticker(hc, from, videoBuffer, {
-            packname: text.split('|')[0] || packname,
-            author: text.split('|')[1] || author,
-          });
-        } catch (e) {
-          console.error(e);
-          reply(`Gagal membuat stiker audio: ${e.message}`);
-        }
-      }
-      break
+
       
     // (CODE DI ATAS TIDAK MASUK MENU)
       
@@ -2312,6 +2313,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}ssweb (url)
 │${setv} ${prefix}draw (prompt)
 │${setv} ${prefix}toimage (reply pesan)
+│${setv} ${prefix}saudio (send/reply video)
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}smeme (send/reply img/vid)
 │${setv} ${prefix}sticker (send/reply img/vid)
@@ -2508,6 +2510,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
 │${setv} ${prefix}ssweb (url)
 │${setv} ${prefix}draw (prompt)
 │${setv} ${prefix}toimage (reply pesan)
+│${setv} ${prefix}saudio (send/reply video)
 │${setv} ${prefix}rvo (reply pesan viewone)
 │${setv} ${prefix}smeme (send/reply img/vid)
 │${setv} ${prefix}sticker (send/reply img/vid)
