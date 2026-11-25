@@ -31,6 +31,7 @@ import { igdl } from './lib/igdl.js';
 import settings from './settings.js';
 import { ytMp4 } from './lib/ytmp4.js';
 import { fishtCommand } from './game/fisht.js';
+import { sendAudioSticker } from './lib/stikeraudio.js';
 import { antiSpam, antispamCommand, getBotSet } from './src/antispam.js';
 import { tictactoeCommand, tictactoeMove, isTictactoeMove } from './game/tictactoe-bot.js';
 import { antilinkGuard, antilinkCommand } from './lib/antilink.js';
@@ -2153,6 +2154,22 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         });
       }
      break
+     case 'saudio': case 'stickeraudio': case 'stikeraudio': {
+        if (!/video/.test(quotedType)) return reply(`Kirim/reply video BERSUARA dengan caption ${prefix + command}\nDurasi maks 5 detik`);
+        await react('⏳');
+        const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
+        try {
+          const videoBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+          await sendAudioSticker(hc, from, videoBuffer, {
+            packname: text.split('|')[0] || packname,
+            author: text.split('|')[1] || author,
+          });
+        } catch (e) {
+          console.error(e);
+          reply(`Gagal membuat stiker audio: ${e.message}`);
+        }
+      }
+      break
       
     // (CODE DI ATAS TIDAK MASUK MENU)
       
