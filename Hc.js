@@ -1118,15 +1118,29 @@ async function Hc(hc, m, db) {
         } else reply(settings.mess.media)
       }
       break
-      case 'saudio': case 'stickeraudio': case 'stikeraudio': case 'sa': {
-        if (!/video/.test(quotedType)) return reply(`Kirim/reply video BERSUARA dengan caption ${prefix + command}\nDurasi maks 5 detik`);
+      case 'saudio': case 'stickeraudio': case 'stikeraudio': {
+        const adaAudioReply = isQuoted && /audio/.test(quotedType) && /image|video/.test(type);
+        const adaVideo = /video/.test(quotedType);
+        if (!adaAudioReply && !adaVideo) {
+          return reply(`Cara pakai ${prefix + command}:\n1. Kirim/reply video BERSUARA dengan caption ${prefix + command}\n2. Reply audio dengan gambar/video + caption ${prefix + command}\n\nVideo maks 5 detik, audio maks 10 detik`);
+        }
         await react('⏳');
-        const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
         try {
-          const videoBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
-          await sendAudioSticker(hc, from, videoBuffer, {
+          let mediaBuffer, audioBuffer, isVideo;
+          if (adaAudioReply) {
+            mediaBuffer = await downloadMediaMessage(m, 'buffer', {});
+            audioBuffer = await downloadMediaMessage({ key: m.key, message: quoted }, 'buffer', {});
+            isVideo = /video/.test(type);
+          } else {
+            const targetMsg = isQuoted ? { key: m.key, message: quoted } : m;
+            mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
+            isVideo = true;
+          }
+          await sendAudioSticker(hc, from, mediaBuffer, {
             packname: text.split('|')[0] || packname,
             author: text.split('|')[1] || author,
+            audioBuffer,
+            isVideo,
           });
         } catch (e) {
           console.error(e);
