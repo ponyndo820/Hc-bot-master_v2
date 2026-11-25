@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://cdn.imagetourls.com/uploads/tyImg/13aSRpnk8.png" width="200">
+  <img src="https://res.cloudinary.com/wrxdjaut/image/upload/f_auto,q_auto/2848426" width="200">
 </div>
 
 <p align="center">
