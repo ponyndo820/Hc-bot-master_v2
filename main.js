@@ -6,8 +6,8 @@
 */
 import path from 'path';
 import chalk from 'chalk';
-import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
+import { spawn } from 'child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

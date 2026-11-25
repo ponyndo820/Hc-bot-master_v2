@@ -1,6 +1,5 @@
 const COOLDOWN_MS = 5000
 const usedCommandRecently = new Set()
-
 const isFiltered = (from) => usedCommandRecently.has(from)
 const addFilter = (from) => {
   usedCommandRecently.add(from)
