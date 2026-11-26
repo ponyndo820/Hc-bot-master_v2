@@ -32,7 +32,7 @@ import settings from './settings.js';
 import { ytMp4 } from './lib/ytmp4.js';
 import { fishtCommand } from './game/fisht.js';
 import { welcomeCommand } from './lib/welcome.js';
-import { sendAudioSticker } from './lib/stikeraudio.js';
+import { sendAudioSticker } from './lib/saudio.js';
 import { UguuSe, webp2mp4File } from './lib/uploader.js';
 import { GroupUpdate, LoadDataBase } from './src/message.js';
 import { removeBg, setRemoveBgKey } from './lib/removebg.js';
