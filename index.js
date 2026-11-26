@@ -60,7 +60,9 @@ function displaySystemInfo() {
 
 async function startHcbot() {
   const dbConnector = dataBase(settings.tempatDB || 'database.json');
-  const { state, saveCreds } = await useMultiFileAuthState('sessions');
+  // const { state, saveCreds } = await useMultiFileAuthState('sessions');
+  
+  const { state, saveCreds } = await useMultiFileAuthState(process.env.SESSION_DIR || 'sessions');
   const { version } = await fetchLatestBaileysVersion();
 
   try {
@@ -141,7 +143,10 @@ async function startHcbot() {
     
     if (connection === 'close') {
       const reason = lastDisconnect?.error?.output?.statusCode
-      const hapusSesi = () => fs.rmSync('./sessions', { recursive: true, force: true })
+      const hapusSesi = () => fs.rmSync(process.env.SESSION_DIR || './sessions', { recursive: true, force: true })
+      
+      // const hapusSesi = () => fs.rmSync('./sessions', { recursive: true, force: true })
+      
       const sambungUlang = () => setTimeout(startHcbot, 3000)
       if (reason === DisconnectReason.connectionLost || reason === DisconnectReason.timedOut) {
         console.log(chalk.yellowBright('[SYSTEM] Koneksi Terputus / Waktu Habis, Mencoba Menyambung Kembali...'));

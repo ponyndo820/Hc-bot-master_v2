@@ -1118,7 +1118,7 @@ async function Hc(hc, m, db) {
         } else reply(settings.mess.media)
       }
       break
-      case 'saudio': case 'stickeraudio': case 'stikeraudio': {
+      case 'sa': case 'saudio': case 'stickeraudio': case 'stikeraudio': {
         const adaAudioReply = isQuoted && /audio/.test(quotedType) && /image|video/.test(type);
         const adaVideo = /video/.test(quotedType);
         if (!adaAudioReply && !adaVideo) {
