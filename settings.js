@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 
 const settings = {
-  ownerNumber: ['6285828708258'], // Setting nomor owner di sini ☕🗿
+  ownerNumber: ['6285828708258'], // Settings nomor owner di sini ☕🗿
   author: 'Heart candy',
   botName: ['Hc-bot-master_v2'],
   packname: 'ponyndo',

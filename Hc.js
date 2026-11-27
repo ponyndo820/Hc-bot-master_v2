@@ -195,20 +195,6 @@ async function Hc(hc, m, db) {
             }
         }
     }
-    
-    /*const hour = parseInt(new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', hour12: false }));
-    const ucapanWaktu = 
-    hour >= 4 && hour < 11 ? 'Selamat Pagi 🌄' :
-    hour >= 11 && hour < 15 ? 'Selamat Siang 🏙' :
-    hour >= 15 && hour < 18 ? 'Selamat Sore 🌅' :
-    hour >= 18 && hour < 19 ? 'Selamat Petang 🌃' : 'Selamat Malam 🌌';*/
-    
-    
-   /*const isVip = isCreator || (db.users[sender]?.vip || false);
-   const isBan = db.users[sender]?.ban || false; 
-   const isLimit = isCreator || (db.users[sender]?.limit > 0 || false);
-   const isPremium = isCreator || checkStatus(sender, premium) || false;
-   const isNsfw = m.isGroup ? (db.groups[m.chat]?.nsfw || false) : false;*/
    
     const set = getBotSet(db, hc.user.id);
     if (set.antispam && isCmd && !isCreator) {
@@ -779,44 +765,6 @@ async function Hc(hc, m, db) {
         } catch (err) {
           console.error(err);
           await reply('Maaf, fitur stiker video brat sedang mengalami gangguan teknis.');
-        }
-      }
-      break
-      case 'alyabrat': { // Fitur ini masih dalam tahap pengembangan.
-        if (!text) return reply(`Teksnya mana bang?\nContoh: *${prefix}alyabrat halo*`);
-        await react('⏳');
-        try {
-          const Jimp = await import('jimp');
-          const imageUrl = 'https://files.catbox.moe/5zv26f.jpg';
-          const image = await Jimp.default.read(imageUrl);
-          image.resize(512, Jimp.default.AUTO);
-          const width = image.bitmap.width;
-          const height = image.bitmap.height;
-          const paperW = Math.round(width * 0.58);
-          const paperH = Math.round(height * 0.20);
-          const textCanvas = new Jimp.default(paperW, paperH, 0x00000000);
-          const font = await Jimp.default.loadFont(Jimp.default.FONT_SANS_64_BLACK);
-          textCanvas.print(font, 0, 0, {
-            text: text,
-            alignmentX: Jimp.default.HORIZONTAL_ALIGN_CENTER,
-            alignmentY: Jimp.default.VERTICAL_ALIGN_MIDDLE
-          }, paperW, paperH);
-          
-          textCanvas.rotate(+5, false);
-          
-          const posX = Math.round(width * 0.21);
-          const posY = Math.round(height * 0.58);
-          
-          image.composite(textCanvas, posX, posY);
-          
-          const buffer = await image.getBufferAsync(Jimp.default.MIME_JPEG);
-          const stickerFile = await writeExif(buffer, { packname: packname, author: author });
-          await hc.sendMessage(from, { sticker: { url: stickerFile } }, { quoted: m });
-          
-          if (fs.existsSync(stickerFile)) fs.unlinkSync(stickerFile);
-        } catch (err) {
-          console.error(err);
-          reply('❌ Error saat membuat stiker alyabrat');
         }
       }
       break
@@ -1819,71 +1767,6 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         } catch (err) {
           console.error("Error pada fitur search:", err);
           await reply('Terjadi kesalahan saat mencari video di YouTube.');
-        }
-      }
-      break
-      case 'spotify': case 'spotifydl': {
-        if (!text) return reply(`Masukkan judul lagu!\nContoh: *${prefix}spotify Koa Background pt.2*`);
-        await react('⏳');
-        
-        const prosesMsg = await reply('⏳ *Sedang mengunduh audio, mohon tunggu sebentar...*');
-        
-        let audioPath = null;
-        try {
-          let query = text;
-          if (text.includes('spotify.com')) {
-             query = text.split('/').pop().split('?')[0] + " official audio";
-          } else {
-             query = text + " official audio";
-          }
-          
-          const searchResult = await yts(query);
-          if (!searchResult || !searchResult.videos.length) {
-            return reply('❌ Lagu tidak ditemukan.');
-          }
-          
-          const video = searchResult.videos[0];
-          const ytUrl = video.url;
-          
-          audioPath = path.join('./database/temp', `spotify_${Date.now()}.mp3`);
-          
-          const execPromise = promisify(exec);
-          await execPromise(`yt-dlp -x --audio-format mp3 -o "${audioPath}" "${ytUrl}"`);
-          
-          if (fs.existsSync(audioPath)) {
-            let caption = `🎧 *LOCAL MUSIC DOWNLOADER*\n\n`;
-            caption += `🎵 *Judul:* ${video.title}\n`;
-            caption += `⏱️ *Durasi:* ${video.timestamp}\n`;
-            caption += `📺 *Channel:* ${video.author.name}\n\n`;
-            caption += `*By: Heart candy*`;
-            
-            await hc.sendMessage(from, { 
-              image: { url: video.thumbnail }, 
-              caption: caption 
-            }, { quoted: m });
-            
-            await hc.sendMessage(from, { 
-              audio: { url: audioPath }, 
-              mimetype: 'audio/mpeg', 
-              ptt: false 
-            }, { quoted: m });
-            
-            await react('✅');
-          } else {
-            return reply('❌ Gagal menghasilkan file audio.');
-          }
-          
-        } catch (err) {
-          console.error("Error Local Downloader:", err);
-          await reply('❌ Terjadi kesalahan saat memproses audio. Pastikan paket yt-dlp terinstal di Termux.');
-        } finally {
-          if (audioPath && fs.existsSync(audioPath)) {
-            try {
-              fs.unlinkSync(audioPath);
-            } catch (e) {
-              console.error("Error hapus file audio temp:", e);
-            }
-          }
         }
       }
       break
