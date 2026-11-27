@@ -43,6 +43,7 @@ const simpleStore = {
 };
 
 const store = simpleStore;
+global.store = store;
 
 function displaySystemInfo() {
     console.log(chalk.red.bold(`
@@ -60,8 +61,6 @@ function displaySystemInfo() {
 
 async function startHcbot() {
   const dbConnector = dataBase(settings.tempatDB || 'database.json');
-  // const { state, saveCreds } = await useMultiFileAuthState('sessions');
-  
   const { state, saveCreds } = await useMultiFileAuthState(process.env.SESSION_DIR || 'sessions');
   const { version } = await fetchLatestBaileysVersion();
 
@@ -260,6 +259,9 @@ async function startHcbot() {
         : (m.key.participant || m.key.remoteJid);
       
       await printMessageLog(hc, m);
+      const _s = JSON.stringify(m.message, (k, v) =>
+      ArrayBuffer.isView(v) || v?.type === 'Buffer' ? 'bytes': typeof v === 'string' && v.length > 40 ? v.slice(0, 40) + '…' : v);
+      if (/viewOnce/i.test(_s) || /-1$/.test(m.key.id)) console.log('[RAW]', m.key.id, _s.slice(0, 1500));
       await Hc(hc, m, global.db);
       await dbConnector.write(global.db);
     } catch (err) {

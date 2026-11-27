@@ -19,7 +19,7 @@ const settings = {
   prefix: ['+', ',', '.', '!'],
   autoRead: false,
   selfMode: false,
-  tempatDB: 'database.json',
+  tempatDB: 'database/database.json',
   timezone: 'Asia/Jakarta',
   secretBackupCmd: process.env.SECRET_BACKUP_CMD || '1ips',
   tempatStore: 'baileys_store.json',

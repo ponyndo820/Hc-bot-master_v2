@@ -711,37 +711,24 @@ async function Hc(hc, m, db) {
         }
       }
       break
-      case 'readviewonce': case 'readviewone': case 'rvo': {
+            case 'readviewonce': case 'readviewone': case 'rvo': {
         if (!isQuoted) return reply(settings.mess.qud);
         try {
-          const buka = (x) => {
-            for (let i = 0; i < 3; i++) {
-              x = x?.ephemeralMessage?.message || x?.viewOnceMessage?.message
-              || x?.viewOnceMessageV2?.message || x?.viewOnceMessageV2Extension?.message || x;
-              
-            }
-            return x;
-            
-          };
-          let viewOnceMsg = buka(quoted);
-          let mediaType = getContentType(viewOnceMsg);
-          
-          if (!viewOnceMsg?.[mediaType]?.url && !viewOnceMsg?.[mediaType]?.directPath) {
-            const asli = buka(global.loadMessage?.(from, contextInfo.stanzaId)?.message);
-            if (asli) { viewOnceMsg = asli; mediaType = getContentType(asli); }
-          }
-          
+          const stored = global.store?.messages?.[from]?.array
+          ?.find(x => x.key.id === contextInfo.stanzaId);
+          let viewOnceMsg = stored?.message || quoted;
+          viewOnceMsg = viewOnceMsg.ephemeralMessage?.message || viewOnceMsg;
+          viewOnceMsg = viewOnceMsg.viewOnceMessageV2Extension?.message
+          || viewOnceMsg.viewOnceMessageV2?.message
+          || viewOnceMsg.viewOnceMessage?.message
+          || viewOnceMsg;
+          const mediaType = getContentType(viewOnceMsg);
           if (!mediaType || !/imageMessage|videoMessage|audioMessage/.test(mediaType)) {
-            
             return reply(`Reply pesan media View Once!\nContoh: *${prefix + command}*`);
           }
           
-          if (!viewOnceMsg[mediaType]?.url && !viewOnceMsg[mediaType]?.directPath) {
-            return reply('Media view once ini sudah tidak bisa diambil (bot belum menerimanya atau sudah kedaluwarsa).');
-          }
-          
           await react('⏳');
-          const targetMsg = { key: m.key, message: viewOnceMsg };
+          const targetMsg = { key: stored?.key || m.key, message: viewOnceMsg };
           const mediaBuffer = await downloadMediaMessage(targetMsg, 'buffer', {});
           if (!mediaBuffer) return reply('Gagal mengunduh media View Once.');
           const caption = viewOnceMsg[mediaType]?.caption || '';
@@ -759,6 +746,7 @@ async function Hc(hc, m, db) {
         }
       }
       break
+ 
       case 'brat': {
         if (!text) return reply(`Teksnya mana?\nContoh: *${prefix}brat halo semua*`);
         await react('⏳');
