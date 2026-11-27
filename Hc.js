@@ -45,6 +45,7 @@ import { writeExif, toAudio, toPTT, toPTV, toVideo } from './lib/converter.js';
 import { antiSpam, antispamCommand, getBotSet } from './src/antispam.js';
 import { getSavenowKey, setSavenowKey, savenowToFile } from './lib/savenow.js';
 import { tictactoeCommand, tictactoeMove, isTictactoeMove } from './game/tictactoe-bot.js';
+import { extractSpotifyUrl, normalizeSpotifyUrl, downloadSpotifyTrack, MAX_AUDIO_BYTES } from './lib/spotify.js';
 import { ytdlpBaseOptions, youtubeErrorMessage, saveYoutubeCookies, updateYtdlp, isYoutubeBotBlock } from './lib/ytdlp-opts.js';
 import { cmdAdd, cmdAddHit, addExpired, getPosition, getExpired, getStatus, getAllExpired, checkExpired } from './src/database.js';
 import { getRandomImage, getRandomWaifu, searchWaifu, getBuffer, pickRandom, runtime, sleep, clockString } from './lib/function.js';
@@ -1480,6 +1481,8 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
         }
       }
       break
+      
+      // Download menu
       case 'ytmp3': {
         let ytUrl = '';
         if (text) {
@@ -1731,6 +1734,68 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
           console.error("Error Instagram Lokal:", err);
           await react('❌');
           reply(`❌ Terjadi kesalahan: ${err.message || 'Gagal memproses permintaan download.'}`);
+        }
+      }
+      break
+      case 'spotify': case 'spotifydl': case 'spdl': {
+        let spRaw = extractSpotifyUrl(text || '');
+        if (!spRaw && isQuoted) {
+          const q = contextInfo.quotedMessage;
+          for (const t of [q.conversation, q.extendedTextMessage?.text, q.imageMessage?.caption, q.videoMessage?.caption]) {
+            spRaw = extractSpotifyUrl(t);
+            if (spRaw) break;
+          }
+        }
+        if (!spRaw) return reply(`Example: ${prefix + command} url_spotify\nAtau reply pesan yang memiliki link Spotify!`);
+        
+        await react('⏳');
+        let spFile = null;
+        try {
+          const norm = await normalizeSpotifyUrl(spRaw);
+          if (!norm) {
+            await react('❌');
+            return reply('❌ Link Spotify tidak dikenali. Gunakan link lagu, contoh: https://open.spotify.com/track/xxxx');
+          }
+          if (norm.type) {
+            await react('❌');
+            return reply(`❌ Link ${norm.type} belum didukung. Kirim link *lagu* (track) saja.`);
+          }
+          
+          const { info, filePath } = await downloadSpotifyTrack(norm.url);
+          spFile = filePath;
+          
+          if (fs.statSync(spFile).size > MAX_AUDIO_BYTES) {
+            await react('❌');
+            return reply('❌ File lagu terlalu besar untuk dikirim lewat WhatsApp.');
+          }
+          
+          const caption = `*🎵 Title:* ${info.title}\n*👤 Artist:* ${info.artists}` +
+            (info.album ? `\n*💿 Album:* ${info.album}` : '') +
+            (info.release ? `\n*📅 Rilis:* ${info.release}` : '');
+          if (info.cover) {
+            try {
+              await hc.sendMessage(from, { image: { url: info.cover }, caption }, { quoted: m });
+            } catch (e) {
+              await reply(caption);
+            }
+          } else {
+            await reply(caption);
+          }
+          await hc.sendMessage(from, {
+            audio: { url: spFile },
+            mimetype: 'audio/mpeg',
+            fileName: `${info.artists} - ${info.title}.mp3`.replace(/[\\/:*?"<>|]/g, ''),
+            ptt: false
+          }, { quoted: m });
+          await react('✅');
+        } catch (err) {
+          console.error('Error spotify:', err);
+          await react('❌');
+          await reply(`❌ Gagal mengunduh lagu dari Spotify.\n${err?.message ? `Detail: ${String(err.message).slice(0, 200)}` : ''}`.trim());
+        } finally {
+          if (spFile && fs.existsSync(spFile)) {
+            try { fs.unlinkSync(spFile); } catch (e) { console.error('Error hapus file spotify temp:', e); }
+          }
         }
       }
       break
