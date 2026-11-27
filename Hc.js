@@ -714,13 +714,30 @@ async function Hc(hc, m, db) {
       case 'readviewonce': case 'readviewone': case 'rvo': {
         if (!isQuoted) return reply(settings.mess.qud);
         try {
-          let viewOnceMsg = quoted;
-          if (viewOnceMsg.viewOnceMessage) viewOnceMsg = viewOnceMsg.viewOnceMessage.message;
-          else if (viewOnceMsg.viewOnceMessageV2) viewOnceMsg = viewOnceMsg.viewOnceMessageV2.message;
-          else if (viewOnceMsg.viewOnceMessageV2Extension) viewOnceMsg = viewOnceMsg.viewOnceMessageV2Extension.message;
-          const mediaType = getContentType(viewOnceMsg);
+          const buka = (x) => {
+            for (let i = 0; i < 3; i++) {
+              x = x?.ephemeralMessage?.message || x?.viewOnceMessage?.message
+              || x?.viewOnceMessageV2?.message || x?.viewOnceMessageV2Extension?.message || x;
+              
+            }
+            return x;
+            
+          };
+          let viewOnceMsg = buka(quoted);
+          let mediaType = getContentType(viewOnceMsg);
+          
+          if (!viewOnceMsg?.[mediaType]?.url && !viewOnceMsg?.[mediaType]?.directPath) {
+            const asli = buka(global.loadMessage?.(from, contextInfo.stanzaId)?.message);
+            if (asli) { viewOnceMsg = asli; mediaType = getContentType(asli); }
+          }
+          
           if (!mediaType || !/imageMessage|videoMessage|audioMessage/.test(mediaType)) {
+            
             return reply(`Reply pesan media View Once!\nContoh: *${prefix + command}*`);
+          }
+          
+          if (!viewOnceMsg[mediaType]?.url && !viewOnceMsg[mediaType]?.directPath) {
+            return reply('Media view once ini sudah tidak bisa diambil (bot belum menerimanya atau sudah kedaluwarsa).');
           }
           
           await react('⏳');
