@@ -31,7 +31,7 @@
 
 - Sc/Script ini masih dalam tahap pengembangan ❗
 - Terimakasih telah mengunjungi repositori ini.
-- Jangan mengkloning bot ini di malam hari kerena di malam hari owner sedang melakukan perubahan code code yang di kloning kemungkinan code yang error.
+- Jangan mengkloning bot ini di malam hari kerena di malam hari owner sedang melakukan perubahan code. code yang di kloning kemungkinan code yang error.
 
 # Run ⬇️
 
