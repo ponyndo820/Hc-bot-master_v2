@@ -22,6 +22,7 @@ import { exec, execFile, spawn, execSync } from 'child_process';
 import { getContentType, downloadMediaMessage, generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
 
 const require = createRequire(import.meta.url);
+const AFK_IGNORED_TYPES = new Set(['protocolMessage', 'senderKeyDistributionMessage', 'messageContextInfo', 'reactionMessage', 'encReactionMessage', 'pollUpdateMessage', 'keepInChatMessage', 'editedMessage']);
 const KNOWN_COMMANDS = new Set(
   [...fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').matchAll(/case\s+(['"])([^'"\n]+?)\1\s*:/g)]
     .map(x => x[2].toLowerCase())
@@ -31,6 +32,7 @@ import { igdl } from './lib/igdl.js';
 import settings from './settings.js';
 import { ytMp4 } from './lib/ytmp4.js';
 import { fishtCommand } from './game/fisht.js';
+import thumbnailUrl from './scrape/thumbnail.js';
 import { welcomeCommand } from './lib/welcome.js';
 import { sendAudioSticker } from './lib/saudio.js';
 import { UguuSe, webp2mp4File } from './lib/uploader.js';
@@ -75,12 +77,12 @@ async function Hc(hc, m, db) {
     const type = getContentType(msg);
     if (!type) return;
     
-    const body = (type === 'conversation') ? msg.conversation : 
+    let body = (type === 'conversation') ? msg.conversation : 
     (type === 'extendedTextMessage') ? msg.extendedTextMessage?.text :
     (type === 'imageMessage') ? msg.imageMessage?.caption : 
     (type === 'videoMessage') ? msg.videoMessage?.caption : 
     (type === 'interactiveResponMessage' && m.quoted) ? (m.message.interactiveResponseMessage?.nativeFlowResponseMessage?.singleSelectReply.selectedRowId || "" ) : '';
-    if (!body) return;
+    body = body || '';
     
     const sender = m.key.fromMe 
         ? (hc.user.id.split(':')[0] + '@s.whatsapp.net') 
@@ -112,7 +114,7 @@ async function Hc(hc, m, db) {
     }
     
     // Afk
-    if (!m.key.fromMe) {
+    if (!m.key.fromMe && !AFK_IGNORED_TYPES.has(type)) {
       
         let mentionUser = [...new Set([...(m.mentionedJid || []), ...(m.quoted ? [m.quoted.sender] : [])])];
         for (let jid of mentionUser) {
@@ -138,6 +140,7 @@ async function Hc(hc, m, db) {
     
     
     if (!isCmd && !global.activeAutoAI.has(sender) && !(sender in tebakbom) && !isTictactoeMove(from, sender, body)) return;
+    if (!body) return;
     
     const command = isCmd ? body.slice(prefix.length).trim().split(/ +/).shift().toLowerCase() : '';
     
@@ -354,7 +357,7 @@ async function Hc(hc, m, db) {
             externalAdReply: {
               title: author,
               body: 'Subsscribe My YouTube',
-              thumbnail: await getBuffer(pickRandom(settings.thumbnailUrl.url)),
+              thumbnail: await getBuffer(pickRandom(thumbnailUrl.url)),
               mediaType: 2,
               mediaUrl: settings.my.yt,
               sourceUrl: settings.my.yt,
@@ -1117,7 +1120,7 @@ async function Hc(hc, m, db) {
             externalAdReply: {
               title: author,
               body: 'Subsscribe My YouTube',
-              thumbnail: await getBuffer(pickRandom(settings.thumbnailUrl.url)),
+              thumbnail: await getBuffer(pickRandom(thumbnailUrl.url)),
               mediaType: 2,
               mediaUrl: settings.my.yt,
               sourceUrl: settings.my.yt,
@@ -1139,7 +1142,7 @@ async function Hc(hc, m, db) {
             externalAdReply: {
               title: author,
               body: 'Subsscribe My YouTube',
-              thumbnail: await getBuffer(pickRandom(settings.thumbnailUrl.url)),
+              thumbnail: await getBuffer(pickRandom(thumbnailUrl.url)),
               mediaType: 2,
               mediaUrl: settings.my.yt,
               sourceUrl: settings.my.yt,
@@ -2096,7 +2099,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
             externalAdReply: {
               title: author,
               body: 'Subsscribe My YouTube',
-              thumbnail: await getBuffer(pickRandom(settings.thumbnailUrl.url)),
+              thumbnail: await getBuffer(pickRandom(thumbnailUrl.url)),
               mediaType: 2,
               mediaUrl: settings.my.yt,
               sourceUrl: settings.my.yt,
@@ -2107,7 +2110,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
       break
       case 'id.2': {
         await hc.sendMessage(from, { 
-          image: { url: pickRandom(settings.thumbnailUrl.url) },
+                image: { url: pickRandom(thumbnailUrl.url) },
           caption: 'Tes.id.2' 
           
         }, { quoted: m })
@@ -2128,7 +2131,7 @@ _CPU Core(s) Usage (${cpus.length} Core CPU)_${cpus.map((cpu, i) => `${i + 1}. $
             externalAdReply: {
               title: author,
               body: 'Subsscribe My YouTube',
-              thumbnail: await getBuffer(pickRandom(settings.thumbnailUrl.url)),
+              thumbnail: await getBuffer(pickRandom(thumbnailUrl.url)),
               mediaType: 2,
               mediaUrl: settings.my.yt,
               sourceUrl: settings.my.yt,
